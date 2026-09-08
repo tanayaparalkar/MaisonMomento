@@ -1,0 +1,60 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+  <!-- Vintage Executive Welcome Banner -->
+  <div style="background: #241610; border-radius: 2px; padding: 22px 28px; color: #fbf8f2; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); border: 1px solid var(--vintage-brass); border-top: 3px solid var(--vintage-gold);">
+    <div>
+      <div style="font-family: var(--font-serif-display); font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--vintage-gold);">
+        MAISON MOMENTO &middot; RETAIL ARCHIVES &amp; CONSOLE
+      </div>
+      <p style="margin: 6px 0 0 0; color: #c9bfb5; font-size: 13px; font-family: var(--font-serif-body); font-style: italic;">
+        Apothecary catalog orchestration, fulfillment registers, inventory status, and fragrance recommendations.
+      </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <a href="{% url 'admin_analytics_dashboard' %}" class="button" style="background: #734827 !important; color: #fff9f0 !important; font-family: var(--font-serif-display) !important; font-weight: 700 !important; font-size: 11px !important; letter-spacing: 1px !important; padding: 10px 18px !important; text-decoration: none; border: 1px solid var(--vintage-gold) !important;">
+        Launch Analytics Ledger
+      </a>
+      <a href="{% url 'admin:catalog_product_add' %}" class="button" style="background: #3a2518 !important; color: #f7f2ea !important; font-family: var(--font-serif-display) !important; font-weight: 600 !important; font-size: 11px !important; letter-spacing: 1px !important; padding: 10px 16px !important; text-decoration: none; border: 1px solid var(--vintage-brass) !important;">
+        New Formulation
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Structure Guide -->
+  <div style="margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+    <a href="{% url 'admin:catalog_product_changelist' %}" style="text-decoration: none;">
+      <div class="kpi-card" style="padding: 16px;">
+        <div class="kpi-label">Catalog</div>
+        <div style="font-family: var(--font-serif-display); font-size: 14px; font-weight: 700; color: var(--vintage-leather); margin-top: 4px;">Formulations &amp; Families</div>
+        <div class="kpi-subtext">Manage olfactory notes, accords &amp; stock</div>
+      </div>
+    </a>
+    <a href="{% url 'admin:sales_order_changelist' %}" style="text-decoration: none;">
+      <div class="kpi-card" style="padding: 16px;">
+        <div class="kpi-label">Sales</div>
+        <div style="font-family: var(--font-serif-display); font-size: 14px; font-weight: 700; color: var(--vintage-leather); margin-top: 4px;">Orders &amp; Invoices</div>
+        <div class="kpi-subtext">Customer purchase register &amp; fulfillment</div>
+      </div>
+    </a>
+    <a href="{% url 'admin:customers_customer_changelist' %}" style="text-decoration: none;">
+      <div class="kpi-card" style="padding: 16px;">
+        <div class="kpi-label">Customers</div>
+        <div style="font-family: var(--font-serif-display); font-size: 14px; font-weight: 700; color: var(--vintage-leather); margin-top: 4px;">Client Profiles</div>
+        <div class="kpi-subtext">Order histories &amp; Firebase identifiers</div>
+      </div>
+    </a>
+    <a href="{% url 'admin:recommendations_userinteraction_changelist' %}" style="text-decoration: none;">
+      <div class="kpi-card" style="padding: 16px;">
+        <div class="kpi-label">Recommendations</div>
+        <div style="font-family: var(--font-serif-display); font-size: 14px; font-weight: 700; color: var(--vintage-leather); margin-top: 4px;">Interaction Logs</div>
+        <div class="kpi-subtext">Olfactory preference &amp; click affinity</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+{{ block.super }}
+{% endblock %}
