@@ -14,8 +14,9 @@ from django.core.files import File
 from apps.catalog.models import Category, Product, ProductImage
 from apps.sales.models import Order, OrderItem
 from apps.customers.models import Customer
-from apps.recommendations.models import UserInteraction
+from apps.recommendations.models import Interaction
 from apps.analytics.models import AnalyticsEvent
+from apps.tracking.models import VisitorSession
 
 
 class Command(BaseCommand):
@@ -442,7 +443,7 @@ class Command(BaseCommand):
             subtotal = Decimal("0.00")
             for prod in chosen_prods:
                 qty = random.choice([1, 1, 2])
-                price = prod.discount_price if prod.discount_price else prod.price
+                price = prod.effective_price
                 item_sub = price * qty
                 subtotal += item_sub
                 OrderItem.objects.create(
@@ -460,32 +461,43 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"[OK] Seeded {len(created_orders)} historical orders with items."))
 
-        # 7. Seed UserInteractions for Recommendation Engine & Analytics
+        # 7. Seed Interactions for Recommendation Engine & Analytics
         interactions_count = 0
         woody_prods = [p for p in product_objs if p.fragrance_family == "woody"]
         oud_prods = [p for p in product_objs if p.fragrance_family == "oud"]
         fresh_prods = [p for p in product_objs if p.fragrance_family == "fresh"]
         other_prods = [p for p in product_objs if p.fragrance_family not in ("woody", "oud", "fresh")]
 
+        # Create stable VisitorSession objects for each seeded customer
+        # These represent anonymous storefront sessions (no Django auth user attached)
+        visitor_sessions = {}
+        for cust in cust_objs:
+            session_id = f"seed_visitor_{cust.id}"
+            vs, _ = VisitorSession.objects.get_or_create(session_id=session_id)
+            visitor_sessions[cust.id] = vs
+
+        # Create a small pool of anonymous visitor sessions
+        anon_sessions = []
+        for i in range(5):
+            vs, _ = VisitorSession.objects.get_or_create(session_id=f"seed_anon_{i}")
+            anon_sessions.append(vs)
+
         # Seed focused interactions for Customer 0 (Victoria) heavily on Woody & Oud
         primary_cust = cust_objs[0]
+        primary_visitor = visitor_sessions[primary_cust.id]
         for prod in woody_prods * 4:
-            UserInteraction.objects.create(
-                user=primary_cust,
-                session_id=f"sess_{primary_cust.id}_rec",
+            Interaction.objects.create(
+                visitor=primary_visitor,
                 product=prod,
-                category=prod.category,
-                interaction_type="PRODUCT_CLICK" if random.random() > 0.4 else "PRODUCT_VIEW"
+                event_type="view",
             )
             interactions_count += 1
 
         for prod in oud_prods * 2:
-            UserInteraction.objects.create(
-                user=primary_cust,
-                session_id=f"sess_{primary_cust.id}_rec",
+            Interaction.objects.create(
+                visitor=primary_visitor,
                 product=prod,
-                category=prod.category,
-                interaction_type="PRODUCT_VIEW"
+                event_type="view",
             )
             interactions_count += 1
 
@@ -493,21 +505,22 @@ class Command(BaseCommand):
         for i in range(40):
             cust = random.choice(cust_objs + [None, None])
             prod = random.choice(product_objs)
-            sess = f"sess_guest_{random.randint(1000, 9999)}" if not cust else f"sess_user_{cust.id}"
-            itype = random.choice(["PRODUCT_VIEW", "PRODUCT_VIEW", "PRODUCT_CLICK"])
-            inter = UserInteraction.objects.create(
-                user=cust,
-                session_id=sess,
+            if cust:
+                visitor = visitor_sessions[cust.id]
+            else:
+                visitor = random.choice(anon_sessions)
+            itype = random.choice(["view", "view", "view"])
+            inter = Interaction.objects.create(
+                visitor=visitor,
                 product=prod,
-                category=prod.category,
-                interaction_type=itype
+                event_type=itype,
             )
             # Randomize timestamps within past 10 days
             past_time = now - timedelta(days=random.randint(0, 8), hours=random.randint(0, 23))
-            UserInteraction.objects.filter(id=inter.id).update(created_at=past_time)
+            Interaction.objects.filter(id=inter.id).update(created_at=past_time)
             interactions_count += 1
 
-        self.stdout.write(self.style.SUCCESS(f"[OK] Seeded {interactions_count} UserInteraction events for recommendation engine."))
+        self.stdout.write(self.style.SUCCESS(f"[OK] Seeded {interactions_count} Interaction events for recommendation engine."))
 
         # 8. Seed AnalyticsEvent records
         event_types = [

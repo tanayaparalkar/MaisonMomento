@@ -1,0 +1,150 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ action }} Product{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Product Management</p>
+        <h1>{{ action }} Product</h1>
+    </div>
+    <div>
+        <a href="{% url 'dashboard:products' %}" class="secondary-btn">Cancel</a>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: span 2;">
+                <label for="{{ form.name.id_for_label }}">Product Name</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.brand.id_for_label }}">Brand</label>
+                {{ form.brand }}
+                {{ form.brand.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.sku.id_for_label }}">SKU</label>
+                {{ form.sku }}
+                {{ form.sku.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.category.id_for_label }}">Category</label>
+                {{ form.category }}
+                {{ form.category.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.gender.id_for_label }}">Gender</label>
+                {{ form.gender }}
+                {{ form.gender.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.fragrance_family.id_for_label }}">Fragrance Family</label>
+                {{ form.fragrance_family }}
+                {{ form.fragrance_family.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.concentration.id_for_label }}">Concentration</label>
+                {{ form.concentration }}
+                {{ form.concentration.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.price.id_for_label }}">Regular Price (₹)</label>
+                {{ form.price }}
+                {{ form.price.errors }}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.discount_price.id_for_label }}">Discount Price (₹)</label>
+                {{ form.discount_price }}
+                <small>Optional</small>
+                {{ form.discount_price.errors }}
+            </div>
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label for="{{ form.description.id_for_label }}">Description</label>
+                {{ form.description }}
+                {{ form.description.errors }}
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                {{ form.is_featured }}
+                <label for="{{ form.is_featured.id_for_label }}" style="margin:0;">Featured Product</label>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                {{ form.is_active }}
+                <label for="{{ form.is_active.id_for_label }}" style="margin:0;">Active in Catalog</label>
+            </div>
+            
+            {% if product %}
+            <div class="form-group" style="grid-column: span 2; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px;">
+                <strong>Current Stock: {{ product.stock }}</strong>
+                <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--muted);">Stock cannot be edited directly here. Use the <a href="{% url 'dashboard:adjust_stock' product.id %}">Inventory Adjustment</a> tool.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <hr style="margin: 32px 0; border: none; border-top: 1px solid var(--border);">
+        
+        <h3>Product Images</h3>
+        <p style="color: var(--muted); font-size: 14px; margin-bottom: 16px;">Upload images and specify which should be the primary display image.</p>
+        
+        {{ formset.management_form }}
+        
+        <div style="display: grid; gap: 16px;">
+        {% for inline_form in formset %}
+            <div style="padding: 16px; border: 1px dashed var(--border); border-radius: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                {{ inline_form.id }}
+                {% if inline_form.instance.pk %}
+                    <div style="grid-column: span 2; display: flex; align-items: center; gap: 16px;">
+                        <img src="{{ inline_form.instance.image.url }}" alt="Preview" style="width: 64px; height: 64px; object-fit: cover; border-radius: 4px;">
+                        <div>
+                            <strong>Current Image</strong>
+                            <div style="font-size: 13px; color: var(--muted);">{{ inline_form.instance.image.name }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="form-group" style="grid-column: span 2;">
+                    {{ inline_form.image.label_tag }}
+                    {{ inline_form.image }}
+                </div>
+                <div class="form-group">
+                    {{ inline_form.alt_text.label_tag }}
+                    {{ inline_form.alt_text }}
+                </div>
+                <div class="form-group">
+                    {{ inline_form.display_order.label_tag }}
+                    {{ inline_form.display_order }}
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                    {{ inline_form.is_primary }}
+                    {{ inline_form.is_primary.label_tag }}
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 8px; color: #ef4444;">
+                    {{ inline_form.DELETE }}
+                    {{ inline_form.DELETE.label_tag }}
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+        <div style="margin-top: 32px;">
+            <button class="primary-btn" type="submit">Save Product</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

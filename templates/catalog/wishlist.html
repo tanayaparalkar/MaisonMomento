@@ -1,0 +1,39 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}My Collection | Maison Momento Parfumeur{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="sf-hero" style="min-height: 30vh; margin-bottom: 40px; padding: 60px 24px;">
+    <div class="sf-hero-content">
+        <div class="sf-hero-eyebrow">Wishlist</div>
+        <h1 style="font-size: clamp(40px, 5vw, 64px);">My Collection</h1>
+        <p>Your curated selection of artisan fragrances.</p>
+    </div>
+</section>
+
+<!-- Collection Grid -->
+<section class="sf-section" style="padding-top: 0; min-height: 40vh;">
+    <div class="sf-container">
+        {% if products %}
+            <div class="sf-grid">
+                {% for product in products %}
+                    {% include "catalog/includes/product_card.html" %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Premium Empty State -->
+            <div class="sf-empty-state" style="text-align: center; padding: 80px 24px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted); margin-bottom: 24px;">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                <h2 class="sf-empty-title" style="font-family: var(--font-display); font-size: 28px; color: var(--charcoal); font-weight: 400; margin-bottom: 16px;">Your Collection Awaits</h2>
+                <p class="sf-empty-desc" style="font-size: 15px; color: var(--charcoal-soft); max-width: 400px; margin: 0 auto 32px; line-height: 1.6;">You haven't saved any fragrances yet. Explore our curated selection to find your perfect scent.</p>
+                <a href="{% url 'catalog:product_list' %}" class="primary-btn" style="display: inline-flex; width: auto; padding: 0 32px;">
+                    Browse Fragrances
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

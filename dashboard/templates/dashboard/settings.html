@@ -1,0 +1,122 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Maison Momento · Workspace Configuration</p>
+        <h1>Settings</h1>
+        <p class="subtitle">
+            Manage the Maison’s operational preferences, communication settings, and account security.
+        </p>
+    </div>
+</section>
+
+<section class="panel">
+    <p class="eyebrow">Business profile</p>
+    <h3>Store information</h3>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="store-name">Store name</label>
+            <input
+                id="store-name"
+                type="text"
+                value="Maison Momento"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="store-email">Email</label>
+            <input
+                id="store-email"
+                type="email"
+                value="admin@maisonmomento.com"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="store-phone">Phone</label>
+            <input
+                id="store-phone"
+                type="tel"
+                value="+91 9876543210"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="store-currency">Currency</label>
+            <select id="store-currency">
+                <option selected>INR (₹)</option>
+                <option>USD ($)</option>
+                <option>EUR (€)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="settings-actions">
+        <button class="primary-btn" type="button">
+            Save changes
+        </button>
+    </div>
+</section>
+
+<section class="panel">
+    <p class="eyebrow">Communications</p>
+    <h3>Notifications</h3>
+
+    <div class="settings-options">
+        <label class="setting-option">
+            <span class="setting-option-copy">
+                <span class="setting-option-title">Inventory alerts</span>
+                <span class="setting-option-description">
+                    Receive a notification when fragrance stock requires attention.
+                </span>
+            </span>
+
+            <input type="checkbox" checked>
+            <span class="toggle-switch" aria-hidden="true"></span>
+        </label>
+
+        <label class="setting-option">
+            <span class="setting-option-copy">
+                <span class="setting-option-title">Weekly reports</span>
+                <span class="setting-option-description">
+                    Receive a weekly overview of sales, inventory, and client activity.
+                </span>
+            </span>
+
+            <input type="checkbox" checked>
+            <span class="toggle-switch" aria-hidden="true"></span>
+        </label>
+
+        <label class="setting-option">
+            <span class="setting-option-copy">
+                <span class="setting-option-title">Promotional emails</span>
+                <span class="setting-option-description">
+                    Receive Maison announcements, feature releases, and product updates.
+                </span>
+            </span>
+
+            <input type="checkbox">
+            <span class="toggle-switch" aria-hidden="true"></span>
+        </label>
+    </div>
+</section>
+
+<section class="panel">
+    <p class="eyebrow">Account protection</p>
+    <h3>Security</h3>
+
+    <p class="subtitle settings-description">
+        Maintain the security of your workspace by reviewing your credentials regularly.
+    </p>
+
+    <div class="settings-actions">
+        <button class="primary-btn" type="button">
+            Change password
+        </button>
+    </div>
+</section>
+{% endblock %}

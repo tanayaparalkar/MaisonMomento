@@ -1,0 +1,153 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Recommendations{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Maison Momento · Intelligence</p>
+        <h1>Considered opportunities.</h1>
+        <p class="subtitle">
+            Surface timely product, inventory, and client opportunities to guide the Maison’s next considered move.
+        </p>
+    </div>
+</section>
+
+<section class="stats-grid" aria-label="Recommendation overview">
+    <article class="stat-card revenue">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">✦</div>
+            <span class="stat-change positive">+38%</span>
+        </div>
+
+        <span class="stat-title">Trending fragrance</span>
+
+        <h2 class="text-stat">Royal Oud</h2>
+
+        <small>Demand continues to rise</small>
+    </article>
+
+    <article class="stat-card orders">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">◐</div>
+            <span class="stat-change negative">12</span>
+        </div>
+
+        <span class="stat-title">Restock</span>
+
+        <h2 data-counter="12">
+            12
+        </h2>
+
+        <small>Products running low</small>
+    </article>
+
+    <article class="stat-card customers">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">◎</div>
+            <span class="stat-change positive">8</span>
+        </div>
+
+        <span class="stat-title">Cross-sell</span>
+
+        <h2 data-counter="8">
+            8
+        </h2>
+
+        <small>Recommended pairings</small>
+    </article>
+
+    <article class="stat-card products">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">◈</div>
+            <span class="stat-change positive">30 days</span>
+        </div>
+
+        <span class="stat-title">Predicted revenue</span>
+
+        <h2 data-counter="1260000" data-prefix="₹" data-suffix="L" data-display-value="12.6">
+            ₹12.6L
+        </h2>
+
+        <small>Projected next 30 days</small>
+    </article>
+</section>
+
+<section class="panel">
+    <p class="eyebrow">AI-guided direction</p>
+    <h3>Recommended actions</h3>
+
+    <table class="products-table">
+        <thead>
+            <tr>
+                <th scope="col">Recommendation</th>
+                <th scope="col">Rationale</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Potential impact</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr class="stagger-item">
+                <td>Restock Royal Oud Imperial</td>
+                <td>Demand has increased by 38%</td>
+                <td>
+                    <span class="status shipped">
+                        High
+                    </span>
+                </td>
+                <td>
+                    <span class="recommendation-stars" data-stars="5" aria-label="5 out of 5 impact">
+                        ★★★★★
+                    </span>
+                </td>
+            </tr>
+
+            <tr class="stagger-item">
+                <td>Bundle Oud + Amber Collection</td>
+                <td>Frequently purchased together</td>
+                <td>
+                    <span class="status packing">
+                        Medium
+                    </span>
+                </td>
+                <td>
+                    <span class="recommendation-stars" data-stars="4" aria-label="4 out of 5 impact">
+                        ★★★★☆
+                    </span>
+                </td>
+            </tr>
+
+            <tr class="stagger-item">
+                <td>Promote Citrus Collection</td>
+                <td>Seasonal demand detected</td>
+                <td>
+                    <span class="status packing">
+                        Medium
+                    </span>
+                </td>
+                <td>
+                    <span class="recommendation-stars" data-stars="4" aria-label="4 out of 5 impact">
+                        ★★★★☆
+                    </span>
+                </td>
+            </tr>
+
+            <tr class="stagger-item">
+                <td>Review Ambre Nuit positioning</td>
+                <td>Inventory movement has slowed</td>
+                <td>
+                    <span class="status delivered">
+                        Low
+                    </span>
+                </td>
+                <td>
+                    <span class="recommendation-stars" data-stars="3" aria-label="3 out of 5 impact">
+                        ★★★☆☆
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+{% endblock %}

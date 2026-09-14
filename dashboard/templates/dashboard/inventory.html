@@ -1,0 +1,108 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Maison Momento · Stock Management</p>
+        <h1>Inventory.</h1>
+        <p class="subtitle">
+            Real-time inventory health — {{ inventory.total_products }} active products.
+        </p>
+    </div>
+</section>
+
+{# ── Summary cards ───────────────────────────────────────────────── #}
+<section class="stats-grid">
+    <article class="stat-card customers">
+        <span class="stat-title">In Stock</span>
+        <h2>{{ inventory.in_stock_count }}</h2>
+        <small>Above {{ inventory.threshold }} units</small>
+    </article>
+    <article class="stat-card" style="{% if inventory.low_stock_count > 0 %}border-color:#f59e0b;{% endif %}">
+        <span class="stat-title">Low Stock</span>
+        <h2>{{ inventory.low_stock_count }}</h2>
+        <small>1–{{ inventory.threshold }} units remaining</small>
+    </article>
+    <article class="stat-card" style="{% if inventory.out_of_stock_count > 0 %}border-color:#ef4444;{% endif %}">
+        <span class="stat-title">Out of Stock</span>
+        <h2>{{ inventory.out_of_stock_count }}</h2>
+        <small>Zero units available</small>
+    </article>
+</section>
+
+{# ── Out of stock ────────────────────────────────────────────────── #}
+{% if inventory.out_of_stock_products %}
+<section class="panel" style="border-left: 3px solid #ef4444; margin-bottom: 24px;">
+    <p class="eyebrow">Immediate action required</p>
+    <h3>Out of Stock ({{ inventory.out_of_stock_count }})</h3>
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in inventory.out_of_stock_products %}
+            <tr class="stagger-item">
+                <td>{{ p.name }}</td>
+                <td style="font-family:monospace;font-size:12px;">{{ p.sku }}</td>
+                <td>{{ p.category.name|default:"—" }}</td>
+                <td style="color:#ef4444;font-weight:700;">0</td>
+                <td>
+                    <a href="{% url 'dashboard:adjust_stock' p.id %}" style="font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; margin-right: 12px;">Adjust</a>
+                    <a href="{% url 'dashboard:stock_history' p.id %}" style="font-size: 12px; color: var(--muted); text-decoration: none;">History</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endif %}
+
+{# ── Low stock ───────────────────────────────────────────────────── #}
+{% if inventory.low_stock_products %}
+<section class="panel" style="border-left: 3px solid #f59e0b;">
+    <p class="eyebrow">Reorder soon</p>
+    <h3>Low Stock ({{ inventory.low_stock_count }})</h3>
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in inventory.low_stock_products %}
+            <tr class="stagger-item">
+                <td>{{ p.name }}</td>
+                <td style="font-family:monospace;font-size:12px;">{{ p.sku }}</td>
+                <td>{{ p.category.name|default:"—" }}</td>
+                <td style="color:#f59e0b;font-weight:700;">{{ p.stock }}</td>
+                <td>
+                    <a href="{% url 'dashboard:adjust_stock' p.id %}" style="font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; margin-right: 12px;">Adjust</a>
+                    <a href="{% url 'dashboard:stock_history' p.id %}" style="font-size: 12px; color: var(--muted); text-decoration: none;">History</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endif %}
+
+{% if not inventory.low_stock_products and not inventory.out_of_stock_products %}
+<section class="panel" style="text-align:center; padding: 48px;">
+    <p style="font-size:32px; margin-bottom:12px;">✓</p>
+    <h3>All products in stock</h3>
+    <p style="color:var(--muted);">No inventory alerts at this time.</p>
+</section>
+{% endif %}
+{% endblock %}

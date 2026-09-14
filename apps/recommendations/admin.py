@@ -1,43 +1,66 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
-from .models import UserInteraction
+from .models import Interaction
 
 
-@admin.register(UserInteraction)
-class UserInteractionAdmin(admin.ModelAdmin):
-    list_display = [
-        "actor_display",
-        "interaction_type_badge",
+@admin.register(Interaction)
+class InteractionAdmin(admin.ModelAdmin):
+    list_display = (
+        "visitor_display",
         "product",
-        "category",
+        "event_badge",
         "created_at",
-    ]
-    list_filter = ["interaction_type", "category", "created_at"]
-    search_fields = ["user__first_name", "user__last_name", "session_id", "product__name", "category__name"]
-    autocomplete_fields = ["product", "category", "user"]
-    readonly_fields = ["created_at"]
-    ordering = ["-created_at"]
+    )
 
-    def actor_display(self, obj):
-        if obj.user:
-            return format_html(
-                '<strong>{}</strong> <span style="color:#64748b; font-size:11px;">({})</span>',
-                obj.user.full_name,
-                obj.user.email
-            )
-        return format_html('<span style="font-family: monospace; color: #475569;">Session {}</span>', obj.session_id[:12])
+    list_filter = (
+        "event_type",
+        "created_at",
+    )
 
-    actor_display.short_description = "User / Session"
+    search_fields = (
+        "visitor__session_id",
+        "product__name",
+    )
 
-    def interaction_type_badge(self, obj):
-        if obj.interaction_type == "PRODUCT_CLICK":
-            return mark_safe(
-                '<span style="background: #fdf5e6; color: #7a5416; border: 1px solid #dbc493; padding: 2px 7px; border-radius: 2px; font-weight: 700; font-size: 10px; font-family: Courier Prime, monospace;">CLICK</span>'
-            )
-        return mark_safe(
-            '<span style="background: #eee8dc; color: #473831; border: 1px solid #d0c7b7; padding: 2px 7px; border-radius: 2px; font-weight: 700; font-size: 10px; font-family: Courier Prime, monospace;">VIEW</span>'
+    autocomplete_fields = (
+        "visitor",
+        "product",
+    )
+
+    readonly_fields = (
+        "created_at",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    def visitor_display(self, obj):
+        return format_html(
+            '<span style="font-family: monospace;">{}</span>',
+            obj.visitor.session_id[:12],
         )
 
-    interaction_type_badge.short_description = "Interaction"
-    interaction_type_badge.admin_order_field = "interaction_type"
+    visitor_display.short_description = "Visitor"
+
+    def event_badge(self, obj):
+        colors = {
+            "view": ("#EEE8DC", "#473831"),
+            "search": ("#E6F3FF", "#1E3A8A"),
+            "wishlist": ("#FCE7F3", "#9D174D"),
+            "cart": ("#FEF3C7", "#92400E"),
+            "purchase": ("#DCFCE7", "#166534"),
+            "recommendation_click": ("#EDE9FE", "#5B21B6"),
+        }
+
+        bg, fg = colors.get(obj.event_type, ("#F3F4F6", "#374151"))
+
+        return format_html(
+            '<span style="background:{}; color:{}; border:1px solid {}; padding:3px 8px; border-radius:4px; font-weight:600;">{}</span>',
+            bg,
+            fg,
+            fg,
+            obj.get_event_type_display(),
+        )
+
+    event_badge.short_description = "Event"

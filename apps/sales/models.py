@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 from django.db import models
 from django.utils import timezone
 
@@ -12,12 +13,13 @@ class Order(models.Model):
     ]
 
     ORDER_STATUS_CHOICES = [
-        ("pending", "Pending"),
+        ("pending",   "Pending"),
         ("confirmed", "Confirmed"),
-        ("processing", "Processing"),
-        ("shipped", "Shipped"),
+        ("packed",    "Packed"),
+        ("shipped",   "Shipped"),
         ("delivered", "Delivered"),
         ("cancelled", "Cancelled"),
+        ("refunded",  "Refunded"),
     ]
 
     order_number = models.CharField(max_length=36, unique=True, editable=False, db_index=True)
@@ -33,10 +35,10 @@ class Order(models.Model):
     email = models.EmailField(help_text="Customer notification email")
     phone = models.CharField(max_length=32, help_text="Contact telephone number")
     shipping_address = models.TextField(help_text="Complete physical delivery address")
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default="pending", db_index=True)
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default="pending", db_index=True)
     notes = models.TextField(blank=True, help_text="Internal notes or customer delivery instructions")
@@ -89,6 +91,63 @@ class OrderItem(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.unit_price and self.product:
-            self.unit_price = self.product.discount_price if self.product.discount_price else self.product.price
+            self.unit_price = self.product.effective_price
         self.subtotal = self.unit_price * self.quantity
         super().save(*args, **kwargs)
+
+
+class Cart(models.Model):
+    customer = models.OneToOneField(
+        "customers.Customer",
+        on_delete=models.CASCADE,
+        related_name="cart"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Cart"
+        verbose_name_plural = "Carts"
+
+    def __str__(self):
+        return f"Cart for {self.customer.email}"
+
+    @property
+    def total_items(self):
+        result = self.items.aggregate(total=models.Sum('quantity'))['total']
+        return result if result is not None else 0
+
+    @property
+    def subtotal(self):
+        return sum(item.line_total for item in self.items.all())
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(
+        Cart,
+        on_delete=models.CASCADE,
+        related_name="items"
+    )
+    product = models.ForeignKey(
+        "catalog.Product",
+        on_delete=models.CASCADE,
+        related_name="cart_items"
+    )
+    quantity = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Cart Item"
+        verbose_name_plural = "Cart Items"
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["cart", "product"], name="unique_cart_product")
+        ]
+
+    def __str__(self):
+        return f"{self.quantity}x {self.product.name} in Cart"
+
+    @property
+    def line_total(self):
+        return self.product.effective_price * self.quantity

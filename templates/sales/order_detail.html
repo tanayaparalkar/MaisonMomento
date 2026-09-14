@@ -1,0 +1,163 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Order #{{ order.order_number }} | Maison Momento{% endblock %}
+
+{% block content %}
+<main class="sf-container" style="padding-top: 120px; padding-bottom: 120px; max-width: 900px;">
+    
+    <!-- Back Link -->
+    <a href="{% url 'sales:my_orders' %}" style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); text-decoration: none; margin-bottom: 48px;">
+        &larr; Back to My Orders
+    </a>
+
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; margin-bottom: 48px;">
+        <div>
+            <div style="font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 16px;">
+                Order Details
+            </div>
+            <h1 style="font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px); font-weight: 400; color: var(--charcoal); line-height: 1.1;">
+                #{{ order.order_number }}
+            </h1>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px;">
+                Placed on
+            </div>
+            <div style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--charcoal);">
+                {{ order.created_at|date:"F j, Y" }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    <div style="background: var(--bg-alt); padding: 48px 32px; border: 1px solid var(--border); margin-bottom: 48px;">
+        <h2 style="font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); font-weight: 600; margin-bottom: 32px; text-align: center;">
+            Order Status
+        </h2>
+
+        {% if is_cancelled %}
+            <div style="text-align: center; color: #ef4444; font-family: var(--font-sans); font-size: 14px; font-weight: 600; padding: 16px; background: #fef2f2; border-radius: 4px;">
+                This order has been cancelled.
+            </div>
+        {% elif is_refunded %}
+            <div style="text-align: center; color: #f59e0b; font-family: var(--font-sans); font-size: 14px; font-weight: 600; padding: 16px; background: #fffbeb; border-radius: 4px;">
+                This order has been refunded.
+            </div>
+        {% else %}
+            <!-- Desktop/Responsive Timeline -->
+            <div class="sf-timeline" style="display: flex; justify-content: space-between; position: relative; max-width: 600px; margin: 0 auto;">
+                
+                <!-- Connecting Line -->
+                <div style="position: absolute; top: 12px; left: 10%; right: 10%; height: 2px; background: var(--border); z-index: 0;"></div>
+                
+                <!-- Progress Line -->
+                {% if status_index > 0 %}
+                <div style="position: absolute; top: 12px; left: 10%; height: 2px; background: var(--charcoal); z-index: 1; transition: width 0.5s ease; width: calc({{ status_index }} / {{ timeline_steps|length|add:"-1" }} * 80%);"></div>
+                {% endif %}
+
+                {% for key, label in timeline_steps %}
+                    <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; flex: 1;">
+                        {% if forloop.counter0 <= status_index %}
+                            <!-- Completed / Current Step -->
+                            <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--charcoal); border: 4px solid var(--bg-alt); display: flex; align-items: center; justify-content: center;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </div>
+                            <span style="font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--charcoal); font-weight: 600;">{{ label }}</span>
+                        {% else %}
+                            <!-- Future Step -->
+                            <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--border); border: 4px solid var(--bg-alt);"></div>
+                            <span style="font-family: var(--font-sans); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600;">{{ label }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Details Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 48px; align-items: start;" class="sf-order-grid">
+        
+        <!-- Left: Items -->
+        <div>
+            <h2 style="font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); font-weight: 600; margin-bottom: 24px;">
+                Items in this order
+            </h2>
+
+            <div class="sf-product-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                {% for item in order.items.all %}
+                    {% include "catalog/includes/product_card.html" with product=item.product %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right: Summary & Addresses -->
+        <div style="display: flex; flex-direction: column; gap: 32px;">
+            <!-- Order Totals -->
+            <div style="background: var(--bg-alt); padding: 28px;">
+                <h2 style="font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); font-weight: 600; margin-bottom: 20px;">
+                    Order Summary
+                </h2>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; font-family: var(--font-sans); font-size: 14px; color: var(--charcoal-soft); margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Subtotal</span>
+                        <span>₹{{ order.subtotal }}</span>
+                    </div>
+                    {% if order.discount > 0 %}
+                    <div style="display: flex; justify-content: space-between; color: var(--charcoal);">
+                        <span>Discount</span>
+                        <span>-₹{{ order.discount }}</span>
+                    </div>
+                    {% endif %}
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Shipping</span>
+                        <span>₹{{ order.shipping_cost }}</span>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border); padding-top: 20px; display: flex; justify-content: space-between; align-items: baseline;">
+                    <span style="font-family: var(--font-sans); font-size: 14px; font-weight: 600; color: var(--charcoal);">Total</span>
+                    <span style="font-family: 'Courier Prime', monospace; font-size: 22px; font-weight: 700; color: var(--charcoal);">₹{{ order.total }}</span>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div style="border: 1px solid var(--border); padding: 28px;">
+                <h2 style="font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); font-weight: 600; margin-bottom: 16px;">
+                    Delivered To
+                </h2>
+                <div style="font-family: var(--font-sans); font-size: 14px; color: var(--charcoal); font-weight: 600; margin-bottom: 4px;">
+                    {{ order.customer_name }}
+                </div>
+                <div style="font-family: var(--font-sans); font-size: 14px; color: var(--charcoal-soft); line-height: 1.7; white-space: pre-line;">{{ order.shipping_address }}</div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<style>
+@media (max-width: 768px) {
+    .sf-order-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .sf-timeline {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 24px;
+        padding-left: 12px;
+    }
+    .sf-timeline > div[style*="position: absolute"] {
+        /* Hide horizontal lines on mobile */
+        display: none !important;
+    }
+    .sf-timeline > div {
+        flex-direction: row !important;
+        width: 100%;
+        gap: 16px !important;
+    }
+}
+</style>
+{% endblock %}

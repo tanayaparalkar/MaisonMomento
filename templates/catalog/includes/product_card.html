@@ -1,0 +1,47 @@
+<article class="sf-product-card" {% if custom_style %}style="{{ custom_style }}"{% endif %}>
+    <div style="position: relative; height: 100%;">
+        <a href="{% url 'catalog:product_detail' product.pk %}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
+            <div class="sf-card-image-wrap" {% if no_border_radius %}style="margin-bottom: 0; border-radius: 0;"{% endif %}>
+                {% if not hide_badge %}
+                    {% if badge_text %}
+                        <div class="sf-badge-rec">{{ badge_text }}</div>
+                    {% else %}
+                        <div class="sf-badge">{{ product.category.name }}</div>
+                    {% endif %}
+                {% endif %}
+                
+                {% if product.primary_image %}
+                    <img src="{{ product.primary_image.image.url }}" alt="{{ product.primary_image.alt_text|default:product.name }}" class="sf-card-image" loading="lazy">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=600&auto=format&fit=crop" alt="Fallback image for {{ product.name }}" class="sf-card-image" loading="lazy">
+                {% endif %}
+            </div>
+            <div class="sf-card-content" {% if custom_padding %}style="{{ custom_padding }}"{% endif %}>
+                <h3 class="sf-card-title" {% if large_title %}style="font-size: 18px;"{% endif %}>{{ product.name }}</h3>
+                <p class="sf-card-desc" {% if large_desc_margin %}style="margin-bottom: 24px;"{% endif %}>{{ product.description|truncatewords:15 }}</p>
+                <div class="sf-card-footer">
+                    <span class="sf-card-price">₹{{ product.effective_price }}</span>
+                    {% if alternate_footer %}
+                        <span style="color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em;">View &rarr;</span>
+                    {% elif product.stock == 0 %}
+                        <button class="secondary-btn" disabled style="min-height: 36px; padding: 0 16px; font-size: 9px; opacity: 0.45; cursor: not-allowed;">Out of Stock</button>
+                    {% else %}
+                        <button class="secondary-btn sf-add-to-cart" data-product="{{ product.id }}" style="min-height: 36px; padding: 0 16px; font-size: 9px; cursor: pointer; position: relative; z-index: 2;">Add to Bag</button>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        
+        <!-- Wishlist Heart -->
+        <button class="sf-wishlist-toggle {% if product.id in wishlisted_product_ids %}is-active{% endif %}" 
+                data-url="{% url 'catalog:toggle_wishlist' product.pk %}" 
+                aria-label="Toggle Wishlist"
+                style="position: absolute; top: 12px; right: 12px; z-index: 2;">
+            {% if product.id in wishlisted_product_ids %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            {% else %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            {% endif %}
+        </button>
+    </div>
+</article>

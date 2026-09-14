@@ -1,0 +1,16 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Page Not Found | Maison Momento Parfumeur{% endblock %}
+
+{% block content %}
+<section class="sf-hero" style="min-height: 80vh; background-image: url('https://images.unsplash.com/photo-1615634260167-c8cdede054de?q=80&w=2000&auto=format&fit=crop');">
+    <div class="sf-hero-content">
+        <div class="sf-hero-eyebrow">404</div>
+        <h1 style="font-size: clamp(36px, 5vw, 64px);">Fragrance Lost</h1>
+        <p style="margin-bottom: 40px;">The specific olfactory note you are searching for cannot be found in our current archives. It may have been discontinued or the path was incorrectly entered.</p>
+        <a href="{% url 'catalog:product_list' %}" class="primary-btn sf-btn-large" style="display: inline-flex; width: auto; padding: 0 32px;">
+            Return to Collection
+        </a>
+    </div>
+</section>
+{% endblock %}

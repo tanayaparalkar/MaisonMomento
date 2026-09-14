@@ -43,3 +43,19 @@ class Customer(models.Model):
     @property
     def last_order(self):
         return self.orders.order_by("-created_at").first()
+
+class Wishlist(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="wishlist")
+    product = models.ForeignKey("catalog.Product", on_delete=models.CASCADE, related_name="wishlisted_by")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Wishlist Item"
+        verbose_name_plural = "Wishlist Items"
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["customer", "product"], name="unique_customer_wishlist")
+        ]
+
+    def __str__(self):
+        return f"{self.customer.email} - {self.product.name}"

@@ -1,0 +1,126 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Orders{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Maison Momento · Order Management</p>
+        <h1>Orders</h1>
+        <p class="subtitle">
+            Oversee client purchases, payments, fulfilment, and delivery with quiet precision.
+        </p>
+    </div>
+    <div>
+        <a href="{% url 'dashboard:export_data' %}?type=orders" class="secondary-btn">Export CSV</a>
+    </div>
+</section>
+
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 16px; border-radius: 4px; font-size: 14px; font-weight: 600; {% if message.tags == 'error' %}background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;{% elif message.tags == 'warning' %}background: #fffbeb; color: #f59e0b; border: 1px solid #fcd34d;{% else %}background: #f0fdf4; color: #10b981; border: 1px solid #6ee7b7;{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<section class="toolbar" aria-label="Order controls" style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
+    <form method="GET" action="{% url 'dashboard:orders' %}" style="display: flex; gap: 12px; align-items: center; width: 100%;">
+        <input
+            type="text"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Search by order number or customer"
+            class="search-box"
+            style="flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px;"
+        >
+        
+        <select name="status" style="padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+            <option value="">All Statuses</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="payment_status" style="padding: 8px; border: 1px solid var(--border); border-radius: 4px;">
+            <option value="">All Payments</option>
+            {% for value, label in payment_choices %}
+                <option value="{{ value }}" {% if payment_filter == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="primary-btn" style="padding: 8px 16px;">Filter</button>
+        <a href="{% url 'dashboard:orders' %}" class="secondary-btn" style="padding: 8px 16px; text-decoration: none;">Clear</a>
+    </form>
+</section>
+
+<section class="panel">
+    <h3>Order Register</h3>
+
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th scope="col">Order</th>
+                <th scope="col">Client</th>
+                <th scope="col">Date</th>
+                <th scope="col">Status</th>
+                <th scope="col">Payment</th>
+                <th scope="col">Total</th>
+                <th scope="col" style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for order in orders %}
+            <tr class="stagger-item">
+                <td style="font-family: monospace; font-size: 13px;">#{{ order.order_number }}</td>
+                <td>
+                    <div style="font-weight: 600; color: var(--charcoal);">{{ order.customer.full_name|default:"Guest" }}</div>
+                    <div style="font-size: 12px; color: var(--muted);">{{ order.customer.email|default:"-" }}</div>
+                </td>
+                <td style="font-size: 13px;">{{ order.created_at|date:"M d, Y" }}</td>
+                <td>
+                    <span class="status {{ order.order_status }}">
+                        {{ order.get_order_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <span class="status" style="
+                        {% if order.payment_status == 'paid' %}background: #d1fae5; color: #059669;
+                        {% elif order.payment_status == 'failed' %}background: #fee2e2; color: #dc2626;
+                        {% elif order.payment_status == 'refunded' %}background: #f3f4f6; color: #4b5563;
+                        {% else %}background: #fef3c7; color: #d97706;{% endif %}
+                    ">
+                        {{ order.get_payment_status_display }}
+                    </span>
+                </td>
+                <td style="font-weight: 600;">₹{{ order.total|floatformat:0 }}</td>
+                <td style="text-align: right;">
+                    <a href="{% url 'dashboard:order_detail' order.id %}" class="table-btn" style="text-decoration: none;">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px 0;">No orders found matching your criteria.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if orders.has_other_pages %}
+    <div style="margin-top: 24px; display: flex; gap: 8px; justify-content: center;">
+        {% if orders.has_previous %}
+            <a href="?page={{ orders.previous_page_number }}&q={{ search_query }}&status={{ status_filter }}&payment_status={{ payment_filter }}" class="secondary-btn" style="padding: 4px 12px; font-size: 12px;">&laquo; Prev</a>
+        {% endif %}
+        
+        <span style="font-size: 12px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 2px;">
+            Page {{ orders.number }} of {{ orders.paginator.num_pages }}
+        </span>
+
+        {% if orders.has_next %}
+            <a href="?page={{ orders.next_page_number }}&q={{ search_query }}&status={{ status_filter }}&payment_status={{ payment_filter }}" class="secondary-btn" style="padding: 4px 12px; font-size: 12px;">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

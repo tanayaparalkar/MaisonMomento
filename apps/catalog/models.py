@@ -132,6 +132,10 @@ class Product(models.Model):
             primary = self.images.order_by("display_order", "id").first()
         return primary
 
+    @property
+    def effective_price(self):
+        return self.discount_price if self.discount_price else self.price
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(

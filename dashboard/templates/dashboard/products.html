@@ -1,0 +1,307 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Maison Momento · Inventory Management</p>
+        <h1>The fragrance library.</h1>
+        <p class="subtitle">
+            Curate the Maison’s collection, monitor availability, and maintain each scent with considered detail.
+        </p>
+    </div>
+
+    <button class="primary-btn" id="openModal" type="button">
+        Add fragrance
+    </button>
+</section>
+
+<section class="toolbar" aria-label="Product controls">
+    <input
+        type="text"
+        placeholder="Search fragrances"
+        class="search-box"
+        aria-label="Search fragrances"
+    >
+
+    <div class="filters" role="group" aria-label="Filter fragrances by stock level">
+        <button class="filter active" type="button">
+            All
+        </button>
+
+        <button class="filter" type="button">
+            In stock
+        </button>
+
+        <button class="filter" type="button">
+            Low stock
+        </button>
+
+        <button class="filter" type="button">
+            Out of stock
+        </button>
+    </div>
+</section>
+
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Catalog Management</p>
+        <h1>Products.</h1>
+        <p class="subtitle">
+            Manage your catalog, stock levels, and active status.
+        </p>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="{% url 'dashboard:product_create' %}" class="primary-btn">Add Product</a>
+        <a href="{% url 'dashboard:export_data' %}?type=inventory" class="secondary-btn">Export CSV</a>
+    </div>
+</section>
+
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 16px; border-radius: 4px; font-size: 14px; font-weight: 600; {% if message.tags == 'error' %}background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;{% elif message.tags == 'warning' %}background: #fffbeb; color: #f59e0b; border: 1px solid #fcd34d;{% else %}background: #f0fdf4; color: #10b981; border: 1px solid #6ee7b7;{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<section class="panel">
+    <form method="POST" action="{% url 'dashboard:products' %}">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>All Products</h3>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <select name="action" class="form-control" style="padding: 4px 8px; height: auto; min-width: 150px;">
+                    <option value="">Bulk Actions...</option>
+                    <option value="activate">Activate Selected</option>
+                    <option value="deactivate">Deactivate Selected</option>
+                    <option value="archive">Archive (Soft Delete)</option>
+                    <option value="restock">Restock (+10 units)</option>
+                </select>
+                <button type="submit" class="secondary-btn" style="padding: 6px 12px;">Apply</button>
+            </div>
+        </div>
+
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th style="width: 40px;"><input type="checkbox" id="select-all" onclick="toggleCheckboxes(this)"></th>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for product in products %}
+            <tr class="product-row stagger-item {% if not product.is_active %}opacity-50{% endif %}">
+                <td><input type="checkbox" name="selected_products" value="{{ product.id }}"></td>
+                <td>
+                    <div class="product-cell">
+                        <div class="product-image" aria-hidden="true" style="{% if product.primary_image %}background-image: url('{{ product.primary_image.image.url }}'); background-size: cover;{% endif %}"></div>
+                        <div>
+                            <strong>{{ product.name }}</strong> {% if not product.is_active %}<span style="font-size: 10px; background: #e2e8f0; padding: 2px 4px; border-radius: 2px; margin-left: 4px;">ARCHIVED</span>{% endif %}
+                            <small>{{ product.concentration }}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ product.category.name|default:"—" }}</td>
+                <td>₹{{ product.effective_price|floatformat:0 }}</td>
+                <td>{{ product.stock }}</td>
+                <td>
+                    <span class="status {% if product.stock > 5 %}delivered{% elif product.stock > 0 %}packing{% else %}shipped{% endif %}">
+                        {{ product.inventory_status_label }}
+                    </span>
+                </td>
+                <td style="text-align: right;">
+                    <a href="{% url 'dashboard:adjust_stock' product.id %}" style="font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; margin-right: 12px;">Adjust</a>
+                    <a href="{% url 'dashboard:stock_history' product.id %}" style="font-size: 12px; color: var(--muted); text-decoration: none; margin-right: 12px;">History</a>
+                    <a href="{% url 'dashboard:product_edit' product.id %}" class="table-btn" style="text-decoration: none;">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px 0;">No products found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </form>
+</section>
+
+<script>
+function toggleCheckboxes(source) {
+    checkboxes = document.getElementsByName('selected_products');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+</script>
+
+<div class="drawer-overlay" aria-hidden="true"></div>
+
+<aside class="product-drawer" aria-hidden="true" aria-label="Fragrance details">
+    <button class="drawer-close" type="button" aria-label="Close fragrance details">
+        &times;
+    </button>
+
+    <div class="drawer-image">
+        Bottle image
+    </div>
+
+    <p class="eyebrow">Fragrance profile</p>
+    <h2>Royal Oud Imperial</h2>
+
+    <div class="drawer-details">
+        <div>
+            <span>Collection</span>
+            <strong>Oud</strong>
+        </div>
+
+        <div>
+            <span>Price</span>
+            <strong>₹8,500</strong>
+        </div>
+
+        <div>
+            <span>Stock</span>
+            <strong>18 units</strong>
+        </div>
+
+        <div>
+            <span>Availability</span>
+            <strong>In stock</strong>
+        </div>
+    </div>
+
+    <p class="drawer-description">
+        A composed woody fragrance of rich oud, burnished amber, and warm saffron. Designed as an enduring signature for evening ritual and intimate occasions.
+    </p>
+
+    <div class="drawer-actions">
+        <button class="primary-btn" type="button">
+            Edit
+        </button>
+
+        <button class="secondary-btn" type="button">
+            Delete
+        </button>
+    </div>
+</aside>
+
+<div class="modal-overlay" id="addModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="add-fragrance-title">
+        <div class="modal-header">
+            <div>
+                <p class="eyebrow">Catalogue</p>
+                <h2 id="add-fragrance-title">Add fragrance</h2>
+            </div>
+
+            <button class="close-modal" type="button" aria-label="Close add fragrance form">
+                &times;
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fragrance-name">Fragrance name</label>
+                    <input
+                        id="fragrance-name"
+                        type="text"
+                        placeholder="Royal Oud Imperial"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="fragrance-collection">Collection</label>
+                    <select id="fragrance-collection">
+                        <option>Oud</option>
+                        <option>Fresh</option>
+                        <option>Floral</option>
+                        <option>Amber</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fragrance-price">Price</label>
+                    <input
+                        id="fragrance-price"
+                        type="number"
+                        placeholder="8500"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="fragrance-stock">Stock</label>
+                    <input
+                        id="fragrance-stock"
+                        type="number"
+                        placeholder="18"
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fragrance-description">Description</label>
+                <textarea
+                    id="fragrance-description"
+                    rows="4"
+                    placeholder="Describe the fragrance, its character, and its intended occasion."
+                ></textarea>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="top-notes">Top notes</label>
+                    <input
+                        id="top-notes"
+                        type="text"
+                        placeholder="Saffron, bergamot"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="middle-notes">Middle notes</label>
+                    <input
+                        id="middle-notes"
+                        type="text"
+                        placeholder="Rose, amber"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="base-notes">Base notes</label>
+                    <input
+                        id="base-notes"
+                        type="text"
+                        placeholder="Oud, sandalwood"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="bottle-image">Bottle image</label>
+                    <input
+                        id="bottle-image"
+                        type="file"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="secondary-btn modal-close" type="button">
+                Cancel
+            </button>
+
+            <button class="primary-btn" type="button">
+                Save fragrance
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

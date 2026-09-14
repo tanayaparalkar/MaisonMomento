@@ -1,0 +1,282 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Maison Momento Parfumeur{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Link existing dashboard styles for variables, then storefront for component layout -->
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
+</head>
+<body>
+    <header class="sf-header">
+        <div class="sf-container sf-nav-wrapper">
+            <a href="{% url 'home' %}" class="sf-brand">
+                <span class="logo-mark"></span>
+                <span class="sf-wordmark">MAISON MOMENTO</span>
+            </a>
+            
+            <nav class="sf-nav-links" aria-label="Main Navigation">
+                <a href="{% url 'home' %}" class="sf-nav-link {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'product_list' %}active{% endif %}">Home</a>
+                <a href="{% url 'collections' %}" class="sf-nav-link {% if request.resolver_match.url_name == 'collections' %}active{% endif %}">Collections</a>
+                <a href="{% url 'catalog:product_list' %}" class="sf-nav-link {% if request.resolver_match.url_name == 'product_list' and not request.path == '/' %}active{% endif %}">Fragrances</a>
+                <a href="{% url 'about' %}" class="sf-nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+                <a href="{% url 'contact' %}" class="sf-nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+            </nav>
+            
+            <div class="sf-nav-utils">
+                <!-- Search Container -->
+                <div class="sf-search-container" style="display: none;"></div>
+                <button class="sf-icon-btn" aria-label="Search">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+                <!-- Notifications -->
+                {% if user.is_authenticated %}
+                <a href="{% url 'customers:notifications' %}" class="sf-icon-btn" aria-label="Notifications" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    <span class="sf-badge sf-badge-notification" style="{% if unread_customer_notifications_count == 0 %}display: none;{% endif %} background: #ef4444; color: white;">{{ unread_customer_notifications_count }}</span>
+                </a>
+                {% endif %}
+                
+                <!-- Wishlist Container -->
+                <div class="sf-wishlist-container" style="display: none;"></div>
+                <a href="{% url 'catalog:wishlist' %}" class="sf-icon-btn sf-nav-wishlist-btn" aria-label="Wishlist" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    <span class="sf-badge sf-badge-wishlist" style="{% if wishlist_count == 0 %}display: none;{% endif %}">{{ wishlist_count }}</span>
+                </a>
+                <!-- Cart -->
+                <div class="sf-cart-container" style="display: none;"></div>
+                <a href="{% url 'sales:cart' %}" class="sf-icon-btn sf-nav-cart-btn" aria-label="Cart" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    <span class="sf-badge sf-badge-cart" style="{% if cart_item_count == 0 or not cart_item_count %}display: none;{% endif %}">{{ cart_item_count }}</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="layout">
+        {% if breadcrumbs %}
+            <div class="sf-container" style="padding-top: 24px;">
+                {% include "catalog/includes/breadcrumbs.html" %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="sf-footer">
+        <div class="sf-container">
+            <div class="sf-footer-grid">
+                <div>
+                    <div class="sf-footer-brand">Maison Momento</div>
+                    <p class="sf-footer-text">
+                        Apothecary catalog orchestration, and fragrance recommendations. Quiet luxury, timeless sophistication, and emotional warmth.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="sf-footer-heading">Collections</h4>
+                    <a href="{% url 'collections' %}" class="sf-footer-link">Woody &amp; Earth</a>
+                    <a href="{% url 'collections' %}" class="sf-footer-link">Oud &amp; Leather</a>
+                    <a href="{% url 'collections' %}" class="sf-footer-link">Fresh &amp; Citrus</a>
+                    <a href="{% url 'collections' %}" class="sf-footer-link">Floral &amp; Musky</a>
+                </div>
+                <div>
+                    <h4 class="sf-footer-heading">Maison</h4>
+                    <a href="{% url 'about' %}" class="sf-footer-link">Our Story</a>
+                    <a href="{% url 'contact' %}" class="sf-footer-link">Contact Us</a>
+                </div>
+            </div>
+            <div class="sf-footer-bottom">
+                <div>&copy; 2026 Maison Momento. All rights reserved.</div>
+                <div style="display: flex; gap: 16px;">
+                    <a href="https://instagram.com" aria-label="Instagram" style="color: inherit;" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                    <a href="https://twitter.com" aria-label="Twitter" style="color: inherit;" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- CSRF Token for JavaScript -->
+    <script>
+        const getCookie = (name) => {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        };
+        const csrftoken = getCookie('csrftoken');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wishlist Toggle
+            document.querySelectorAll('.sf-wishlist-toggle').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const url = btn.dataset.url;
+                    
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrftoken,
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (!data.authenticated) {
+                            window.location.href = data.login_url;
+                            return;
+                        }
+                        
+                        // Toggle visual state
+                        if (data.is_wishlisted) {
+                            btn.classList.add('is-active');
+                            btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+                        } else {
+                            btn.classList.remove('is-active');
+                            btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+                        }
+                        
+                        // Update badge ONLY for wishlist
+                        const badge = document.querySelector('.sf-badge-wishlist');
+                        if (badge) {
+                            badge.textContent = data.count;
+                            badge.style.display = data.count > 0 ? 'flex' : 'none';
+                        }
+                    } catch (err) {
+                        console.error('Wishlist error:', err);
+                    }
+                });
+            });
+
+            // Cart Actions
+            const updateCartBadge = (totalItems) => {
+                const badge = document.querySelector('.sf-badge-cart');
+                if (badge) {
+                    badge.textContent = totalItems;
+                    badge.style.display = totalItems > 0 ? 'flex' : 'none';
+                }
+            };
+
+            // Add to Cart
+            document.querySelectorAll('.sf-add-to-cart').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const productId = btn.dataset.product;
+                    
+                    try {
+                        const response = await fetch('/cart/api/action/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrftoken,
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                action: 'ADD',
+                                product_id: productId,
+                                quantity: 1
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        if (!data.authenticated) {
+                            window.location.href = data.login_url;
+                            return;
+                        }
+                        
+                        updateCartBadge(data.cart_total_items);
+                        
+                        // Visual feedback
+                        const originalText = btn.textContent;
+                        btn.textContent = 'Added to Bag';
+                        setTimeout(() => btn.textContent = originalText, 2000);
+                        
+                    } catch (err) {
+                        console.error('Cart add error:', err);
+                    }
+                });
+            });
+
+            // Cart Page Item Updates
+            document.querySelectorAll('.sf-cart-item').forEach(itemEl => {
+                const productId = itemEl.dataset.id;
+                const input = itemEl.querySelector('.sf-qty-input');
+                const lineTotalEl = itemEl.querySelector('.sf-line-total');
+                
+                const updateItem = async (action, newQty) => {
+                    try {
+                        const response = await fetch('/cart/api/action/', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrftoken,
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                action: action,
+                                product_id: productId,
+                                quantity: newQty
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (action === 'REMOVE' || newQty === 0) {
+                            itemEl.remove();
+                            if (document.querySelectorAll('.sf-cart-item').length === 0) {
+                                window.location.reload(); // Reload to show empty state
+                            }
+                        } else {
+                            input.value = newQty;
+                            // Line total is trickier to calculate here accurately without returning it from server, 
+                            // so we rely on page reload if we want strict accuracy, or we just reload
+                            window.location.reload(); 
+                        }
+                        
+                        updateCartBadge(data.cart_total_items);
+                        
+                    } catch (err) {
+                        console.error('Cart update error:', err);
+                    }
+                };
+
+                itemEl.querySelectorAll('.sf-qty-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const action = btn.dataset.action;
+                        let newQty = parseInt(input.value);
+                        if (action === 'increase') newQty++;
+                        if (action === 'decrease') newQty = Math.max(0, newQty - 1);
+                        
+                        updateItem('UPDATE', newQty);
+                    });
+                });
+
+                const removeBtn = itemEl.querySelector('.sf-remove-btn');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', () => {
+                        updateItem('REMOVE', 0);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

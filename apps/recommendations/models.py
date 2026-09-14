@@ -1,52 +1,51 @@
 from django.db import models
 
 
-class UserInteraction(models.Model):
-    INTERACTION_TYPES = [
-        ("PRODUCT_VIEW", "Product View"),
-        ("PRODUCT_CLICK", "Product Click"),
+class Interaction(models.Model):
+
+    EVENT_CHOICES = [
+        ("view", "Viewed Product"),
+        ("search", "Search"),
+        ("wishlist", "Wishlist"),
+        ("cart", "Added to Cart"),
+        ("purchase", "Purchase"),
+        ("recommendation_click", "Recommendation Click"),
     ]
 
-    user = models.ForeignKey(
-        "customers.Customer",
-        on_delete=models.SET_NULL,
+    visitor = models.ForeignKey(
+        "tracking.VisitorSession",
+        on_delete=models.CASCADE,
+        related_name="interactions",
         null=True,
         blank=True,
-        related_name="interactions",
-        help_text="Associated customer account if logged in"
     )
-    session_id = models.CharField(
-        max_length=100,
-        db_index=True,
-        help_text="Anonymous visitor session identifier"
-    )
+
     product = models.ForeignKey(
         "catalog.Product",
         on_delete=models.CASCADE,
-        related_name="interactions"
+        related_name="interactions",
     )
-    category = models.ForeignKey(
-        "catalog.Category",
-        on_delete=models.CASCADE,
-        related_name="interactions"
+
+    event_type = models.CharField(
+        max_length=30,
+        choices=EVENT_CHOICES,
+        default="view",
+        db_index=True,
     )
-    interaction_type = models.CharField(
-        max_length=20,
-        choices=INTERACTION_TYPES,
-        db_index=True
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    metadata = models.JSONField(
+        blank=True,
+        null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
-        verbose_name = "User Interaction"
-        verbose_name_plural = "User Interactions"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["product", "event_type", "created_at"], name="interaction_product_event_idx"),
+            models.Index(fields=["visitor", "event_type", "created_at"], name="interaction_visitor_event_idx"),
+        ]
 
     def __str__(self):
-        actor = self.user.full_name if self.user else f"Session {self.session_id[:8]}"
-        return f"{actor} - {self.get_interaction_type_display()} on {self.product.name}"
-
-    def save(self, *args, **kwargs):
-        if not self.category_id and self.product and self.product.category:
-            self.category = self.product.category
-        super().save(*args, **kwargs)
+        return f"{self.visitor.session_id} • {self.event_type} • {self.product.name}"

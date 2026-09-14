@@ -10,7 +10,7 @@ from django.conf import settings
 from apps.catalog.models import Product, Category
 from apps.sales.models import Order, OrderItem
 from apps.customers.models import Customer
-from apps.recommendations.models import UserInteraction
+from apps.recommendations.models import Interaction
 from .models import AnalyticsEvent
 
 
@@ -106,39 +106,70 @@ def admin_analytics_dashboard(request):
         chart_revenue_data.append(float(day_rev))
         chart_orders_data.append(day_orders.count())
 
-    # 3. Popular Categories (Interactions)
+    # 3. Popular Categories (Interactions) — single aggregated query
+    from apps.recommendations.models import Interaction as _Interaction
+    cat_interactions = (
+        _Interaction.objects
+        .filter(created_at__range=(start_date, end_date))
+        .values("product__category", "event_type")
+        .annotate(cnt=Count("id"))
+    )
+    # Build per-category counters from the flat aggregation result
+    cat_views_map = {}
+    cat_clicks_map = {}
+    for row in cat_interactions:
+        cid = row["product__category"]
+        if row["event_type"] == "view":
+            cat_views_map[cid] = cat_views_map.get(cid, 0) + row["cnt"]
+        elif row["event_type"] == "recommendation_click":
+            cat_clicks_map[cid] = cat_clicks_map.get(cid, 0) + row["cnt"]
+
     categories = Category.objects.filter(is_active=True)
     popular_categories = []
     for cat in categories:
-        interactions = UserInteraction.objects.filter(category=cat, created_at__range=(start_date, end_date))
-        views = interactions.filter(interaction_type="PRODUCT_VIEW").count()
-        clicks = interactions.filter(interaction_type="PRODUCT_CLICK").count()
-        total_interactions = views + clicks
+        views = cat_views_map.get(cat.pk, 0)
+        clicks = cat_clicks_map.get(cat.pk, 0)
         popular_categories.append({
             "name": cat.name,
             "slug": cat.slug,
             "views": views,
             "clicks": clicks,
-            "total": total_interactions,
+            "total": views + clicks,
         })
     popular_categories.sort(key=lambda x: x["total"], reverse=True)
 
-    # 4. Top Products
+    # 4. Top Products — single aggregated Interaction query + single range_items query
+    prod_interactions = (
+        Interaction.objects
+        .filter(created_at__range=(start_date, end_date))
+        .values("product", "event_type")
+        .annotate(cnt=Count("id"))
+    )
+    prod_views_map = {}
+    prod_clicks_map = {}
+    for row in prod_interactions:
+        pid = row["product"]
+        if row["event_type"] == "view":
+            prod_views_map[pid] = prod_views_map.get(pid, 0) + row["cnt"]
+        elif row["event_type"] == "recommendation_click":
+            prod_clicks_map[pid] = prod_clicks_map.get(pid, 0) + row["cnt"]
+
+    # Batch sales aggregation per product
+    prod_sales = (
+        range_items
+        .values("product")
+        .annotate(units=Sum("quantity"), revenue=Sum("subtotal"))
+    )
+    prod_units_map = {r["product"]: r["units"] or 0 for r in prod_sales}
+    prod_revenue_map = {r["product"]: r["revenue"] or Decimal("0.00") for r in prod_sales}
+
     products = Product.objects.filter(is_active=True).select_related("category")
     top_products = []
     for prod in products:
-        p_interactions = UserInteraction.objects.filter(product=prod, created_at__range=(start_date, end_date))
-        views = p_interactions.filter(interaction_type="PRODUCT_VIEW").count()
-        clicks = p_interactions.filter(interaction_type="PRODUCT_CLICK").count()
-        
-        sales_agg = range_items.filter(product=prod).aggregate(
-            units=Sum("quantity"),
-            revenue=Sum("subtotal")
-        )
-        units_sold = sales_agg["units"] or 0
-        revenue_gen = sales_agg["revenue"] or Decimal("0.00")
-
-        # Only list if there has been some activity
+        views = prod_views_map.get(prod.pk, 0)
+        clicks = prod_clicks_map.get(prod.pk, 0)
+        units_sold = prod_units_map.get(prod.pk, 0)
+        revenue_gen = prod_revenue_map.get(prod.pk, Decimal("0.00"))
         total_activity = views + clicks + units_sold
         top_products.append({
             "product": prod,
