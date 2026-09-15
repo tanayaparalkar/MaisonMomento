@@ -1,0 +1,155 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Checkout - Maison Momento{% endblock %}
+
+{% block content %}
+<main class="sf-container" style="padding-top: 120px; padding-bottom: 120px;">
+    <h1 class="sf-page-title" style="margin-bottom: 48px;">Checkout</h1>
+    
+    <div class="sf-cart-layout" style="display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start;">
+        
+        <!-- Left Column: Shipping Form -->
+        <div class="sf-checkout-form-container">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 18px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 32px; font-weight: 500;">Shipping Information</h2>
+            
+            <form method="POST" action="{% url 'sales:checkout' %}" novalidate class="sf-checkout-form" style="display: flex; flex-direction: column; gap: 24px;">
+                {% csrf_token %}
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.first_name.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.last_name.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.email.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.phone.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    {{ form.address_line_1 }}
+                    {% if form.address_line_1.errors %}
+                        <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.address_line_1.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    {{ form.address_line_2 }}
+                    {% if form.address_line_2.errors %}
+                        <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.address_line_2.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.city.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.state }}
+                        {% if form.state.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.state.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.postal_code.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ form.country }}
+                        {% if form.country.errors %}
+                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.country.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    {{ form.delivery_notes }}
+                    {% if form.delivery_notes.errors %}
+                        <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.delivery_notes.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Hidden button so it submits on enter or can be targeted by external button -->
+                <button type="submit" id="sf-checkout-submit-btn" style="display: none;"></button>
+            </form>
+        </div>
+
+        <!-- Right Column: Order Summary -->
+        <div class="sf-cart-summary" style="background: var(--bg-alt); padding: 32px; position: sticky; top: 100px;">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; font-weight: 500;">Order Summary ({{ cart_item_count }})</h2>
+            
+            <div class="sf-summary-items" style="margin-bottom: 32px; max-height: 400px; overflow-y: auto; padding-right: 8px;">
+                {% for item in items %}
+                <div class="sf-summary-item" style="display: flex; gap: 16px; margin-bottom: 16px; align-items: center;">
+                    <div style="width: 60px; height: 80px; flex-shrink: 0; background: #fff;">
+                        {% if item.product.primary_image %}
+                            <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=200&auto=format&fit=crop" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 14px; margin-bottom: 4px;">{{ item.product.name }}</h4>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted);">Qty: {{ item.quantity }}</p>
+                    </div>
+                    <div style="font-family: 'Courier Prime', monospace; font-size: 14px;">
+                        ₹{{ item.subtotal }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="sf-summary-rows" style="font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Subtotal</span>
+                    <span>₹{{ subtotal }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Shipping</span>
+                    <span style="font-size: 12px;">{{ shipping_placeholder }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Taxes</span>
+                    <span style="font-size: 12px;">{{ tax_placeholder }}</span>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-family: 'Courier Prime', monospace; font-size: 18px; font-weight: 700; color: var(--text-color); margin-bottom: 32px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 24px;">
+                <span>Estimated Total</span>
+                <span>₹{{ estimated_total }}</span>
+            </div>
+
+            <button onclick="document.getElementById('sf-checkout-submit-btn').click();" class="primary-btn sf-btn-large" style="width: 100%;">
+                Place Order
+            </button>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Shopping Bag | Maison Momento Parfumeur{% endblock %}
+
+{% block content %}
+<section class="sf-hero" style="min-height: 20vh; margin-bottom: 20px; padding: 40px 24px;">
+    <div class="sf-hero-content">
+        <h1 style="font-size: clamp(32px, 4vw, 48px);">Shopping Bag</h1>
+    </div>
+</section>
+
+<section class="sf-section" style="padding-top: 0; min-height: 50vh;">
+    <div class="sf-container">
+        {% if items %}
+            <div style="display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start;">
+                <!-- Cart Items -->
+                <div style="flex: 1 1 600px;">
+                    <div style="border-top: 1px solid var(--border);">
+                        {% for item in items %}
+                        <div class="sf-cart-item" data-id="{{ item.product.id }}" style="display: flex; gap: 24px; padding: 32px 0; border-bottom: 1px solid var(--border);">
+                            <div style="width: 120px; flex-shrink: 0;">
+                                <a href="{% url 'catalog:product_detail' item.product.id %}">
+                                    {% if item.product.primary_image %}
+                                        <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" style="width: 100%; height: auto; object-fit: cover;">
+                                    {% else %}
+                                        <div style="width: 100%; aspect-ratio: 3/4; background: var(--warm-beige);"></div>
+                                    {% endif %}
+                                </a>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">{{ item.product.category.name }}</div>
+                                    <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 400; margin-bottom: 8px;">
+                                        <a href="{% url 'catalog:product_detail' item.product.id %}" style="text-decoration: none; color: inherit;">{{ item.product.name }}</a>
+                                    </h3>
+                                    <div style="color: var(--charcoal-soft); font-size: 14px;">₹{{ item.product.effective_price }}</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                                    <div style="display: flex; align-items: center; border: 1px solid var(--border); border-radius: 4px; overflow: hidden;">
+                                        <button class="sf-qty-btn" data-action="decrease" style="background: none; border: none; padding: 8px 12px; cursor: pointer; color: var(--charcoal);">&minus;</button>
+                                        <input type="number" class="sf-qty-input" value="{{ item.quantity }}" min="1" readonly style="width: 40px; text-align: center; border: none; font-family: var(--font-sans); font-size: 14px; background: transparent; padding: 0;">
+                                        <button class="sf-qty-btn" data-action="increase" style="background: none; border: none; padding: 8px 12px; cursor: pointer; color: var(--charcoal);">&plus;</button>
+                                    </div>
+                                    <button class="sf-remove-btn" style="background: none; border: none; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; text-decoration: underline;">Remove</button>
+                                </div>
+                            </div>
+                            <div style="font-weight: 500; font-size: 15px; text-align: right; min-width: 80px;">
+                                <span class="sf-line-total">₹{{ item.line_total }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div style="flex: 0 1 380px; background: var(--warm-beige); padding: 32px; position: sticky; top: 120px;">
+                    <h3 style="font-family: var(--font-display); font-size: 24px; font-weight: 400; margin-bottom: 24px;">Order Summary</h3>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
+                        <span style="color: var(--charcoal-soft);">Subtotal (<span class="sf-summary-items">{{ cart.total_items }}</span> items)</span>
+                        <span class="sf-summary-subtotal">₹{{ cart.subtotal }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
+                        <span style="color: var(--charcoal-soft);">Shipping</span>
+                        <span style="color: var(--muted);">Calculated at checkout</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 24px; font-size: 15px;">
+                        <span style="color: var(--charcoal-soft);">Taxes</span>
+                        <span style="color: var(--muted);">Calculated at checkout</span>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--border); margin-bottom: 24px;"></div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 32px; font-size: 18px; font-weight: 600;">
+                        <span>Estimated Total</span>
+                        <span class="sf-summary-total">₹{{ cart.subtotal }}</span>
+                    </div>
+                    
+                    <button class="primary-btn sf-btn-large" style="width: 100%; opacity: 0.5; cursor: not-allowed;">
+                        Proceed to Checkout
+                    </button>
+                    <p style="text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px;">Checkout functionality coming soon.</p>
+                </div>
+            </div>
+        {% else %}
+            <!-- Premium Empty State -->
+            <div class="sf-empty-state" style="text-align: center; padding: 80px 24px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted); margin-bottom: 24px;">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <h2 class="sf-empty-title" style="font-family: var(--font-display); font-size: 28px; color: var(--charcoal); font-weight: 400; margin-bottom: 16px;">Your Shopping Bag is Waiting</h2>
+                <p class="sf-empty-desc" style="font-size: 15px; color: var(--charcoal-soft); max-width: 400px; margin: 0 auto 32px; line-height: 1.6;">Discover our exclusive collection of fine fragrances and begin your olfactory journey.</p>
+                <a href="{% url 'catalog:product_list' %}" class="primary-btn" style="display: inline-flex; width: auto; padding: 0 32px;">
+                    Browse Fragrances
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Maison Momento{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Inter:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+</head>
+
+<body>
+    <div class="layout">
+        <header class="sidebar">
+            <div class="nav-shell">
+                <a href="{% url 'dashboard:dashboard' %}" class="logo" aria-label="Maison Momento dashboard">
+                    <span class="logo-mark" aria-hidden="true"></span>
+                    <span class="logo-wordmark">Maison Momento</span>
+                </a>
+
+                <nav class="main-nav" aria-label="Main navigation">
+                    <a href="{% url 'dashboard:dashboard' %}" class="nav-item">
+                        Dashboard
+                    </a>
+
+                    <div class="dropdown">
+                        <button
+                            class="dropbtn"
+                            type="button"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                        >
+                            Catalogue
+                        </button>
+
+                        <div class="dropdown-content" role="menu">
+                            <a href="{% url 'dashboard:products' %}" role="menuitem">
+                                Fragrances
+                            </a>
+
+                            <!-- TODO(Phase 10C): Build a custom dashboard categories page. Currently temporarily routing to Django Admin until this module is built. -->
+                            <a href="{% url 'admin:catalog_category_changelist' %}" role="menuitem" title="Temporary admin interface">
+                                Categories
+                            </a>
+
+                            <a href="{% url 'dashboard:inventory' %}" role="menuitem">
+                                Stock
+                            </a>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'dashboard:orders' %}" class="nav-item">
+                        Orders
+                    </a>
+
+                    <a href="{% url 'dashboard:clients' %}" class="nav-item">
+                        Clients
+                    </a>
+
+                    <a href="{% url 'dashboard:recommendations' %}" class="nav-item">
+                        Recommendations
+                    </a>
+
+                    <a href="{% url 'dashboard:analytics' %}" class="nav-item">
+                        Insights
+                    </a>
+                    
+                    <a href="{% url 'dashboard:export_data' %}" class="nav-item">
+                        Exports
+                    </a>
+
+                    <a href="{% url 'dashboard:settings' %}" class="nav-item">
+                        Settings
+                    </a>
+                </nav>
+
+                <div class="nav-right">
+                    <label class="search-field" for="global-search">
+                        <span class="search-icon" aria-hidden="true"></span>
+
+                        <input
+                            id="global-search"
+                            class="top-search"
+                            type="search"
+                            placeholder="Search"
+                            aria-label="Search dashboard"
+                        >
+                    </label>
+
+                    <a
+                        href="{% url 'dashboard:notifications' %}"
+                        class="icon-btn notification-btn"
+                        aria-label="Notifications"
+                        style="text-decoration: none; position: relative;"
+                    >
+                        <span class="notification-icon" aria-hidden="true"></span>
+                        {% if unread_admin_notifications_count > 0 %}
+                            <span class="notification-indicator" aria-hidden="true" style="position: absolute; top: 0; right: 0; background: var(--primary); color: white; font-size: 10px; border-radius: 50%; padding: 2px 6px;">{{ unread_admin_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button
+                            class="profile"
+                            type="submit"
+                            aria-label="Log out"
+                            title="Click to log out"
+                        >
+                            <span class="avatar" aria-hidden="true">T</span>
+
+                            <span class="profile-details">
+                                <span class="profile-name">Admin</span>
+                                <span class="profile-role">Log out</span>
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+</body>
+</html>

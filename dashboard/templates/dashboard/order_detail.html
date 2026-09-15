@@ -1,0 +1,129 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Order #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Order Management</p>
+        <h1>Order #{{ order.order_number }}</h1>
+        <p class="subtitle">{{ order.created_at|date:"F j, Y, g:i a" }}</p>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="{% url 'dashboard:orders' %}" class="secondary-btn">Back to Orders</a>
+    </div>
+</section>
+
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 16px; border-radius: 4px; font-size: 14px; font-weight: 600; {% if message.tags == 'error' %}background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;{% elif message.tags == 'warning' %}background: #fffbeb; color: #f59e0b; border: 1px solid #fcd34d;{% else %}background: #f0fdf4; color: #10b981; border: 1px solid #6ee7b7;{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="dashboard-grid">
+    <article class="panel large">
+        <h3>Order Items</h3>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Price</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>
+                        <strong>{{ item.product.name }}</strong><br>
+                        <small>{{ item.product.sku }}</small>
+                    </td>
+                    <td style="text-align: center;">{{ item.quantity }}</td>
+                    <td style="text-align: right;">₹{{ item.price|floatformat:0 }}</td>
+                    <td style="text-align: right;">₹{{ item.get_cost|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align: right; padding-top: 24px;"><strong>Subtotal</strong></td>
+                    <td style="text-align: right; padding-top: 24px;">₹{{ order.total|floatformat:0 }}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: right;"><strong>Shipping</strong></td>
+                    <td style="text-align: right;">Free</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: right; font-size: 18px; padding-top: 16px;"><strong>Total</strong></td>
+                    <td style="text-align: right; font-size: 18px; padding-top: 16px;"><strong>₹{{ order.total|floatformat:0 }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </article>
+
+    <aside style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="panel">
+            <h3>Status & Workflow</h3>
+            
+            <div style="margin: 16px 0; padding: 16px; background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; display: grid; gap: 8px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--muted);">Order Status</span>
+                    <span class="status {{ order.order_status }}">{{ order.get_order_status_display }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--muted);">Payment Status</span>
+                    <strong style="text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">{{ order.get_payment_status_display }}</strong>
+                </div>
+            </div>
+
+            {% if valid_transitions %}
+            <div style="margin-top: 24px; display: grid; gap: 12px;">
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 8px;">Available Actions (Order State Machine):</p>
+                {% for state, label in valid_transitions %}
+                    <form method="POST" action="{% url 'dashboard:order_transition' order.id %}" style="display: block;">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_state" value="{{ state }}">
+                        {% if state == 'shipped' %}
+                            <input type="text" name="tracking_reference" placeholder="Tracking Number (Optional)" class="form-control" style="margin-bottom: 8px;">
+                        {% endif %}
+                        <button type="submit" class="primary-btn" style="width: 100%; text-align: center; {% if state == 'cancelled' or state == 'refunded' %}background: #ef4444; border-color: #ef4444;{% endif %}">{{ label }}</button>
+                    </form>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="font-size: 13px; color: var(--muted); text-align: center; margin-top: 24px;">This order is in a terminal state. No further workflow transitions are possible.</p>
+            {% endif %}
+        </div>
+
+        <div class="panel">
+            <h3>Customer & Shipping</h3>
+            <div style="margin-top: 16px;">
+                <strong>{{ order.customer.full_name|default:"Guest Checkout" }}</strong><br>
+                <a href="mailto:{{ order.email }}" style="color: var(--accent); text-decoration: none;">{{ order.email }}</a>
+                {% if order.customer and order.customer.phone %}
+                <br>{{ order.customer.phone }}
+                {% endif %}
+            </div>
+            
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                <p class="eyebrow">Shipping Address</p>
+                {% if order.shipping_address %}
+                    <div style="font-size: 14px; line-height: 1.5; color: var(--charcoal);">
+                        {{ order.shipping_address.street_address }}<br>
+                        {% if order.shipping_address.apartment %}{{ order.shipping_address.apartment }}<br>{% endif %}
+                        {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.postal_code }}<br>
+                        {{ order.shipping_address.country }}
+                    </div>
+                {% else %}
+                    <p style="color: var(--muted); font-size: 14px;">No shipping address provided.</p>
+                {% endif %}
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}

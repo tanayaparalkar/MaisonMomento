@@ -1,0 +1,90 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Notification Center{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">System Alerts</p>
+        <h1>Notification Center</h1>
+        <p class="subtitle">Stay updated on orders, inventory, and system health.</p>
+    </div>
+    <form method="post" action="{% url 'dashboard:notification_mark_all_read' %}">
+        {% csrf_token %}
+        <button type="submit" class="primary-btn">Mark All Read</button>
+    </form>
+</section>
+
+<!-- Filter Tabs -->
+<div class="tabs" style="margin-bottom: 24px; display: flex; gap: 16px; border-bottom: 1px solid var(--border);">
+    <a href="?filter=all" style="padding: 8px 0; color: {% if filter == 'all' %}var(--text-primary){% else %}var(--muted){% endif %}; text-decoration: none; border-bottom: {% if filter == 'all' %}2px solid var(--text-primary){% else %}none{% endif %};">All</a>
+    <a href="?filter=unread" style="padding: 8px 0; color: {% if filter == 'unread' %}var(--text-primary){% else %}var(--muted){% endif %}; text-decoration: none; border-bottom: {% if filter == 'unread' %}2px solid var(--text-primary){% else %}none{% endif %};">Unread</a>
+    <a href="?filter=orders" style="padding: 8px 0; color: {% if filter == 'orders' %}var(--text-primary){% else %}var(--muted){% endif %}; text-decoration: none; border-bottom: {% if filter == 'orders' %}2px solid var(--text-primary){% else %}none{% endif %};">Orders</a>
+    <a href="?filter=inventory" style="padding: 8px 0; color: {% if filter == 'inventory' %}var(--text-primary){% else %}var(--muted){% endif %}; text-decoration: none; border-bottom: {% if filter == 'inventory' %}2px solid var(--text-primary){% else %}none{% endif %};">Inventory</a>
+</div>
+
+<section class="panel">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% for notif in page_obj %}
+        <div class="stat-card stagger-item" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 16px; border-color: {% if not notif.is_read %}var(--primary){% else %}var(--border){% endif %}; opacity: {% if notif.is_read %}0.7{% else %}1{% endif %};">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <!-- Severity Icon -->
+                    <span style="font-size: 14px; 
+                        {% if notif.severity == 'info' %}color: #3b82f6;
+                        {% elif notif.severity == 'success' %}color: #10b981;
+                        {% elif notif.severity == 'warning' %}color: #f59e0b;
+                        {% elif notif.severity == 'error' %}color: #ef4444;{% endif %}">
+                        {% if notif.severity == 'info' %}ℹ️
+                        {% elif notif.severity == 'success' %}✅
+                        {% elif notif.severity == 'warning' %}⚠️
+                        {% elif notif.severity == 'error' %}❌{% endif %}
+                    </span>
+                    <strong style="color: var(--text-primary); font-size: 15px;">{{ notif.title }}</strong>
+                    {% if not notif.is_read %}
+                        <span style="background: var(--primary); width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                    {% endif %}
+                </div>
+                <p style="color: var(--muted); font-size: 14px; margin: 0 0 8px 0;">{{ notif.message }}</p>
+                <div style="font-size: 12px; color: var(--muted);">
+                    {{ notif.created_at|timesince }} ago
+                    {% if notif.url %}
+                        &middot; <a href="{{ notif.url }}" style="color: var(--text-primary); text-decoration: underline;">View Details</a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if not notif.is_read %}
+            <form method="post" action="{% url 'dashboard:notification_mark_read' notif.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="secondary-btn" style="padding: 4px 12px; font-size: 12px;">Mark Read</button>
+            </form>
+            {% else %}
+            <span style="font-size: 12px; color: var(--muted);">Read</span>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 40px; color: var(--muted);">
+            No notifications found.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="margin-top: 32px; display: flex; gap: 8px; justify-content: center;">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&filter={{ filter }}" class="secondary-btn" style="padding: 4px 12px; font-size: 12px;">&laquo; Prev</a>
+        {% endif %}
+        
+        <span style="font-size: 12px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 2px;">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&filter={{ filter }}" class="secondary-btn" style="padding: 4px 12px; font-size: 12px;">Next &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

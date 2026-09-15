@@ -1,0 +1,48 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Maison Momento Parfumeur & Apothécaire{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+  <h1 id="site-name-heading">
+    <a href="{% url 'admin:index' %}">
+      <span class="brand-crest">MM</span>
+      <span>MAISON <span class="brand-brass">MOMENTO</span></span>
+      <span style="font-size: 11px; font-weight: 500; letter-spacing: 1.5px; opacity: 0.8; margin-left: 10px; font-family: var(--font-serif-display); text-transform: uppercase;">Parfumeur &amp; Apothécaire · Archives</span>
+    </a>
+  </h1>
+</div>
+{% endblock %}
+
+{% block nav-global %}
+<div class="mm-nav-bar">
+  <a href="{% url 'admin_analytics_dashboard' %}" class="mm-nav-link highlight">
+    Analytics
+  </a>
+  <a href="{% url 'admin:catalog_product_changelist' %}" class="mm-nav-link">
+    Catalog
+  </a>
+  <a href="{% url 'admin:catalog_category_changelist' %}" class="mm-nav-link">
+    Categories
+  </a>
+  <a href="{% url 'admin:sales_order_changelist' %}" class="mm-nav-link">
+    Sales &amp; Orders
+  </a>
+  <a href="{% url 'admin:customers_customer_changelist' %}" class="mm-nav-link">
+    Client Ledger
+  </a>
+  <a href="{% url 'admin:recommendations_interaction_changelist' %}" class="mm-nav-link">
+    Recommendations
+  </a>
+  <a href="{% url 'admin:analytics_analyticsevent_changelist' %}" class="mm-nav-link">
+    Telemetry Events
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,273 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Products | Maison Momento Parfumeur{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="sf-hero" style="min-height: 40vh; margin-bottom: 40px;">
+    <div class="sf-hero-content">
+        <div class="sf-hero-eyebrow">The Collection</div>
+        <h1>Artisan Fragrances</h1>
+        <p>Discover our meticulously crafted selection of Eau de Parfums, Extraits, and home olfactory experiences.</p>
+    </div>
+</section>
+
+<!-- Active Filters / Top Bar -->
+<div class="sf-container" style="margin-bottom: 24px;">
+    <div class="sf-catalog-topbar" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <div class="sf-active-filters" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+            {% if active_filters %}
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--charcoal); margin-right: 8px;">Active Filters:</span>
+                {% for filter in active_filters %}
+                    <a href="{{ filter.remove_url }}" class="sf-filter-chip">
+                        {{ filter.name }} <span>&times;</span>
+                    </a>
+                {% endfor %}
+                <a href="{% url 'catalog:product_list' %}" class="sf-filter-clear" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-left: 8px; text-decoration: none; transition: color 250ms;">Clear All</a>
+            {% endif %}
+        </div>
+        
+        <div class="sf-sort-container">
+            <form id="sort-form" method="GET" action="{% url 'catalog:product_list' %}">
+                <!-- Preserve existing GET params except sort and page -->
+                {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+                {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+                {% if request.GET.family %}<input type="hidden" name="family" value="{{ request.GET.family }}">{% endif %}
+                {% if request.GET.gender %}<input type="hidden" name="gender" value="{{ request.GET.gender }}">{% endif %}
+                
+                <label for="sort" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--charcoal); margin-right: 8px;">Sort By:</label>
+                <select name="sort" id="sort" class="sf-select" onchange="document.getElementById('sort-form').submit();">
+                    <option value="featured" {% if current_sort == 'featured' %}selected{% endif %}>Featured</option>
+                    <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
+                    <option value="alpha" {% if current_sort == 'alpha' %}selected{% endif %}>Alphabetical (A-Z)</option>
+                    <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                </select>
+                <noscript><button type="submit" style="display:none;">Sort</button></noscript>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Product Grid Section -->
+<section id="collection" class="sf-section" style="padding-top: 0;">
+    <div class="sf-container sf-catalog-layout">
+        
+        <!-- Sidebar Filters -->
+        <aside class="sf-sidebar">
+            <form id="filter-form" method="GET" action="{% url 'catalog:product_list' %}">
+                <input type="hidden" name="sort" value="{{ current_sort }}">
+                
+                <!-- Search Filter -->
+                <div class="sf-filter-group" style="margin-bottom: 24px;">
+                    <div style="position: relative;">
+                        <input type="search" name="q" value="{{ current_query }}" placeholder="Search fragrances..." 
+                               style="width: 100%; padding: 12px 16px 12px 40px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); background: var(--warm-beige); font-family: var(--font-body); font-size: 14px; color: var(--charcoal); outline: none; transition: border-color 250ms var(--ease-soft);"
+                               onfocus="this.style.borderColor='var(--deep-navy)'"
+                               onblur="this.style.borderColor='var(--border-strong)'">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 16px; top: 14px;">
+                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Category Filter -->
+                <details class="sf-filter-group" open>
+                    <summary class="sf-filter-title">Category</summary>
+                    <div class="sf-filter-content">
+                        <label class="sf-radio">
+                            <input type="radio" name="category" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.category %}checked{% endif %}>
+                            <span>All Categories</span>
+                        </label>
+                        {% for cat in categories %}
+                        <label class="sf-radio">
+                            <input type="radio" name="category" value="{{ cat.slug }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.category == cat.slug %}checked{% endif %}>
+                            <span>{{ cat.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </details>
+                
+                <!-- Fragrance Family Filter -->
+                <details class="sf-filter-group" open>
+                    <summary class="sf-filter-title">Fragrance Family</summary>
+                    <div class="sf-filter-content">
+                        <label class="sf-radio">
+                            <input type="radio" name="family" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.family %}checked{% endif %}>
+                            <span>All Families</span>
+                        </label>
+                        {% for value, label in families %}
+                        <label class="sf-radio">
+                            <input type="radio" name="family" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.family == value %}checked{% endif %}>
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </details>
+
+                <!-- Gender Filter -->
+                <details class="sf-filter-group" open>
+                    <summary class="sf-filter-title">Gender</summary>
+                    <div class="sf-filter-content">
+                        <label class="sf-radio">
+                            <input type="radio" name="gender" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.gender %}checked{% endif %}>
+                            <span>All</span>
+                        </label>
+                        {% for value, label in genders %}
+                        <label class="sf-radio">
+                            <input type="radio" name="gender" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.gender == value %}checked{% endif %}>
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </details>
+
+
+
+                <!-- Graceful Fallback Submit Button -->
+                <noscript>
+                    <button type="submit" class="primary-btn" style="width: 100%; margin-top: 24px;">Apply Filters</button>
+                </noscript>
+            </form>
+        </aside>
+
+        <!-- Product Grid -->
+        <div class="sf-catalog-grid">
+            {% if page_obj %}
+                <div class="sf-grid">
+                    {% for product in page_obj %}
+                        {% include "catalog/includes/product_card.html" %}
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav class="sf-pagination" aria-label="Pagination" style="margin-top: 80px; display: flex; justify-content: center; align-items: center; gap: 16px;">
+                    {% if page_obj.has_previous %}
+                        <a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}" class="sf-page-link sf-page-prev" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--charcoal); text-decoration: none; padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-xs);">Prev</a>
+                    {% else %}
+                        <span class="sf-page-link sf-page-prev sf-page-disabled" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-xs); opacity: 0.5;">Prev</span>
+                    {% endif %}
+                    
+                    <div class="sf-page-numbers">
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--charcoal);">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </div>
+
+                    {% if page_obj.has_next %}
+                        <a href="?{{ query_string }}&page={{ page_obj.next_page_number }}" class="sf-page-link sf-page-next" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--charcoal); text-decoration: none; padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-xs);">Next</a>
+                    {% else %}
+                        <span class="sf-page-link sf-page-next sf-page-disabled" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-xs); opacity: 0.5;">Next</span>
+                    {% endif %}
+                </nav>
+                {% endif %}
+            
+            {% else %}
+                <!-- Premium Empty State -->
+                <div class="sf-empty-state" style="text-align: center; padding: 80px 24px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted); margin-bottom: 24px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <h2 class="sf-empty-title" style="font-family: var(--font-display); font-size: 28px; color: var(--charcoal); font-weight: 400; margin-bottom: 16px;">Refine Your Search</h2>
+                    <p class="sf-empty-desc" style="font-size: 15px; color: var(--charcoal-soft); max-width: 400px; margin: 0 auto 32px; line-height: 1.6;">We couldn't find fragrances matching your specific criteria. Please try adjusting your filters or clearing your search.</p>
+                    <a href="{% url 'catalog:product_list' %}" class="primary-btn" style="display: inline-flex; width: auto; padding: 0 32px;">
+                        Clear All Filters
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================
+     PHASE 3: RECOMMENDATION ENGINE INTEGRATION
+     ========================================== -->
+{% if not is_filtering %}
+    <div class="sf-recommendations-wrapper" style="padding-top: 40px; border-top: 1px solid var(--border);">
+        {% if recent %}
+            <!-- EXISTING VISITOR STATE -->
+
+            <!-- Recently Viewed -->
+            <section class="sf-section sf-fade-up" style="background: var(--white); padding: 60px 0;">
+                <div class="sf-container">
+                    <div class="sf-section-header" style="text-align: left; margin-bottom: 40px;">
+                        <h2 style="font-family: var(--font-display); font-size: clamp(24px, 3vw, 32px); color: var(--charcoal); margin-bottom: 8px; font-weight: 400;">Recently Viewed</h2>
+                        <p style="color: var(--charcoal-soft); font-size: 14px;">Your fragrance journey begins here.</p>
+                    </div>
+                    <div class="sf-scroll-row">
+                        {% for item in recent %}
+                            {% include "catalog/includes/product_card.html" with product=item badge_text="Recently Viewed" %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Recommended For You -->
+            {% if recommended %}
+            <section class="sf-section sf-fade-up" style="background: var(--warm-beige); padding: 60px 0;">
+                <div class="sf-container">
+                    <div class="sf-section-header" style="text-align: left; margin-bottom: 40px;">
+                        <h2 style="font-family: var(--font-display); font-size: clamp(24px, 3vw, 32px); color: var(--charcoal); margin-bottom: 8px; font-weight: 400;">Recommended For You</h2>
+                        <p style="color: var(--charcoal-soft); font-size: 14px;">Explore our curated collection to unlock personalised recommendations.</p>
+                    </div>
+                    <div class="sf-scroll-row">
+                        {% for item in recommended %}
+                            {% include "catalog/includes/product_card.html" with product=item badge_text="Recommended" %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Trending Now -->
+            {% if trending %}
+            <section class="sf-section sf-fade-up" style="background: var(--white); padding: 60px 0; border-top: 1px solid var(--border);">
+                <div class="sf-container">
+                    <div class="sf-section-header" style="text-align: left; margin-bottom: 40px;">
+                        <h2 style="font-family: var(--font-display); font-size: clamp(24px, 3vw, 32px); color: var(--charcoal); margin-bottom: 8px; font-weight: 400;">Trending Now</h2>
+                        <p style="color: var(--charcoal-soft); font-size: 14px;">Discover the fragrances capturing everyone's attention.</p>
+                    </div>
+                    <div class="sf-scroll-row">
+                        {% for item in trending %}
+                            {% include "catalog/includes/product_card.html" with product=item badge_text="Trending" %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+        {% else %}
+            <!-- NEW VISITOR STATE -->
+
+            <!-- Trending Now (Primary) -->
+            {% if trending %}
+            <section class="sf-section sf-fade-up" style="background: var(--warm-beige); padding: 80px 0;">
+                <div class="sf-container">
+                    <div class="sf-section-header" style="text-align: left; margin-bottom: 40px;">
+                        <h2 style="font-family: var(--font-display); font-size: clamp(24px, 3vw, 32px); color: var(--charcoal); margin-bottom: 8px; font-weight: 400;">Trending Now</h2>
+                        <p style="color: var(--charcoal-soft); font-size: 14px;">Discover the fragrances capturing everyone's attention.</p>
+                    </div>
+                    <div class="sf-scroll-row">
+                        {% for item in trending %}
+                            {% include "catalog/includes/product_card.html" with product=item badge_text="Trending" %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+            
+            <!-- Empty Recently Viewed (Elegant) -->
+            <section class="sf-section sf-fade-up" style="background: var(--white); padding: 80px 0; border-top: 1px solid var(--border); text-align: center;">
+                <div class="sf-container">
+                    <div style="max-width: 500px; margin: 0 auto; padding: 40px; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted); margin-bottom: 20px;"><path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <h3 style="font-family: var(--font-display); font-size: 24px; color: var(--charcoal); font-weight: 400; margin-bottom: 12px;">Recently Viewed</h3>
+                        <p style="color: var(--charcoal-soft); font-size: 15px; margin-bottom: 24px;">Your fragrance journey begins here. Explore our artisan collection to build your olfactory profile.</p>
+                        <a href="#collection" class="secondary-btn" style="padding: 0 32px; font-size: 11px;">Explore Collection</a>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}

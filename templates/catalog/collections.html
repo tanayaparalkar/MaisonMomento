@@ -1,0 +1,65 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Collections | Maison Momento Parfumeur{% endblock %}
+
+{% block content %}
+<section class="sf-hero" style="min-height: 50vh; background-image: url('https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?q=80&w=2000&auto=format&fit=crop');">
+    <div class="sf-hero-content">
+        <div class="sf-hero-eyebrow">The Collections</div>
+        <h1>Curated Selections</h1>
+        <p>Explore our fragrance families, grouped by their distinct olfactory profiles.</p>
+    </div>
+</section>
+
+<div class="sf-container" style="padding-top: 80px; padding-bottom: 80px;">
+    {% for category in categories %}
+        <div class="sf-section" style="padding-top: 0; padding-bottom: 80px; border-bottom: 1px solid var(--border); margin-bottom: 80px;">
+            <!-- Collection Header Card -->
+            <div class="sf-pdp-grid" style="gap: 48px; margin-bottom: 64px; align-items: center;">
+                <div class="sf-pdp-info-col" style="padding: 0;">
+                    <div class="sf-hero-eyebrow" style="color: var(--muted); margin-bottom: 12px;">Collection</div>
+                    <h2 style="font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); margin-bottom: 16px; color: var(--charcoal); font-weight: 400;">
+                        {{ category.name }}
+                        <span style="font-size: 20px; color: var(--muted); vertical-align: middle;">({{ category.num_products }})</span>
+                    </h2>
+                    <p style="font-size: 15.5px; color: var(--charcoal-soft); line-height: 1.8; margin-bottom: 32px; max-width: 500px;">
+                        {{ category.description|default:"Discover our curated selection of fine fragrances." }}
+                    </p>
+                    <a href="{% url 'catalog:product_list' %}?category={{ category.slug }}" class="secondary-btn sf-btn-large" style="display: inline-flex; width: auto; padding: 0 32px; align-items: center; justify-content: center;">
+                        View Collection
+                    </a>
+                </div>
+                <div class="sf-pdp-image-col" style="position: relative; top: 0;">
+                    <!-- Get a featured image or fallback -->
+                    {% with first_product=category.products.all|first %}
+                        {% if first_product and first_product.primary_image %}
+                            <img src="{{ first_product.primary_image.image.url }}" alt="{{ category.name }}" style="width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-sm); box-shadow: var(--shadow-subtle);">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop" alt="{{ category.name }}" style="width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-sm); box-shadow: var(--shadow-subtle);">
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <!-- Products Grid (Max 6) -->
+            <div class="sf-grid">
+                {% for product in category.products.all|slice:":6" %}
+                {% include "catalog/includes/product_card.html" with product=product custom_style="background: var(--white); border: 1px solid var(--border);" no_border_radius=True custom_padding="padding: 24px;" large_title=True large_desc_margin=True alternate_footer=True hide_badge=True %}
+                {% endfor %}
+            </div>
+
+            {% if category.num_products > 6 %}
+            <div style="text-align: center; margin-top: 48px;">
+                <a href="{% url 'catalog:product_list' %}?category={{ category.slug }}" style="font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600; color: var(--charcoal); text-decoration: none; transition: color 250ms var(--ease-soft); display: inline-flex; align-items: center; gap: 8px;" onmouseover="this.style.color='var(--muted)'" onmouseout="this.style.color='var(--charcoal)'">
+                    View all {{ category.num_products }} fragrances <span style="font-size: 16px;">&rarr;</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div style="text-align: center; padding: 120px 0;">
+            <p style="font-size: 16px; color: var(--muted);">Collections are currently being curated.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

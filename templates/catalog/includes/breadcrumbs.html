@@ -1,0 +1,39 @@
+<nav aria-label="breadcrumb" class="sf-breadcrumbs" style="margin-bottom: 24px;">
+    <ol style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--muted);">
+        
+        <!-- Base Home Link -->
+        <li>
+            <a href="{% url 'home' %}" style="color: inherit; text-decoration: none; transition: color 250ms var(--ease-soft);" onmouseover="this.style.color='var(--charcoal)'" onmouseout="this.style.color='inherit'">Home</a>
+            {% if request.resolver_match.url_name != 'home' and request.path != '/' %}<span style="margin-left: 8px;">/</span>{% endif %}
+        </li>
+
+        {% if breadcrumbs %}
+            <!-- Explicit Breadcrumbs (e.g. Product Detail) -->
+            {% for crumb in breadcrumbs %}
+                {% if crumb.name != 'Home' %}
+                    <li>
+                        {% if crumb.url %}
+                            <a href="{{ crumb.url }}" style="color: inherit; text-decoration: none; transition: color 250ms var(--ease-soft);" onmouseover="this.style.color='var(--charcoal)'" onmouseout="this.style.color='inherit'">{{ crumb.name }}</a>
+                        {% else %}
+                            <span style="color: var(--charcoal);">{{ crumb.name }}</span>
+                        {% endif %}
+                        {% if not forloop.last %}
+                            <span style="margin-left: 8px;">/</span>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <!-- Dynamic Breadcrumbs -->
+            {% if request.resolver_match.url_name == 'about' %}
+                <li><span style="color: var(--charcoal);">About</span></li>
+            {% elif request.resolver_match.url_name == 'contact' %}
+                <li><span style="color: var(--charcoal);">Contact</span></li>
+            {% elif request.resolver_match.url_name == 'collections' %}
+                <li><span style="color: var(--charcoal);">Collections</span></li>
+            {% elif request.resolver_match.url_name == 'product_list' and request.path != '/' %}
+                <li><span style="color: var(--charcoal);">Fragrances</span></li>
+            {% endif %}
+        {% endif %}
+    </ol>
+</nav>

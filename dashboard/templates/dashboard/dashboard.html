@@ -1,0 +1,268 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <p class="eyebrow">Maison Momento · Executive Overview</p>
+        <h1>The Maison, at a glance.</h1>
+        <p class="subtitle">
+            A considered view of sales performance, client activity, and operational health.
+        </p>
+    </div>
+    
+    <div style="display: flex; gap: 12px; align-items: center;">
+        <form method="GET" action="{% url 'dashboard:dashboard' %}" style="display: flex; gap: 8px;">
+            <select name="date_range" class="form-control" onchange="this.form.submit()" style="min-width: 150px; padding: 6px 12px;">
+                <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+                <option value="last_7_days" {% if date_filter == 'last_7_days' %}selected{% endif %}>Last 7 Days</option>
+                <option value="this_month" {% if date_filter == 'this_month' %}selected{% endif %}>This Month</option>
+                <option value="last_30_days" {% if date_filter == 'last_30_days' %}selected{% endif %}>Last 30 Days</option>
+            </select>
+        </form>
+        <a href="{% url 'dashboard:export_data' %}?type=sales_summary" class="secondary-btn">Export Summary</a>
+    </div>
+</section>
+
+{# ── Dynamic Notification Center ─────────────────────────────────── #}
+{% if notifications %}
+<section class="panel" style="margin-bottom: 32px; border: 1px solid var(--border);">
+    <p class="eyebrow">Notification Center</p>
+    <h3>Action Required</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+        {% for note in notifications %}
+        <div style="
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px; border-radius: 4px; border: 1px solid var(--border);
+            {% if note.severity == 'critical' %}background: #fef2f2; border-color: #fca5a5;
+            {% elif note.severity == 'warning' %}background: #fffbeb; border-color: #fcd34d;
+            {% else %}background: #f0f9ff; border-color: #bae6fd;{% endif %}
+        ">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="font-size: 20px; {% if note.severity == 'critical' %}color: #ef4444;{% elif note.severity == 'warning' %}color: #f59e0b;{% else %}color: #3b82f6;{% endif %}">
+                    {{ note.icon }}
+                </span>
+                <div>
+                    <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: var(--charcoal);">{{ note.title }}</h4>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--charcoal-soft);">{{ note.description }}</p>
+                </div>
+            </div>
+            {% if note.url %}
+            <a href="{{ note.url }}" style="font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none;">Review &rarr;</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{# ── Revenue Metrics ────────────────────────────────────────────── #}
+<section class="stats-grid" aria-label="Revenue metrics" style="margin-bottom: 32px;">
+    <article class="stat-card" style="background: #f8fafc;">
+        <span class="stat-title">Today's Revenue</span>
+        <h2 style="color: var(--accent);">₹{{ revenue_today|floatformat:0 }}</h2>
+    </article>
+    <article class="stat-card">
+        <span class="stat-title">Weekly Revenue</span>
+        <h2>₹{{ revenue_weekly|floatformat:0 }}</h2>
+    </article>
+    <article class="stat-card">
+        <span class="stat-title">Monthly Revenue</span>
+        <h2>₹{{ revenue_monthly|floatformat:0 }}</h2>
+    </article>
+    <article class="stat-card" style="border-color: var(--charcoal);">
+        <span class="stat-title">
+            Filtered Period 
+            ({% if date_filter == 'today' %}Today
+            {% elif date_filter == 'last_7_days' %}Last 7 Days
+            {% elif date_filter == 'this_month' %}This Month
+            {% elif date_filter == 'last_30_days' %}Last 30 Days
+            {% else %}{{ date_filter|title }}{% endif %})
+        </span>
+        <h2>₹{{ revenue_filtered|floatformat:0 }}</h2>
+    </article>
+</section>
+
+{# ── Operations metrics ──────────────────────────────────────── #}
+<section class="stats-grid" aria-label="Operations metrics">
+    <article class="stat-card products">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">◈</div>
+        </div>
+        <span class="stat-title">Pending Orders</span>
+        <h2>{{ pending_orders_count }}</h2>
+        <small>Needs confirmation</small>
+    </article>
+
+    <article class="stat-card products">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">📦</div>
+        </div>
+        <span class="stat-title">Awaiting Packing</span>
+        <h2>{{ awaiting_packing_count }}</h2>
+        <small>Confirmed & ready</small>
+    </article>
+
+    <article class="stat-card customers">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">✈️</div>
+        </div>
+        <span class="stat-title">Shipped Today</span>
+        <h2>{{ shipped_today_count }}</h2>
+    </article>
+
+    <article class="stat-card customers">
+        <div class="stat-header">
+            <div class="stat-icon" aria-hidden="true">◎</div>
+        </div>
+        <span class="stat-title">Delivered Today</span>
+        <h2>{{ delivered_today_count }}</h2>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    {# ── Recommendation Health ──────────────────────────────────── #}
+    <article class="panel">
+        <p class="eyebrow">System Diagnostics</p>
+        <h3>Recommendation Health</h3>
+        <table class="orders-table" style="margin-top: 16px;">
+            <tbody>
+                <tr>
+                    <td>Engine Status</td>
+                    <td style="text-align: right;">
+                        {% if health.engine_status %}<span style="color: #10b981; font-weight: 600;">Operational</span>
+                        {% else %}<span style="color: #ef4444; font-weight: 600;">Down</span>{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Visitor Tracking Status</td>
+                    <td style="text-align: right;">
+                        {% if health.visitor_tracking_status %}<span style="color: #10b981; font-weight: 600;">Active</span>
+                        {% else %}<span style="color: #f59e0b; font-weight: 600;">No Visitors</span>{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Interaction Logging (24h)</td>
+                    <td style="text-align: right;">{{ health.interaction_logging_count }} events</td>
+                </tr>
+                <tr>
+                    <td>Trending Availability</td>
+                    <td style="text-align: right;">
+                        {% if health.trending_availability %}<span style="color: #10b981; font-weight: 600;">Available</span>
+                        {% else %}<span style="color: #f59e0b; font-weight: 600;">Cold Start</span>{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Personalization Status</td>
+                    <td style="text-align: right;">
+                        {% if health.personalization_status %}<span style="color: #10b981; font-weight: 600;">Active</span>
+                        {% else %}<span style="color: #f59e0b; font-weight: 600;">Inactive</span>{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Recommendation Requests Today</td>
+                    <td style="text-align: right;">{{ health.recs_today }}</td>
+                </tr>
+                <tr>
+                    <td>Last Recommendation Activity</td>
+                    <td style="text-align: right;">
+                        {% if health.last_rec_time %}{{ health.last_rec_time|timesince }} ago
+                        {% else %}<span style="color: var(--muted);">None</span>{% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </article>
+
+    {# ── Top Products ─────────────────────────────────────────── #}
+    <article class="panel">
+        <p class="eyebrow">Sales Performance</p>
+        <h3>Top Selling Products</h3>
+        <div class="best-sellers">
+            {% for product in top_products %}
+            <div class="product-item stagger-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding: 12px 0;">
+                <div class="product-info">
+                    <h4 style="margin: 0; font-size: 14px;">{{ product.name }}</h4>
+                    <span style="font-size: 12px; color: var(--muted); font-family: monospace;">{{ product.sku }}</span>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 16px; font-weight: 600; color: var(--charcoal);">{{ product.total_sold }}</span>
+                    <br><small style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Sold</small>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color: var(--muted); font-size: 13px;">No sales data available for this period.</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+{# ── Recent Activity ───────────────────────────────────────────────── #}
+<section class="dashboard-grid" style="margin-top: 32px;">
+    
+    <article class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">Recent Orders</h3>
+            <a href="{% url 'dashboard:orders' %}" style="font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none;">View All</a>
+        </div>
+        <table class="orders-table" style="margin-top: 16px;">
+            <thead>
+                <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Client</th>
+                    <th scope="col" style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr class="stagger-item">
+                    <td style="font-family: monospace; font-size: 12px;"><a href="{% url 'dashboard:order_detail' order.id %}" style="text-decoration:none; color:inherit;">#{{ order.order_number }}</a></td>
+                    <td>{{ order.customer.full_name|default:"Guest" }}</td>
+                    <td style="text-align: right; font-weight: 600;">₹{{ order.total|floatformat:0 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px;">No orders yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </article>
+
+    <article class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0;">Recent Inventory Activity</h3>
+            <a href="{% url 'dashboard:inventory' %}" style="font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none;">View Inventory</a>
+        </div>
+        <table class="orders-table" style="margin-top: 16px;">
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Adj.</th>
+                    <th scope="col" style="text-align: right;">Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for adj in recent_inventory_activity %}
+                <tr class="stagger-item">
+                    <td>
+                        <span style="font-weight: 500;">{{ adj.product.name }}</span><br>
+                        <small style="color: var(--muted);">{{ adj.get_adjustment_type_display }}</small>
+                    </td>
+                    <td style="font-family: monospace; font-weight: 600; {% if adj.quantity > 0 %}color:#10b981;{% else %}color:#ef4444;{% endif %}">
+                        {% if adj.quantity > 0 %}+{% endif %}{{ adj.quantity }}
+                    </td>
+                    <td style="text-align: right; font-size: 12px; color: var(--muted);">{{ adj.created_at|timesince }} ago</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center; color: var(--muted); padding: 32px 0; font-size: 13px;">No recent adjustments.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </article>
+
+</section>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Maison Momento · Client Relations</p>
+        <h1>Clients</h1>
+        <p class="subtitle">
+            Nurture lasting client relationships through considered purchase history and meaningful customer insight.
+        </p>
+    </div>
+
+    <button class="primary-btn" type="button">
+        Add client
+    </button>
+</section>
+
+<section class="toolbar" aria-label="Client controls">
+    <input
+        class="search-box"
+        type="search"
+        placeholder="Search clients"
+        aria-label="Search clients"
+    >
+
+    <div class="filters filter-group" role="group" aria-label="Filter clients by relationship type">
+        <button class="filter active" type="button">
+            All
+        </button>
+
+        <button class="filter" type="button">
+            VIP
+        </button>
+
+        <button class="filter" type="button">
+            Regular
+        </button>
+
+        <button class="filter" type="button">
+            New
+        </button>
+    </div>
+</section>
+
+<section class="panel">
+    <p class="eyebrow">Client directory</p>
+    <h3>Relationship register</h3>
+
+    <table class="products-table">
+        <thead>
+            <tr>
+                <th scope="col">Client</th>
+                <th scope="col">Orders</th>
+                <th scope="col">Lifetime value</th>
+                <th scope="col">Last purchase</th>
+                <th scope="col">Relationship</th>
+                <th scope="col">
+                    <span class="sr-only">Actions</span>
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr class="stagger-item">
+                <td>
+                    <div class="product-cell">
+                        <div class="product-image" aria-hidden="true"></div>
+
+                        <div>
+                            <strong>Emma Wilson</strong>
+                            <small>emma@email.com</small>
+                        </div>
+                    </div>
+                </td>
+
+                <td>12</td>
+                <td>₹78,000</td>
+                <td>2 Sept</td>
+
+                <td>
+                    <span class="status in-stock">
+                        VIP
+                    </span>
+                </td>
+
+                <td>
+                    <button class="table-btn edit-btn" type="button">
+                        View
+                    </button>
+                </td>
+            </tr>
+
+            <tr class="stagger-item">
+                <td>
+                    <div class="product-cell">
+                        <div class="product-image" aria-hidden="true"></div>
+
+                        <div>
+                            <strong>Rahul Sharma</strong>
+                            <small>rahul@email.com</small>
+                        </div>
+                    </div>
+                </td>
+
+                <td>6</td>
+                <td>₹31,000</td>
+                <td>Yesterday</td>
+
+                <td>
+                    <span class="status low-stock">
+                        Regular
+                    </span>
+                </td>
+
+                <td>
+                    <button class="table-btn edit-btn" type="button">
+                        View
+                    </button>
+                </td>
+            </tr>
+
+            <tr class="stagger-item">
+                <td>
+                    <div class="product-cell">
+                        <div class="product-image" aria-hidden="true"></div>
+
+                        <div>
+                            <strong>Sarah Khan</strong>
+                            <small>sarah@email.com</small>
+                        </div>
+                    </div>
+                </td>
+
+                <td>1</td>
+                <td>₹7,000</td>
+                <td>Today</td>
+
+                <td>
+                    <span class="status out-stock">
+                        New
+                    </span>
+                </td>
+
+                <td>
+                    <button class="table-btn edit-btn" type="button">
+                        View
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+{% endblock %}

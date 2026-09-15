@@ -27,6 +27,12 @@ venv/
 # Django
 *.log
 local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+/media/
+staticfiles/
+/staticfiles/
 backend/db.sqlite3
 backend/db.sqlite3-journal
 backend/media/
@@ -35,6 +41,7 @@ backend/staticfiles/
 # Node / React
 frontend/node_modules/
 frontend/dist/
+
 
 # IDE
 .idea/

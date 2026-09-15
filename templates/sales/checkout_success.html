@@ -1,0 +1,31 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Ready to Place Order - Maison Momento{% endblock %}
+
+{% block content %}
+<main class="sf-container" style="padding-top: 120px; padding-bottom: 120px; text-align: center; max-width: 600px;">
+    <div style="margin-bottom: 40px;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: #264e36; margin-bottom: 24px;">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <h1 class="sf-page-title" style="margin-bottom: 16px;">Ready to Place Order</h1>
+        <p class="sf-text" style="color: var(--muted); margin-bottom: 40px;">Your shipping information has been validated successfully. In a future phase, you will be able to complete payment and place your order.</p>
+        
+        <div style="text-align: left; background: var(--bg-alt); padding: 32px; margin-bottom: 40px;">
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Shipping Details</h3>
+            <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); line-height: 1.6;">
+                {{ cleaned_data.first_name }} {{ cleaned_data.last_name }}<br>
+                {{ cleaned_data.address_line_1 }}<br>
+                {% if cleaned_data.address_line_2 %}{{ cleaned_data.address_line_2 }}<br>{% endif %}
+                {{ cleaned_data.city }}, {{ cleaned_data.state }} {{ cleaned_data.postal_code }}<br>
+                {{ cleaned_data.country }}<br>
+                {{ cleaned_data.phone }}<br>
+                {{ cleaned_data.email }}
+            </p>
+        </div>
+
+        <a href="{% url 'sales:cart' %}" class="secondary-btn sf-btn-large" style="display: inline-flex; max-width: 300px;">Return to Cart</a>
+    </div>
+</main>
+{% endblock %}

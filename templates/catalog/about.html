@@ -1,0 +1,82 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}About Us | Maison Momento Parfumeur{% endblock %}
+
+{% block content %}
+<!-- About Hero -->
+<section class="sf-hero" style="min-height: 60vh; background-image: url('https://images.unsplash.com/photo-1595425970377-c9703bc48bca?q=80&w=2000&auto=format&fit=crop');">
+    <div class="sf-hero-content">
+        <div class="sf-hero-eyebrow">The Maison</div>
+        <h1>Our Story</h1>
+        <p>A legacy of scent, crafted with passion and precision. We believe fragrance is the ultimate expression of identity.</p>
+    </div>
+</section>
+
+<!-- Our Story Section -->
+<section class="sf-section" style="background: var(--white);">
+    <div class="sf-container">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <h2 style="font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); margin-bottom: 24px; color: var(--charcoal); font-weight: 400;">A Journey in Olfaction</h2>
+            <p style="font-size: 16px; color: var(--charcoal-soft); line-height: 1.8; margin-bottom: 24px;">
+                Founded with a vision to redefine modern perfumery, Maison Momento bridges the gap between classic French traditions and contemporary emotional landscapes. Every bottle encapsulates a memory, a feeling, a fleeting moment suspended in time.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Craftsmanship Section -->
+<section class="sf-section" style="background: var(--warm-beige);">
+    <div class="sf-container sf-pdp-grid">
+        <div class="sf-pdp-image-col" style="top: calc(var(--nav-height) + 20px);">
+            <img src="https://images.unsplash.com/photo-1615634260167-c8cdede054de?q=80&w=800&auto=format&fit=crop" alt="Craftsmanship" class="sf-pdp-image">
+        </div>
+        <div class="sf-pdp-info-col" style="justify-content: center; padding-top: 0;">
+            <div class="sf-hero-eyebrow" style="color: var(--muted); margin-bottom: 16px;">The Process</div>
+            <h2 style="font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); margin-bottom: 32px; color: var(--charcoal); font-weight: 400;">Uncompromising Craftsmanship</h2>
+            <p style="font-size: 16px; color: var(--charcoal-soft); line-height: 1.8; margin-bottom: 24px;">
+                Our perfumes are compounded in Grasse, the undisputed world capital of perfume, using only the finest natural absolutes and meticulously synthesized molecules. 
+                We allow our extracts to macerate for months before bottling, ensuring a depth and longevity that cannot be rushed.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Fragrance Philosophy -->
+<section class="sf-section" style="background: var(--deep-navy); color: var(--ivory); text-align: center;">
+    <div class="sf-container">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <h2 style="font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); margin-bottom: 24px; font-weight: 400;">Our Philosophy</h2>
+            <p style="font-size: 16px; color: rgba(244,244,242,0.8); line-height: 1.8;">
+                We reject mass-market olfactory fatigue. We embrace bold accords, intimate sillage, and unapologetic character. A Maison Momento fragrance does not enter a room before you do; rather, it lingers long after you have departed.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Sustainability -->
+<section class="sf-section" style="background: var(--white);">
+    <div class="sf-container sf-pdp-grid">
+        <div class="sf-pdp-info-col" style="justify-content: center; padding-top: 0;">
+            <div class="sf-hero-eyebrow" style="color: var(--muted); margin-bottom: 16px;">Responsibility</div>
+            <h2 style="font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); margin-bottom: 32px; color: var(--charcoal); font-weight: 400;">Sustainable Luxury</h2>
+            <p style="font-size: 16px; color: var(--charcoal-soft); line-height: 1.8; margin-bottom: 24px;">
+                True luxury respects the earth it borrows from. From ethically sourced sandalwood to recyclable heavy-glass flacons, we ensure our footprint is as light as our top notes.
+            </p>
+        </div>
+        <div class="sf-pdp-image-col" style="top: calc(var(--nav-height) + 20px);">
+            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop" alt="Sustainability" class="sf-pdp-image">
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="sf-section" style="background: var(--charcoal); color: var(--ivory); text-align: center; padding: 120px 0;">
+    <div class="sf-container">
+        <h2 style="font-family: var(--font-display); font-size: clamp(32px, 4vw, 48px); margin-bottom: 16px; font-weight: 400;">Discover the Collection</h2>
+        <p style="font-size: 16px; color: rgba(244,244,242,0.8); line-height: 1.8; margin-bottom: 32px;">Explore Maison Momento's signature fragrances.</p>
+        <a href="{% url 'catalog:product_list' %}" class="primary-btn sf-btn-large" style="display: inline-flex; width: auto; padding: 0 40px; background: var(--warm-beige); color: var(--deep-navy); border: none;">
+            Explore Fragrances
+        </a>
+    </div>
+</section>
+{% endblock %}

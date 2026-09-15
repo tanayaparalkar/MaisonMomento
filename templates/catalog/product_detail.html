@@ -1,0 +1,77 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}{{ product.name }} | Maison Momento Parfumeur{% endblock %}
+
+{% block content %}
+<div class="sf-container">
+    <div class="sf-pdp">
+        <!-- Product Details Split Layout -->
+        <div class="sf-pdp-grid">
+            
+            <!-- Left: Image Sticky Column -->
+            <div class="sf-pdp-image-col">
+                {% if product.primary_image %}
+                    <img src="{{ product.primary_image.image.url }}" alt="{{ product.primary_image.alt_text|default:product.name }}" class="sf-pdp-image" loading="lazy">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop" alt="Fallback image for {{ product.name }}" class="sf-pdp-image" loading="lazy">
+                {% endif %}
+            </div>
+
+            <!-- Right: Info Column -->
+            <div class="sf-pdp-info-col">
+                <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px;">
+                    <a href="{% url 'catalog:product_list' %}" style="text-decoration: none;">Collection</a> &nbsp;/&nbsp; {{ product.category.name }}
+                </div>
+
+                <div class="sf-pdp-brand">{{ product.brand|default:"Maison Momento" }}</div>
+                <h1 class="sf-pdp-title">{{ product.name }}</h1>
+                <div class="sf-pdp-price">₹{{ product.effective_price }}</div>
+                
+                <div class="sf-pdp-desc">
+                    {{ product.description|linebreaks }}
+                </div>
+                
+                <div class="sf-pdp-actions">
+                    <button class="primary-btn sf-btn-large sf-add-to-cart" data-product="{{ product.id }}">
+                        Add to Cart
+                    </button>
+                    <button class="sf-btn-icon sf-wishlist-toggle {% if product.id in wishlisted_product_ids %}is-active{% endif %}" 
+                            data-url="{% url 'catalog:toggle_wishlist' product.pk %}" 
+                            aria-label="{% if product.id in wishlisted_product_ids %}Remove from wishlist{% else %}Add to wishlist{% endif %}">
+                        {% if product.id in wishlisted_product_ids %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        {% else %}
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                        {% endif %}
+                    </button>
+                </div>
+                
+                <div style="border-top: 1px solid var(--border); padding-top: 24px; font-size: 13px; color: var(--muted);">
+                    <p style="margin-bottom: 8px;"><strong>SKU:</strong> {{ product.sku|default:"N/A" }}</p>
+                    <p style="margin-bottom: 8px;"><strong>Family:</strong> {{ product.get_fragrance_family_display|default:product.category.name }}</p>
+                    <p><strong>Concentration:</strong> {{ product.get_concentration_display|default:"Eau de Parfum" }}</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Recommendations Section -->
+{% if similar_products %}
+<section class="sf-section sf-fade-up" style="background: var(--warm-beige); padding: 80px 0;">
+    <div class="sf-container">
+        <div class="sf-section-header" style="text-align: left; margin-bottom: 40px;">
+            <h2 style="font-family: var(--font-display); font-size: clamp(24px, 3vw, 32px); color: var(--charcoal); margin-bottom: 8px; font-weight: 400;">Selected For You</h2>
+            <p style="color: var(--charcoal-soft); font-size: 14px;">Curated selections from the same olfactory family.</p>
+        </div>
+
+        <div class="sf-scroll-row">
+            {% for item in similar_products %}
+                {% include "catalog/includes/product_card.html" with product=item badge_text="Recommended" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

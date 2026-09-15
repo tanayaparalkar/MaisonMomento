@@ -1,0 +1,72 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Adjust Stock: {{ product.name }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Inventory Management</p>
+        <h1>Adjust Stock: {{ product.name }}</h1>
+        <p class="subtitle">
+            Current stock level: <strong>{{ product.stock }} units</strong>
+        </p>
+    </div>
+    <a href="{% url 'dashboard:inventory' %}" class="secondary-btn">Cancel</a>
+</section>
+
+<section class="panel" style="max-width: 600px;">
+    {% if messages %}
+        <div style="margin-bottom: 24px;">
+            {% for message in messages %}
+                <div style="padding: 16px; border-radius: 4px; font-size: 14px; font-weight: 600; {% if message.tags == 'error' %}background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;{% else %}background: #f0fdf4; color: #10b981; border: 1px solid #6ee7b7;{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'dashboard:adjust_stock' product.id %}">
+        {% csrf_token %}
+        <div class="form-grid" style="grid-template-columns: 1fr;">
+            <div class="form-group">
+                <label for="adjustment_type">Adjustment Type</label>
+                <select id="adjustment_type" name="adjustment_type" required>
+                    <option value="increase">Increase (+)</option>
+                    <option value="decrease">Decrease (-)</option>
+                    <option value="restock">Restock (+)</option>
+                    <option value="damaged">Damaged (-)</option>
+                    <option value="manual_correction">Manual Correction (+/-)</option>
+                </select>
+                <small style="color: var(--muted); display: block; margin-top: 4px;">Select the reason category for this adjustment.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantity (Delta)</label>
+                <input
+                    id="quantity"
+                    name="quantity"
+                    type="number"
+                    required
+                    placeholder="e.g., 5 or -2"
+                >
+                <small style="color: var(--muted); display: block; margin-top: 4px;">Use positive numbers to add stock, negative numbers to remove stock.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Internal Notes / Reason</label>
+                <textarea
+                    id="reason"
+                    name="reason"
+                    rows="3"
+                    placeholder="Optional details about this adjustment..."
+                ></textarea>
+            </div>
+        </div>
+
+        <div style="margin-top: 32px; display: flex; gap: 16px;">
+            <button class="primary-btn" type="submit">Submit Adjustment</button>
+            <a href="{% url 'dashboard:stock_history' product.id %}" class="secondary-btn">View History</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

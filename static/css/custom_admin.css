@@ -1,0 +1,353 @@
+/* Maison Momento - Vintage Heritage Perfumerie & Apothecary Admin Theme */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Cinzel:wght@500;600;700;800;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  /* Vintage Heritage Apothecary Palette */
+  --vintage-leather: #241610;
+  --vintage-dark: #1b120c;
+  --vintage-header: #1e150f;
+  --vintage-wood: #3d261a;
+  --vintage-brass: #b89047;
+  --vintage-gold: #c9a45c;
+  --vintage-amber: #cf9b44;
+  --vintage-parchment: #f6f2ea;
+  --vintage-paper: #fcfaf6;
+  --vintage-cream: #efe9dc;
+  --vintage-border: #dcd3c1;
+  --vintage-border-dark: #473224;
+  --vintage-ink: #1f1a17;
+  --vintage-muted: #6b5f55;
+  
+  /* Vintage Apothecary Status Colors */
+  --vintage-green: #264e36;
+  --vintage-green-bg: #eaf2ed;
+  --vintage-green-border: #9cbda9;
+  
+  --vintage-ochre: #7a5416;
+  --vintage-ochre-bg: #fdf5e6;
+  --vintage-ochre-border: #dbc493;
+  
+  --vintage-crimson: #6e1c24;
+  --vintage-crimson-bg: #faeaeb;
+  --vintage-crimson-border: #d99ea3;
+
+  --vintage-navy: #1f2d3d;
+  --vintage-navy-bg: #e8edf3;
+
+  /* Typography */
+  --font-serif-display: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+  --font-serif-body: 'Libre Baskerville', 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'Courier Prime', 'Courier New', monospace;
+}
+
+body {
+  font-family: var(--font-serif-body) !important;
+  background-color: var(--vintage-parchment) !important;
+  color: var(--vintage-ink) !important;
+  margin: 0;
+  padding: 0;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  background-image: radial-gradient(#e9e1d2 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
+}
+
+/* Header & Vintage Apothecary Cornice */
+#header {
+  background: linear-gradient(180deg, #18100b 0%, #251811 100%) !important;
+  border-bottom: 3px double var(--vintage-brass) !important;
+  padding: 16px 32px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+}
+
+#branding h1 {
+  font-family: var(--font-serif-display) !important;
+  letter-spacing: 3px !important;
+  font-weight: 700 !important;
+  font-size: 22px !important;
+  color: #fbf8f2 !important;
+  margin: 0 !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+#branding h1 a {
+  color: #fbf8f2 !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#branding h1 a span.brand-brass {
+  color: var(--vintage-brass) !important;
+  font-weight: 800 !important;
+}
+
+#branding h1 a span.brand-crest {
+  font-family: var(--font-serif-display) !important;
+  font-size: 14px !important;
+  letter-spacing: 2px !important;
+  color: var(--vintage-gold) !important;
+  border: 1px solid var(--vintage-brass) !important;
+  padding: 2px 8px !important;
+  margin-right: 6px !important;
+}
+
+#user-tools {
+  font-family: var(--font-serif-body) !important;
+  font-size: 13px !important;
+  color: #a89a8c !important;
+  letter-spacing: 0.5px !important;
+}
+
+#user-tools a {
+  color: var(--vintage-gold) !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  margin: 0 8px !important;
+  border-bottom: 1px dotted rgba(201, 164, 92, 0.5) !important;
+  transition: all 0.2s ease;
+}
+
+#user-tools a:hover {
+  color: #ffffff !important;
+  border-bottom-style: solid !important;
+}
+
+/* Vintage Navigation Architrave */
+.mm-nav-bar {
+  background: #2a1c14;
+  border-bottom: 1px solid var(--vintage-border-dark);
+  padding: 8px 32px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.mm-nav-link {
+  color: #c9bfb5;
+  text-decoration: none;
+  font-family: var(--font-serif-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+}
+
+.mm-nav-link:hover, .mm-nav-link.active {
+  color: #ffffff;
+  background: rgba(184, 144, 71, 0.15);
+  border: 1px solid var(--vintage-brass);
+}
+
+.mm-nav-link.highlight {
+  background: #3d281a;
+  color: var(--vintage-gold) !important;
+  border: 1px solid var(--vintage-brass);
+  font-weight: 700;
+}
+
+.mm-nav-link.highlight:hover {
+  background: #4f3422;
+  color: #ffffff !important;
+}
+
+/* Breadcrumbs (Vintage Archive Path) */
+div.breadcrumbs {
+  background: #eee8dc !important;
+  border-bottom: 1px solid var(--vintage-border) !important;
+  padding: 10px 32px !important;
+  font-family: var(--font-serif-body) !important;
+  font-size: 12px !important;
+  color: var(--vintage-muted) !important;
+  letter-spacing: 0.5px !important;
+}
+
+div.breadcrumbs a {
+  color: #422919 !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+}
+
+/* Old-School Apothecary Buttons */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+  background: #3a2518 !important;
+  color: #f7f2ea !important;
+  border-radius: 2px !important;
+  border: 1px solid var(--vintage-brass) !important;
+  padding: 7px 16px !important;
+  font-family: var(--font-serif-display) !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover {
+  background: #503423 !important;
+  color: #ffffff !important;
+  border-color: var(--vintage-gold) !important;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+  background: #734827 !important;
+  color: #fff9f0 !important;
+  border: 1px solid #caa565 !important;
+}
+
+.button.default:hover, input[type=submit].default:hover {
+  background: #87552f !important;
+}
+
+/* Main Container & Ledgers */
+#content {
+  padding: 24px 32px !important;
+}
+
+#changelist table {
+  border-radius: 2px !important;
+  border: 1px solid var(--vintage-border) !important;
+  background: var(--vintage-paper) !important;
+  box-shadow: 0 2px 8px rgba(50, 35, 20, 0.06) !important;
+}
+
+#changelist table thead th {
+  background: #eee6d6 !important;
+  color: #2e1d13 !important;
+  font-family: var(--font-serif-display) !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.2px !important;
+  border-bottom: 2px solid var(--vintage-brass) !important;
+  padding: 12px 14px !important;
+}
+
+#changelist table tbody tr {
+  border-bottom: 1px solid #ebe4d5 !important;
+}
+
+#changelist table tbody tr:nth-child(even) {
+  background: #fbf9f4 !important;
+}
+
+#changelist table tbody tr:hover {
+  background: #f5eedf !important;
+}
+
+#changelist table td, #changelist table th {
+  padding: 10px 14px !important;
+  vertical-align: middle !important;
+  font-size: 13px !important;
+  color: var(--vintage-ink) !important;
+}
+
+/* Form Inputs */
+input[type=text], input[type=password], input[type=email], input[type=url],
+input[type=number], input[type=tel], textarea, select {
+  background: #fcfbfa !important;
+  border: 1px solid #cfc5b2 !important;
+  border-radius: 2px !important;
+  padding: 7px 10px !important;
+  font-family: var(--font-serif-body) !important;
+  font-size: 13px !important;
+  color: var(--vintage-ink) !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--vintage-brass) !important;
+  outline: 2px solid rgba(184, 144, 71, 0.25) !important;
+}
+
+/* Vintage Archive Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--vintage-paper);
+  border-radius: 2px;
+  border: 1px solid var(--vintage-border);
+  padding: 18px 20px;
+  box-shadow: 0 2px 6px rgba(40, 25, 15, 0.05);
+  position: relative;
+  border-top: 3px solid var(--vintage-brass);
+}
+
+.kpi-card:hover {
+  border-color: var(--vintage-gold);
+  box-shadow: 0 4px 12px rgba(40, 25, 15, 0.09);
+}
+
+.kpi-label {
+  font-family: var(--font-serif-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--vintage-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-family: var(--font-serif-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--vintage-leather);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.kpi-subtext {
+  font-size: 12px;
+  color: var(--vintage-muted);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* Vintage Stock & Fulfillment Badges (No Emojis) */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.badge-in-stock {
+  background: var(--vintage-green-bg);
+  color: var(--vintage-green);
+  border: 1px solid var(--vintage-green-border);
+}
+
+.badge-low-stock {
+  background: var(--vintage-ochre-bg);
+  color: var(--vintage-ochre);
+  border: 1px solid var(--vintage-ochre-border);
+}
+
+.badge-out-of-stock {
+  background: var(--vintage-crimson-bg);
+  color: var(--vintage-crimson);
+  border: 1px solid var(--vintage-crimson-border);
+}

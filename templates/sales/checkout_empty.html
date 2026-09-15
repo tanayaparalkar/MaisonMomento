@@ -1,0 +1,18 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Checkout - Maison Momento{% endblock %}
+
+{% block content %}
+<main class="sf-container" style="padding-top: 120px; padding-bottom: 120px; text-align: center; max-width: 600px;">
+    <div style="margin-bottom: 40px;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted); margin-bottom: 24px;">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+        <h1 class="sf-page-title" style="margin-bottom: 16px;">Your Shopping Bag is Waiting</h1>
+        <p class="sf-text" style="color: var(--muted); margin-bottom: 40px;">Your cart is currently empty. Please add items to your cart before proceeding to checkout.</p>
+        <a href="{% url 'collections' %}" class="primary-btn sf-btn-large" style="display: inline-flex; max-width: 300px;">Continue Shopping</a>
+    </div>
+</main>
+{% endblock %}

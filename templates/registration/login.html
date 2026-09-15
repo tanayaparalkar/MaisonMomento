@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Maison Momento</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
+    <style>
+        body {
+            background-color: var(--color-background);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: var(--font-secondary);
+        }
+        .login-card {
+            background: #fff;
+            padding: 48px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+        .login-card h1 {
+            font-family: var(--font-primary);
+            font-size: 32px;
+            margin: 0 0 8px 0;
+            color: var(--color-text);
+        }
+        .login-subtitle {
+            color: var(--color-muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+        .login-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            text-align: left;
+        }
+        .login-card label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-family: var(--font-secondary);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .login-card input:focus {
+            border-color: var(--color-primary);
+        }
+        .login-card button {
+            margin-top: 16px;
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .login-card button:hover {
+            background: #501319;
+        }
+        .errorlist {
+            color: #ef4444;
+            font-size: 13px;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>Maison Momento</h1>
+        <div class="login-subtitle">Authentication</div>
+        
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% for field in form %}
+                <div style="margin-bottom: 4px;">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="errorlist" style="margin-top: 4px; margin-bottom: 0;">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit">Sign In</button>
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+    </div>
+</body>
+</html>

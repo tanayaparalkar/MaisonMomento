@@ -1,0 +1,113 @@
+/* Maison Momento - Luxury Login Styling */
+
+:root {
+    --color-ivory: #FDFCF0;
+    --color-charcoal: #2A2A2A;
+    --color-muted-gold: #C5A880;
+    --color-muted-gold-hover: #B5976D;
+    --color-white: #FFFFFF;
+    --color-border: #E8E6D9;
+    --color-error: #D9534F;
+    
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-sans: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--color-ivory);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background-color: var(--color-white);
+    padding: 3rem 4rem;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--color-border);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+h1 {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+    color: var(--color-charcoal);
+    letter-spacing: 0.05em;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+form p {
+    margin-bottom: 1.5rem;
+}
+
+form label {
+    display: block;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    color: var(--color-charcoal);
+    font-weight: 500;
+}
+
+form input[type="text"],
+form input[type="password"] {
+    width: 100%;
+    padding: 0.75rem 0;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    background-color: transparent;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-charcoal);
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+form input[type="text"]:focus,
+form input[type="password"]:focus {
+    outline: none;
+    border-bottom-color: var(--color-muted-gold);
+}
+
+.errorlist {
+    color: var(--color-error);
+    font-size: 0.85rem;
+    list-style: none;
+    padding: 0;
+    margin: -1rem 0 1.5rem 0;
+}
+
+button[type="submit"] {
+    background-color: var(--color-charcoal);
+    color: var(--color-white);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 1rem;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--color-muted-gold);
+}
