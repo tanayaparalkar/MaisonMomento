@@ -1298,5 +1298,632 @@ details[open] .sf-filter-title::after {
         width: 100%;
         justify-content: center;
     }
+/* ==========================================================================
+   CHECKOUT PAGE & FORM AESTHETICS
+   ========================================================================== */
+.sf-checkout-form-container {
+    background: #ffffff;
+    border: 1px solid #ede5d8;
+    border-radius: 8px;
+    padding: 36px 36px 40px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+}
+
+.sf-checkout-section-title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--charcoal, #1a1a1a);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+}
+
+.sf-checkout-section-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted, #64748b);
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+.sf-checkout-group-heading {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--charcoal, #1f2937);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sf-checkout-group-heading svg {
+    color: #92400e;
+}
+
+.sf-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sf-form-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--charcoal, #2d3748);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sf-form-label .sf-optional {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--muted, #8a99a8);
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.sf-input {
+    width: 100%;
+    height: 48px;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--charcoal, #1a1a1a);
+    background-color: #fbf9f6;
+    border: 1px solid #e2d8ca;
+    border-radius: 6px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
+}
+
+.sf-input::placeholder {
+    color: #a0aec0;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.sf-input:hover {
+    border-color: #c9bdae;
+    background-color: #ffffff;
+}
+
+.sf-input:focus {
+    border-color: #0F1E28;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(15, 30, 40, 0.08);
+}
+
+.sf-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 15px;
+    padding-right: 40px;
+    line-height: 1.3;
+}
+
+.sf-select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230F1E28' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.sf-textarea {
+    height: auto;
+    min-height: 90px;
+    padding: 12px 16px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.sf-checkout-divider {
+    height: 1px;
+    background: #f0ebe1;
+    margin: 12px 0 20px;
+}
+
+/* ==========================================================================
+   RESPONSIVE: TABLET (≤1024px)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .sf-container {
+        padding: 0 clamp(20px, 4vw, 40px);
+    }
+
+    .sf-catalog-layout {
+        grid-template-columns: 220px 1fr;
+        gap: 32px;
+    }
+
+    .sf-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 24px;
+    }
+
+    .sf-hero h1 {
+        font-size: clamp(36px, 6vw, 64px);
+    }
+
+    .sf-hero {
+        min-height: 50vh;
+    }
+
+    .sf-section {
+        padding: clamp(48px, 6vw, 80px) 0;
+    }
+
+    .sf-pdp-grid {
+        gap: 48px;
+    }
+
+    .sf-footer {
+        padding: 60px 0 40px;
+    }
+
+    .sf-footer-grid {
+        gap: 32px;
+        margin-bottom: 48px;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE: SMALL TABLET / LARGE PHONE (≤768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .sf-header {
+        min-height: 64px;
+    }
+
+    .sf-wordmark {
+        font-size: 18px;
+    }
+
+    .sf-nav-links {
+        display: none !important;
+    }
+
+    .sf-nav-utils {
+        gap: 10px;
+    }
+
+    .sf-icon-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .sf-icon-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Hero */
+    .sf-hero {
+        min-height: 35vh;
+        padding: 40px 16px;
+    }
+
+    .sf-hero h1 {
+        font-size: clamp(28px, 8vw, 48px);
+    }
+
+    .sf-hero p {
+        font-size: 14px;
+        margin-bottom: 32px;
+    }
+
+    .sf-hero-eyebrow {
+        font-size: 9px;
+        letter-spacing: 0.2em;
+    }
+
+    /* Catalog Layout: Stack sidebar below */
+    .sf-catalog-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .sf-sidebar {
+        position: static;
+        order: 2;
+    }
+
+    .sf-catalog-grid {
+        order: 1;
+    }
+
+    /* Product Grid */
+    .sf-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .sf-card-title {
+        font-size: 16px;
+    }
+
+    .sf-card-desc {
+        font-size: 12px;
+        -webkit-line-clamp: 2;
+        margin-bottom: 12px;
+    }
+
+    .sf-card-price {
+        font-size: 13px;
+    }
+
+    .sf-card-image-wrap {
+        margin-bottom: 12px;
+    }
+
+    .sf-badge {
+        padding: 4px 8px;
+        font-size: 8px;
+    }
+
+    /* Product Detail */
+    .sf-pdp {
+        padding: clamp(32px, 5vw, 56px) 0;
+    }
+
+    .sf-pdp-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .sf-pdp-image-col {
+        position: static;
+    }
+
+    .sf-pdp-title {
+        font-size: clamp(28px, 6vw, 42px);
+    }
+
+    .sf-pdp-price {
+        font-size: 22px;
+        margin-bottom: 24px;
+    }
+
+    .sf-pdp-desc {
+        font-size: 14px;
+        margin-bottom: 32px;
+    }
+
+    .sf-pdp-actions {
+        flex-direction: column;
+        margin-bottom: 32px;
+    }
+
+    .sf-btn-large {
+        min-height: 52px;
+    }
+
+    .sf-btn-icon {
+        width: 52px;
+        height: 52px;
+    }
+
+    /* Sections */
+    .sf-section {
+        padding: clamp(40px, 5vw, 60px) 0;
+    }
+
+    .sf-section-header {
+        margin-bottom: clamp(32px, 5vw, 48px);
+    }
+
+    /* Footer */
+    .sf-footer {
+        padding: 48px 0 32px;
+    }
+
+    .sf-footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        margin-bottom: 40px;
+    }
+
+    .sf-footer-brand {
+        font-size: 24px;
+    }
+
+    .sf-footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    /* Scent Finder Widget */
+    .scent-finder-widget {
+        padding: 20px 16px;
+    }
+
+    .scent-finder-title {
+        font-size: 18px;
+    }
+
+    /* Catalog Top Bar */
+    .sf-catalog-topbar {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Pagination */
+    .sf-pagination {
+        gap: 8px !important;
+    }
+
+    /* Quiz Results Banner */
+    .sf-quiz-results-banner {
+        padding: 20px 16px;
+    }
+
+    .sf-quiz-banner-title {
+        font-size: clamp(18px, 4vw, 24px);
+    }
+
+    /* Scroll Row */
+    .sf-scroll-row > * {
+        flex: 0 0 calc(50% - 12px);
+        min-width: 200px;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE: MOBILE (≤480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+    .sf-container {
+        padding: 0 16px;
+    }
+
+    .sf-header {
+        min-height: 56px;
+    }
+
+    .sf-wordmark {
+        font-size: 16px;
+    }
+
+    .sf-nav-utils {
+        gap: 6px;
+    }
+
+    .sf-icon-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .sf-icon-btn svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* Hero */
+    .sf-hero {
+        min-height: 28vh;
+        padding: 32px 16px;
+    }
+
+    .sf-hero h1 {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+
+    .sf-hero p {
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 24px;
+    }
+
+    /* Product Grid: Single column on smallest screens */
+    .sf-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .sf-card-content {
+        padding: 0 2px;
+    }
+
+    .sf-card-title {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .sf-card-desc {
+        font-size: 11px;
+        -webkit-line-clamp: 2;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .sf-card-price {
+        font-size: 12px;
+    }
+
+    .sf-card-image-wrap {
+        margin-bottom: 8px;
+        border-radius: 4px;
+    }
+
+    .sf-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sf-card-footer .secondary-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Wishlist Toggle on cards */
+    .sf-wishlist-toggle {
+        width: 28px;
+        height: 28px;
+    }
+
+    .sf-wishlist-toggle svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Product Detail */
+    .sf-pdp-title {
+        font-size: 24px;
+    }
+
+    .sf-pdp-brand {
+        font-size: 10px;
+        margin-bottom: 8px;
+    }
+
+    .sf-pdp-price {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+
+    .sf-pdp-desc {
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 24px;
+    }
+
+    /* Cart */
+    .sf-cart-item {
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+
+    .sf-cart-item > div:first-child {
+        width: 100% !important;
+    }
+
+    .sf-cart-item > div:last-child {
+        text-align: left !important;
+        min-width: auto !important;
+    }
+
+    /* Sections */
+    .sf-section {
+        padding: 32px 0;
+    }
+
+    .sf-section-header {
+        margin-bottom: 24px;
+    }
+
+    /* Footer */
+    .sf-footer {
+        padding: 36px 0 24px;
+    }
+
+    .sf-footer-brand {
+        font-size: 20px;
+    }
+
+    .sf-footer-text {
+        font-size: 12px;
+    }
+
+    .sf-footer-heading {
+        font-size: 10px;
+        margin-bottom: 16px;
+    }
+
+    .sf-footer-link {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    /* Scroll Row on mobile: full width cards */
+    .sf-scroll-row > * {
+        flex: 0 0 75%;
+        min-width: 220px;
+    }
+
+    /* Scent Finder */
+    .scent-finder-widget {
+        padding: 16px 14px;
+    }
+
+    .scent-finder-title {
+        font-size: 16px;
+    }
+
+    .scent-finder-desc {
+        font-size: 11px;
+    }
+
+    .scent-quiz-qlabel {
+        font-size: 10px;
+    }
+
+    .scent-quiz-radio,
+    .scent-quiz-checkbox {
+        font-size: 12px;
+    }
+
+    .scent-pill-label {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    .scent-quiz-submit-btn {
+        padding: 12px 14px;
+        font-size: 11px;
+    }
+
+    /* Checkout bar */
+    .sf-checkout-bar-inner {
+        padding: 12px 16px;
+    }
+
+    .sf-checkout-bar-text {
+        font-size: 12px;
+    }
+
+    .sf-checkout-bar-btn {
+        padding: 8px 16px;
+        font-size: 10px;
+    }
+
+    .sf-checkout-bar-bag-link {
+        font-size: 10px;
+        padding: 6px 12px;
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE: VERY SMALL SCREENS (≤360px)
+   ========================================================================== */
+@media (max-width: 360px) {
+    .sf-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .sf-hero h1 {
+        font-size: 24px;
+    }
+
+    .sf-wordmark {
+        font-size: 14px;
+    }
+
+    .sf-card-footer {
+        flex-direction: row;
+        align-items: center;
+    }
 }
 

@@ -39,68 +39,41 @@ class PaymentResult:
         self.raw = raw or {}
 
 
+import importlib
+from django.conf import settings
+
+
+def _get_backend():
+    backend_path = getattr(settings, "PAYMENT_BACKEND", "apps.sales.services.providers.razorpay")
+    return importlib.import_module(backend_path)
+
+
 def create_payment(order):
     """
-    Initiate a payment session for the given Order.
-
-    Parameters
-    ----------
-    order : sales.Order
-        A fully created, totalled Order with order.total set.
-
-    Returns
-    -------
-    PaymentResult
-        Contains checkout_url or session data needed to redirect the customer.
-
-    TODO: Replace this stub with a real provider implementation.
+    Initiate a payment session for the given Order using the configured backend.
     """
-    raise NotImplementedError(
-        "Payment provider not configured. "
-        "Implement create_payment() in a provider module and set PAYMENT_BACKEND."
-    )
+    backend = _get_backend()
+    if hasattr(backend, "create_payment"):
+        return backend.create_payment(order)
+    raise NotImplementedError(f"Backend {backend} does not implement create_payment()")
 
 
 def verify_payment(order, provider_payload):
     """
-    Verify an inbound payment callback/webhook from the gateway.
-
-    Parameters
-    ----------
-    order : sales.Order
-    provider_payload : dict
-        Raw POST body or query params from the gateway callback.
-
-    Returns
-    -------
-    PaymentResult
-
-    TODO: Replace this stub with signature verification + status check.
+    Verify an inbound payment callback from the gateway using the configured backend.
     """
-    raise NotImplementedError(
-        "Payment verification not configured. "
-        "Implement verify_payment() in a provider module and set PAYMENT_BACKEND."
-    )
+    backend = _get_backend()
+    if hasattr(backend, "verify_payment"):
+        return backend.verify_payment(order, provider_payload)
+    raise NotImplementedError(f"Backend {backend} does not implement verify_payment()")
 
 
 def refund_payment(order, amount=None):
     """
-    Initiate a full or partial refund for a paid Order.
-
-    Parameters
-    ----------
-    order : sales.Order
-        Must have payment_status == 'paid'.
-    amount : Decimal | None
-        Amount to refund. Defaults to order.total if None.
-
-    Returns
-    -------
-    PaymentResult
-
-    TODO: Replace this stub with real refund logic.
+    Initiate a full or partial refund using the configured backend.
     """
-    raise NotImplementedError(
-        "Refund processing not configured. "
-        "Implement refund_payment() in a provider module and set PAYMENT_BACKEND."
-    )
+    backend = _get_backend()
+    if hasattr(backend, "refund_payment"):
+        return backend.refund_payment(order, amount=amount)
+    raise NotImplementedError(f"Backend {backend} does not implement refund_payment()")
+

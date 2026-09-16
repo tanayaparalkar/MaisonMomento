@@ -1,5 +1,7 @@
 import json
 import logging
+from decimal import Decimal
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, Http404
 from django.contrib.auth.decorators import login_required
@@ -14,6 +16,8 @@ from .forms import CheckoutForm
 from .services.order_pipeline import place_order
 from .services.notifications import send_order_confirmation
 from .services.inventory import InsufficientStockError
+from .services.payment import create_payment, verify_payment
+from .services.providers.razorpay import is_razorpay_configured
 
 logger = logging.getLogger(__name__)
 
@@ -138,6 +142,9 @@ def checkout_view(request):
         'phone': customer.phone,
     }
 
+    razorpay_ready = is_razorpay_configured()
+    is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or request.POST.get("format") == "json"
+
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
@@ -149,25 +156,57 @@ def checkout_view(request):
                 )
             except ValueError:
                 logger.warning("Checkout attempted with empty cart: customer=%s", customer.pk)
+                if is_ajax:
+                    return JsonResponse({"error": "Cart is empty"}, status=400)
                 return redirect('sales:cart')
             except InsufficientStockError as e:
                 logger.warning(
                     "Insufficient stock at checkout: customer=%s product=%s requested=%s available=%s",
                     customer.pk, e.product.pk, e.requested, e.available,
                 )
-                messages.error(
-                    request,
+                err_msg = (
                     f"Sorry, '{e.product.name}' only has {e.available} unit(s) in stock "
                     f"but your cart contains {e.requested}. Please update your cart."
                 )
+                messages.error(request, err_msg)
+                if is_ajax:
+                    return JsonResponse({"error": err_msg}, status=400)
                 return redirect('sales:cart')
 
             logger.info("Order created: #%s customer=%s total=%s", order.order_number, customer.pk, order.total)
-            # Notification stub — harmless until email is configured
-            send_order_confirmation(order)
 
-            # PRG: redirect to confirmation page — prevents duplicate orders on refresh
+            if razorpay_ready and is_ajax:
+                pay_result = create_payment(order)
+                if pay_result.success:
+                    return JsonResponse({
+                        "success": True,
+                        "razorpay_configured": True,
+                        "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+                        "razorpay_order_id": order.razorpay_order_id,
+                        "amount": int(round(order.total * Decimal("100"))),
+                        "currency": getattr(settings, "RAZORPAY_CURRENCY", "INR"),
+                        "order_number": order.order_number,
+                        "customer_name": order.customer_name,
+                        "customer_email": order.email,
+                        "customer_phone": order.phone,
+                        "verify_url": reverse("sales:payment_verify"),
+                    })
+                else:
+                    logger.error("Razorpay order creation failed for #%s: %s", order.order_number, pay_result.raw)
+                    return JsonResponse({"error": "Payment session could not be created. Please try again."}, status=500)
+
+            # Standard POST / non-AJAX / fallback
+            send_order_confirmation(order)
+            if is_ajax:
+                return JsonResponse({
+                    "success": True,
+                    "razorpay_configured": False,
+                    "redirect_url": reverse("sales:order_confirmation", kwargs={"order_number": order.order_number}),
+                })
             return redirect('sales:order_confirmation', order_number=order.order_number)
+        else:
+            if is_ajax:
+                return JsonResponse({"error": "Form validation failed", "errors": form.errors}, status=400)
 
     else:
         form = CheckoutForm(initial=initial_data)
@@ -180,8 +219,99 @@ def checkout_view(request):
         "shipping_placeholder": "Calculated after order placement",
         "tax_placeholder": "Calculated during payment",
         "estimated_total": f"{cart.subtotal:.2f}",
+        "razorpay_configured": razorpay_ready,
+        "razorpay_key_id": getattr(settings, "RAZORPAY_KEY_ID", ""),
     }
     return render(request, "sales/checkout.html", context)
+
+
+@login_required
+@require_POST
+def payment_verify(request):
+    """
+    Verify payment signature returned from Razorpay modal.
+    Expects POST parameters (form-data or JSON):
+      - razorpay_payment_id
+      - razorpay_order_id
+      - razorpay_signature
+      - order_number
+    """
+    customer = get_customer_from_user(request.user)
+    if not customer:
+        return JsonResponse({"success": False, "error": "Unauthorized customer"}, status=403)
+
+    if request.content_type == "application/json":
+        try:
+            data = json.loads(request.body)
+        except Exception:
+            data = {}
+    else:
+        data = request.POST
+
+    payment_id = data.get("razorpay_payment_id")
+    rzp_order_id = data.get("razorpay_order_id")
+    signature = data.get("razorpay_signature")
+    order_number = data.get("order_number")
+
+    if not order_number:
+        return JsonResponse({"success": False, "error": "Missing order number"}, status=400)
+
+    order = get_object_or_404(Order, order_number=order_number, customer=customer)
+
+    result = verify_payment(order, {
+        "razorpay_payment_id": payment_id,
+        "razorpay_order_id": rzp_order_id,
+        "razorpay_signature": signature,
+    })
+
+    is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json"
+
+    if result.success:
+        messages.success(request, f"Payment successful for Order #{order.order_number}!")
+        redirect_url = reverse("sales:order_confirmation", kwargs={"order_number": order.order_number})
+        if is_ajax:
+            return JsonResponse({"success": True, "redirect_url": redirect_url})
+        return redirect(redirect_url)
+    else:
+        messages.error(request, "Payment verification failed. Your payment was not confirmed.")
+        retry_url = reverse("sales:payment_retry", kwargs={"order_number": order.order_number})
+        if is_ajax:
+            return JsonResponse({
+                "success": False,
+                "error": result.raw.get("error", "Verification failed"),
+                "redirect_url": retry_url
+            }, status=400)
+        return redirect(retry_url)
+
+
+@login_required
+def payment_retry(request, order_number):
+    """
+    Allow customer to retry payment for a pending or failed order.
+    """
+    customer = get_customer_from_user(request.user)
+    if not customer:
+        raise Http404
+
+    order = get_object_or_404(
+        Order.objects.prefetch_related('items__product'),
+        order_number=order_number,
+        customer=customer,
+    )
+
+    if order.payment_status == "paid":
+        return redirect("sales:order_confirmation", order_number=order.order_number)
+
+    razorpay_ready = is_razorpay_configured()
+    context = {
+        "order": order,
+        "razorpay_configured": razorpay_ready,
+        "razorpay_key_id": getattr(settings, "RAZORPAY_KEY_ID", ""),
+        "currency": getattr(settings, "RAZORPAY_CURRENCY", "INR"),
+        "amount": int(round(order.total * Decimal("100"))),
+    }
+    return render(request, "sales/payment_retry.html", context)
+
 
 
 @login_required

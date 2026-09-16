@@ -10,93 +10,142 @@
         
         <!-- Left Column: Shipping Form -->
         <div class="sf-checkout-form-container">
-            <h2 style="font-family: 'Outfit', sans-serif; font-size: 18px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 32px; font-weight: 500;">Shipping Information</h2>
+            {% if razorpay_configured %}
+            <div style="margin-bottom: 24px; padding: 12px 18px; background: rgba(15,30,40,0.03); border: 1px solid rgba(15,30,40,0.09); border-radius: 6px; font-size: 13px; color: var(--text-color); display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <strong>Secure Checkout:</strong> UPI, Cards &amp; NetBanking
+                </span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600;">Razorpay Gateway</span>
+            </div>
+            {% else %}
+            <div style="margin-bottom: 24px; padding: 14px 18px; background: #faf5eb; border: 1px solid #e2d9c8; border-radius: 6px; font-size: 13px; color: #78644e; display: flex; align-items: flex-start; gap: 12px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>
+                    <strong style="color: #92400e;">Payment Gateway Setup:</strong>
+                    Add your <code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code> in <code>.env</code> to activate live/test payments. Orders currently proceed in test confirmation mode.
+                </div>
+            </div>
+            {% endif %}
+
+            <div id="sf-checkout-error-alert" style="display: none; margin-bottom: 24px; padding: 14px 18px; background: #fdf2f2; border: 1px solid #f8b4b4; border-radius: 6px; color: #9b1c1c; font-size: 13px;"></div>
+
+            <h1 class="sf-checkout-section-title">Shipping &amp; Delivery</h1>
+            <p class="sf-checkout-section-subtitle">Please enter your destination details for complimentary signature packaging.</p>
             
-            <form method="POST" action="{% url 'sales:checkout' %}" novalidate class="sf-checkout-form" style="display: flex; flex-direction: column; gap: 24px;">
+            <form id="sf-checkout-form" method="POST" action="{% url 'sales:checkout' %}" novalidate class="sf-checkout-form" style="display: flex; flex-direction: column; gap: 20px;">
                 {% csrf_token %}
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                    <div>
+                <!-- Group 1: Contact Details -->
+                <div class="sf-checkout-group-heading">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Recipient Details
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_first_name">First Name</label>
                         {{ form.first_name }}
                         {% if form.first_name.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.first_name.errors|join:", " }}</div>
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.first_name.errors|join:", " }}</div>
                         {% endif %}
                     </div>
-                    <div>
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_last_name">Last Name</label>
                         {{ form.last_name }}
                         {% if form.last_name.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.last_name.errors|join:", " }}</div>
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.last_name.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                    <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_email">Email Address</label>
                         {{ form.email }}
                         {% if form.email.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.email.errors|join:", " }}</div>
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.email.errors|join:", " }}</div>
                         {% endif %}
                     </div>
-                    <div>
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_phone">Phone Number</label>
                         {{ form.phone }}
                         {% if form.phone.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.phone.errors|join:", " }}</div>
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.phone.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                 </div>
 
-                <div>
+                <div class="sf-checkout-divider"></div>
+
+                <!-- Group 2: Delivery Destination -->
+                <div class="sf-checkout-group-heading">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Delivery Destination
+                </div>
+
+                <div class="sf-form-group">
+                    <label class="sf-form-label" for="id_address_line_1">Address Line 1</label>
                     {{ form.address_line_1 }}
                     {% if form.address_line_1.errors %}
-                        <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.address_line_1.errors|join:", " }}</div>
+                        <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.address_line_1.errors|join:", " }}</div>
                     {% endif %}
                 </div>
                 
-                <div>
+                <div class="sf-form-group">
+                    <label class="sf-form-label" for="id_address_line_2">Address Line 2 <span class="sf-optional">Optional</span></label>
                     {{ form.address_line_2 }}
                     {% if form.address_line_2.errors %}
-                        <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.address_line_2.errors|join:", " }}</div>
+                        <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.address_line_2.errors|join:", " }}</div>
                     {% endif %}
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                    <div>
-                        {{ form.city }}
-                        {% if form.city.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.city.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <div>
-                        {{ form.state }}
-                        {% if form.state.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.state.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                    <div>
-                        {{ form.postal_code }}
-                        {% if form.postal_code.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.postal_code.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_country">Country / Region</label>
                         {{ form.country }}
                         {% if form.country.errors %}
-                            <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.country.errors|join:", " }}</div>
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.country.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_state">State / Province</label>
+                        {{ form.state }}
+                        {% if form.state.errors %}
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.state.errors|join:", " }}</div>
                         {% endif %}
                     </div>
                 </div>
 
-                <div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_city">City</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.city.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="sf-form-group">
+                        <label class="sf-form-label" for="id_postal_code">Postal Code / PIN</label>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}
+                            <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.postal_code.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="sf-checkout-divider"></div>
+
+                <!-- Group 3: Delivery Notes -->
+                <div class="sf-form-group">
+                    <label class="sf-form-label" for="id_delivery_notes">Delivery Instructions <span class="sf-optional">Optional</span></label>
                     {{ form.delivery_notes }}
                     {% if form.delivery_notes.errors %}
-                        <div class="sf-form-error" style="color: #6e1c24; font-size: 12px; margin-top: 8px;">{{ form.delivery_notes.errors|join:", " }}</div>
+                        <div class="sf-form-error" style="color: #9b1c1c; font-size: 12px; margin-top: 4px;">{{ form.delivery_notes.errors|join:", " }}</div>
                     {% endif %}
                 </div>
                 
-                <!-- Hidden button so it submits on enter or can be targeted by external button -->
+                <!-- Hidden button for enter key submit -->
                 <button type="submit" id="sf-checkout-submit-btn" style="display: none;"></button>
             </form>
         </div>
@@ -146,10 +195,166 @@
                 <span>₹{{ estimated_total }}</span>
             </div>
 
-            <button onclick="document.getElementById('sf-checkout-submit-btn').click();" class="primary-btn sf-btn-large" style="width: 100%;">
-                Place Order
+            <button id="sf-place-order-btn" type="button" class="primary-btn sf-btn-large" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                {% if razorpay_configured %}
+                    Proceed to Payment
+                {% else %}
+                    Place Order
+                {% endif %}
             </button>
+            <div style="text-align: center; margin-top: 14px;">
+                <a href="{% url 'sales:cart' %}" style="font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted); text-decoration: none;">
+                    &larr; Back to Shopping Bag
+                </a>
+            </div>
         </div>
     </div>
 </main>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const placeOrderBtn = document.getElementById('sf-place-order-btn');
+        const form = document.getElementById('sf-checkout-form');
+        const errorAlert = document.getElementById('sf-checkout-error-alert');
+        const originalBtnText = placeOrderBtn.innerHTML;
+
+        const showError = (msg) => {
+            errorAlert.textContent = msg;
+            errorAlert.style.display = 'block';
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        const hideError = () => {
+            errorAlert.textContent = '';
+            errorAlert.style.display = 'none';
+        };
+
+        const setLoading = (loading, text) => {
+            if (loading) {
+                placeOrderBtn.disabled = true;
+                placeOrderBtn.style.opacity = '0.7';
+                placeOrderBtn.innerHTML = text || 'Processing...';
+            } else {
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.style.opacity = '1';
+                placeOrderBtn.innerHTML = originalBtnText;
+            }
+        };
+
+        placeOrderBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            // Client HTML5 validation check
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            setLoading(true, 'Securing Order...');
+
+            const formData = new FormData(form);
+            formData.append('format', 'json');
+
+            try {
+                const response = await fetch("{% url 'sales:checkout' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken') || ''
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    if (data.errors) {
+                        const firstErrorKey = Object.keys(data.errors)[0];
+                        showError(data.errors[firstErrorKey][0] || 'Please review your shipping details.');
+                    } else {
+                        showError(data.error || 'Unable to create order. Please try again.');
+                    }
+                    setLoading(false);
+                    return;
+                }
+
+                // If Razorpay is active, launch checkout modal
+                if (data.razorpay_configured && window.Razorpay) {
+                    setLoading(true, 'Opening Payment Gateway...');
+
+                    const options = {
+                        key: data.razorpay_key_id,
+                        amount: data.amount,
+                        currency: data.currency || 'INR',
+                        name: 'Maison Momento Parfumeur',
+                        description: 'Order #' + data.order_number,
+                        order_id: data.razorpay_order_id,
+                        prefill: {
+                            name: data.customer_name || '',
+                            email: data.customer_email || '',
+                            contact: data.customer_phone || ''
+                        },
+                        theme: {
+                            color: '#0F1E28'
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                setLoading(false);
+                            }
+                        },
+                        handler: async function(paymentResponse) {
+                            setLoading(true, 'Verifying Payment...');
+                            try {
+                                const verifyRes = await fetch(data.verify_url, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': getCookie('csrftoken') || '',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    },
+                                    body: JSON.stringify({
+                                        razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                                        razorpay_order_id: paymentResponse.razorpay_order_id,
+                                        razorpay_signature: paymentResponse.razorpay_signature,
+                                        order_number: data.order_number
+                                    })
+                                });
+
+                                const verifyData = await verifyRes.json();
+                                if (verifyData.success && verifyData.redirect_url) {
+                                    window.location.href = verifyData.redirect_url;
+                                } else {
+                                    window.location.href = verifyData.redirect_url || '/cart/orders/' + data.order_number + '/';
+                                }
+                            } catch (err) {
+                                window.location.href = '/cart/orders/' + data.order_number + '/';
+                            }
+                        }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function(resp) {
+                        setLoading(false);
+                        const errDesc = resp.error && resp.error.description ? resp.error.description : 'Payment failed.';
+                        showError('Payment unsuccessful: ' + errDesc + '. You can retry payment.');
+                    });
+                    rzp.open();
+
+                } else if (data.redirect_url) {
+                    // Direct confirmation (e.g. test mode or unconfigured keys)
+                    window.location.href = data.redirect_url;
+                } else {
+                    window.location.href = "{% url 'sales:my_orders' %}";
+                }
+
+            } catch (err) {
+                console.error('Checkout error:', err);
+                showError('A network error occurred. Please check your connection and try again.');
+                setLoading(false);
+            }
+        });
+    });
+</script>
 {% endblock %}

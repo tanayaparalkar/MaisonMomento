@@ -697,3 +697,127 @@ class OrderDetailViewTest(TestCase):
         # Verify product card is rendered (Buy Again feature uses product_card.html)
         self.assertContains(resp, "sf-add-to-cart")
         self.assertContains(resp, str(self.product.id))
+
+
+# ---------------------------------------------------------------------------
+# Razorpay Payment Integration Tests
+# ---------------------------------------------------------------------------
+from unittest.mock import patch, MagicMock
+from razorpay.errors import SignatureVerificationError
+from apps.sales.services.providers.razorpay import (
+    is_razorpay_configured,
+    create_payment,
+    verify_payment,
+)
+
+
+class RazorpayPaymentTests(TestCase):
+    def setUp(self):
+        self.user = make_user("rzp_buyer")
+        self.customer = make_customer(self.user)
+        self.product = make_product("Ambre Nuit", price="5000.00")
+        self.order = Order.objects.create(
+            customer=self.customer,
+            customer_name="Test Customer",
+            email=self.user.email,
+            phone="9876543210",
+            shipping_address="12 Luxury Lane",
+            subtotal=Decimal("5000.00"),
+            total=Decimal("5000.00"),
+            payment_status="pending",
+        )
+        OrderItem.objects.create(
+            order=self.order,
+            product=self.product,
+            quantity=1,
+            unit_price=self.product.price,
+            subtotal=self.product.price,
+        )
+
+    def test_is_razorpay_configured_flag(self):
+        with self.settings(RAZORPAY_KEY_ID="", RAZORPAY_KEY_SECRET=""):
+            self.assertFalse(is_razorpay_configured())
+        with self.settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="secret"):
+            self.assertTrue(is_razorpay_configured())
+
+    @patch("apps.sales.services.providers.razorpay.get_razorpay_client")
+    def test_create_payment_success(self, mock_get_client):
+        mock_client = MagicMock()
+        mock_client.order.create.return_value = {"id": "order_mock123", "amount": 500000}
+        mock_get_client.return_value = mock_client
+
+        with self.settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="secret"):
+            res = create_payment(self.order)
+
+        self.assertTrue(res.success)
+        self.assertEqual(res.provider_reference, "order_mock123")
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.razorpay_order_id, "order_mock123")
+
+    @patch("apps.sales.services.providers.razorpay.get_razorpay_client")
+    def test_verify_payment_signature_success(self, mock_get_client):
+        mock_client = MagicMock()
+        # verify_payment_signature raises on failure, returns None/True on success
+        mock_client.utility.verify_payment_signature.return_value = True
+        mock_get_client.return_value = mock_client
+
+        self.order.razorpay_order_id = "order_mock123"
+        self.order.save()
+
+        with self.settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="secret"):
+            payload = {
+                "razorpay_order_id": "order_mock123",
+                "razorpay_payment_id": "pay_mock456",
+                "razorpay_signature": "mock_valid_signature",
+            }
+            res = verify_payment(self.order, payload)
+
+        self.assertTrue(res.success)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.payment_status, "paid")
+        self.assertEqual(self.order.order_status, "confirmed")
+        self.assertEqual(self.order.razorpay_payment_id, "pay_mock456")
+        self.assertEqual(self.order.razorpay_signature, "mock_valid_signature")
+
+    @patch("apps.sales.services.providers.razorpay.get_razorpay_client")
+    def test_verify_payment_signature_invalid(self, mock_get_client):
+        mock_client = MagicMock()
+        mock_client.utility.verify_payment_signature.side_effect = SignatureVerificationError("Invalid")
+        mock_get_client.return_value = mock_client
+
+        self.order.razorpay_order_id = "order_mock123"
+        self.order.save()
+
+        with self.settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="secret"):
+            payload = {
+                "razorpay_order_id": "order_mock123",
+                "razorpay_payment_id": "pay_tampered",
+                "razorpay_signature": "bad_sig",
+            }
+            res = verify_payment(self.order, payload)
+
+        self.assertFalse(res.success)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.payment_status, "failed")
+
+    @patch("apps.sales.views.verify_payment")
+    def test_payment_verify_endpoint_valid(self, mock_verify):
+        from apps.sales.services.payment import PaymentResult
+        mock_verify.return_value = PaymentResult(success=True, provider_reference="pay_123")
+
+        self.client.force_login(self.user)
+        resp = self.client.post(
+            reverse("sales:payment_verify"),
+            data={
+                "order_number": self.order.order_number,
+                "razorpay_order_id": "order_123",
+                "razorpay_payment_id": "pay_123",
+                "razorpay_signature": "sig_123",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(resp.status_code, 200)
+        json_data = resp.json()
+        self.assertTrue(json_data["success"])
+        self.assertIn(self.order.order_number, json_data["redirect_url"])
+

@@ -1,0 +1,118 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Payment Pending - Maison Momento{% endblock %}
+
+{% block content %}
+<main class="sf-container" style="padding-top: 100px; padding-bottom: 120px; max-width: 680px; margin: 0 auto; text-align: center;">
+    <div style="background: var(--bg-alt); padding: 48px 36px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.06);">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #fef3c7; color: #d97706; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 24px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+
+        <h1 style="font-family: var(--font-display); font-size: 26px; font-weight: 500; margin-bottom: 12px; color: var(--text-color);">
+            Payment Not Completed
+        </h1>
+        <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6;">
+            Your order <strong>#{{ order.order_number }}</strong> has been created, but payment has not yet been verified.
+        </p>
+
+        <div style="background: #fff; border: 1px solid rgba(0,0,0,0.06); padding: 20px; border-radius: 6px; margin-bottom: 32px; text-align: left; font-family: 'Inter', sans-serif; font-size: 14px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: var(--muted);">Order Amount:</span>
+                <span style="font-family: 'Courier Prime', monospace; font-weight: 600;">₹{{ order.total }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: var(--muted);">Customer:</span>
+                <span>{{ order.customer_name }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--muted);">Status:</span>
+                <span style="text-transform: capitalize; color: #d97706; font-weight: 500;">{{ order.payment_status }}</span>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% if razorpay_configured %}
+            <button id="rzp-retry-btn" class="primary-btn sf-btn-large" style="width: 100%;">
+                Complete Payment via Razorpay
+            </button>
+            {% else %}
+            <div style="font-size: 13px; color: #92400e; background: #fef3c7; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                Razorpay keys are not configured in .env. Please configure them to retry online payment.
+            </div>
+            {% endif %}
+            <a href="{% url 'sales:my_orders' %}" class="sf-btn-outline sf-btn-large" style="width: 100%; text-decoration: none; text-align: center; display: block;">
+                View My Orders
+            </a>
+            <a href="{% url 'catalog:product_list' %}" style="font-family: 'Inter', sans-serif; font-size: 13px; color: var(--muted); text-decoration: none; margin-top: 8px;">
+                &larr; Return to Boutique
+            </a>
+        </div>
+    </div>
+</main>
+
+{% if razorpay_configured %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('rzp-retry-btn')?.addEventListener('click', function() {
+        const btn = this;
+        btn.disabled = true;
+        btn.textContent = "Opening Payment...";
+
+        const options = {
+            key: "{{ razorpay_key_id }}",
+            amount: {{ amount }},
+            currency: "{{ currency }}",
+            name: "Maison Momento Parfumeur",
+            description: "Order #{{ order.order_number }}",
+            order_id: "{{ order.razorpay_order_id }}",
+            prefill: {
+                name: "{{ order.customer_name }}",
+                email: "{{ order.email }}",
+                contact: "{{ order.phone }}"
+            },
+            theme: {
+                color: "#0F1E28"
+            },
+            modal: {
+                ondismiss: function() {
+                    btn.disabled = false;
+                    btn.textContent = "Complete Payment via Razorpay";
+                }
+            },
+            handler: function(response) {
+                btn.textContent = "Verifying...";
+                fetch("{% url 'sales:payment_verify' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        order_number: "{{ order.order_number }}"
+                    })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    window.location.reload();
+                });
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+    });
+</script>
+{% endif %}
+{% endblock %}
