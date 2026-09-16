@@ -15,7 +15,6 @@ from apps.catalog.models import Category, Product, ProductImage
 from apps.sales.models import Order, OrderItem
 from apps.customers.models import Customer
 from apps.recommendations.models import Interaction
-from apps.analytics.models import AnalyticsEvent
 from apps.tracking.models import VisitorSession
 
 
@@ -521,36 +520,5 @@ class Command(BaseCommand):
             interactions_count += 1
 
         self.stdout.write(self.style.SUCCESS(f"[OK] Seeded {interactions_count} Interaction events for recommendation engine."))
-
-        # 8. Seed AnalyticsEvent records
-        event_types = [
-            "PRODUCT_VIEW", "PRODUCT_CLICK", "ADD_TO_CART", "CHECKOUT_STARTED",
-            "PURCHASE", "RECOMMENDATION_VIEW", "RECOMMENDATION_CLICK",
-            "WHATSAPP_CLICK", "INSTAGRAM_CLICK"
-        ]
-
-        events_count = 0
-        for i in range(75):
-            ev_type = random.choices(
-                event_types,
-                weights=[25, 18, 12, 6, 4, 15, 8, 7, 9],
-                k=1
-            )[0]
-            cust = random.choice(cust_objs + [None, None])
-            prod = random.choice(product_objs)
-            past_time = now - timedelta(days=random.randint(0, 10), hours=random.randint(0, 23))
-            
-            ev = AnalyticsEvent.objects.create(
-                user=cust,
-                session_id=f"sess_telemetry_{random.randint(100, 999)}",
-                event_type=ev_type,
-                product=prod if "CLICK" in ev_type or "VIEW" in ev_type or "CART" in ev_type else None,
-                category=prod.category if prod else None,
-                metadata={"browser": "Safari/Chrome", "device": random.choice(["desktop", "mobile"])}
-            )
-            AnalyticsEvent.objects.filter(id=ev.id).update(created_at=past_time)
-            events_count += 1
-
-        self.stdout.write(self.style.SUCCESS(f"[OK] Seeded {events_count} telemetry AnalyticsEvents (funnels, marketing, rec CTR)."))
         self.stdout.write(self.style.SUCCESS("*** Maison Momento development data seeding completed successfully!"))
 

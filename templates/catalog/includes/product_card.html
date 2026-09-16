@@ -26,7 +26,14 @@
                     {% elif product.stock == 0 %}
                         <button class="secondary-btn" disabled style="min-height: 36px; padding: 0 16px; font-size: 9px; opacity: 0.45; cursor: not-allowed;">Out of Stock</button>
                     {% else %}
-                        <button class="secondary-btn sf-add-to-cart" data-product="{{ product.id }}" style="min-height: 36px; padding: 0 16px; font-size: 9px; cursor: pointer; position: relative; z-index: 2;">Add to Bag</button>
+                        <div class="sf-card-cart-controls" data-product-id="{{ product.id }}">
+                            <button class="secondary-btn sf-add-to-cart" data-product="{{ product.id }}" style="min-height: 36px; padding: 0 16px; font-size: 9px; cursor: pointer; position: relative; z-index: 2;">Add to Bag</button>
+                            <div class="sf-card-qty-control" style="display: none;">
+                                <button type="button" class="sf-card-qty-btn sf-card-qty-minus" data-product="{{ product.id }}" aria-label="Decrease quantity">&minus;</button>
+                                <span class="sf-card-qty-value">1</span>
+                                <button type="button" class="sf-card-qty-btn sf-card-qty-plus" data-product="{{ product.id }}" aria-label="Increase quantity">&plus;</button>
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
             </div>

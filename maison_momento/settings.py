@@ -84,7 +84,6 @@ else:
 # Application definition
 # ---------------------------------------------------------------------------
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -97,7 +96,6 @@ INSTALLED_APPS = [
     "apps.sales.apps.SalesConfig",
     "apps.customers.apps.CustomersConfig",
     "apps.recommendations.apps.RecommendationsConfig",
-    "apps.analytics.apps.AnalyticsConfig",
     "apps.tracking.apps.TrackingConfig",
     "apps.inventory.apps.InventoryConfig",
     "apps.notifications",
@@ -140,20 +138,29 @@ WSGI_APPLICATION = "maison_momento.wsgi.application"
 
 # ---------------------------------------------------------------------------
 # Database
-# Credentials are read from environment variables.
+# Credentials are read from environment variables. Defaults to SQLite for local dev.
 # ---------------------------------------------------------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "maison_momento"),
-        "USER": os.environ.get("DB_USER", "tanaya"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-        "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
-        # Extension point: add CONN_MAX_AGE for persistent connections in production
-        # "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "0")),
+_db_engine = os.environ.get("DB_ENGINE", "sqlite3")
+if _db_engine in ("sqlite3", "django.db.backends.sqlite3"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": _db_engine if "." in _db_engine else f"django.db.backends.{_db_engine}",
+            "NAME": os.environ.get("DB_NAME", "maison_momento"),
+            "USER": os.environ.get("DB_USER", "tanaya"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+            # Extension point: add CONN_MAX_AGE for persistent connections in production
+            # "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "0")),
+        }
+    }
 
 # ---------------------------------------------------------------------------
 # Password validation

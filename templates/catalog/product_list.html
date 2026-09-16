@@ -53,87 +53,355 @@
 <section id="collection" class="sf-section" style="padding-top: 0;">
     <div class="sf-container sf-catalog-layout">
         
-        <!-- Sidebar Filters -->
+        <!-- Sidebar Filters & Scent Finder Questionnaire -->
         <aside class="sf-sidebar">
-            <form id="filter-form" method="GET" action="{% url 'catalog:product_list' %}">
-                <input type="hidden" name="sort" value="{{ current_sort }}">
-                
-                <!-- Search Filter -->
-                <div class="sf-filter-group" style="margin-bottom: 24px;">
-                    <div style="position: relative;">
-                        <input type="search" name="q" value="{{ current_query }}" placeholder="Search fragrances..." 
-                               style="width: 100%; padding: 12px 16px 12px 40px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); background: var(--warm-beige); font-family: var(--font-body); font-size: 14px; color: var(--charcoal); outline: none; transition: border-color 250ms var(--ease-soft);"
-                               onfocus="this.style.borderColor='var(--deep-navy)'"
-                               onblur="this.style.borderColor='var(--border-strong)'">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 16px; top: 14px;">
-                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+
+            <!-- Find Your Scent Questionnaire Widget -->
+            <div class="scent-finder-widget">
+                <div class="scent-finder-header">
+                    <div class="scent-finder-eyebrow">
+                        <span>&#10022; Olfactory Engine</span>
                     </div>
+                    <h2 class="scent-finder-title">Find Your Scent &#127800;</h2>
+                    <p class="scent-finder-desc">Answer 7 signature questions to discover your bespoke fragrance or the ideal gift.</p>
                 </div>
+
+                <!-- Purpose Switcher: Myself vs Gifting -->
+                <div class="scent-purpose-tabs" role="tablist">
+                    <button type="button" class="scent-purpose-tab {% if quiz_purpose != 'gifting' %}is-active{% endif %}" id="tab-purpose-myself" onclick="setQuizPurpose('myself')">
+                        &#128100; For Myself
+                    </button>
+                    <button type="button" class="scent-purpose-tab {% if quiz_purpose == 'gifting' %}is-active{% endif %}" id="tab-purpose-gifting" onclick="setQuizPurpose('gifting')">
+                        &#127873; For Gifting
+                    </button>
+                </div>
+
+                <form id="scent-finder-form" method="GET" action="{% url 'catalog:product_list' %}">
+                    <input type="hidden" name="scent_quiz" value="1">
+                    <input type="hidden" name="purpose" id="scent-purpose-input" value="{{ quiz_purpose|default:'myself' }}">
+                    {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+
+                    <!-- Question 1: What kind of scent do you prefer? -->
+                    <div class="scent-quiz-group">
+                        <div class="scent-quiz-qlabel">
+                            <span>1. Scent Preference</span>
+                        </div>
+                        <div class="scent-quiz-options">
+                            {% for option in "Fresh & Clean,Sweet & Fruity,Floral,Woody,Spicy & Warm"|make_list|default:"" %}
+                            {% endfor %}
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="scent_pref" value="Fresh & Clean" {% if quiz_answers.scent_pref == 'Fresh & Clean' %}checked{% endif %}>
+                                <span>Fresh &amp; Clean</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="scent_pref" value="Sweet & Fruity" {% if quiz_answers.scent_pref == 'Sweet & Fruity' %}checked{% endif %}>
+                                <span>Sweet &amp; Fruity</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="scent_pref" value="Floral" {% if quiz_answers.scent_pref == 'Floral' %}checked{% endif %}>
+                                <span>Floral</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="scent_pref" value="Woody" {% if quiz_answers.scent_pref == 'Woody' or not is_quiz %}checked{% endif %}>
+                                <span>Woody</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="scent_pref" value="Spicy & Warm" {% if quiz_answers.scent_pref == 'Spicy & Warm' %}checked{% endif %}>
+                                <span>Spicy &amp; Warm</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 2: Which notes do you like? -->
+                    <div class="scent-quiz-group">
+                        <div class="scent-quiz-qlabel">
+                            <span>2. Notes You Like</span>
+                        </div>
+                        <div class="scent-quiz-pill-grid">
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="Citrus" {% if 'Citrus' in quiz_answers.notes %}checked{% endif %}>
+                                <span>Citrus</span>
+                            </label>
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="Vanilla" {% if 'Vanilla' in quiz_answers.notes %}checked{% endif %}>
+                                <span>Vanilla</span>
+                            </label>
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="Rose" {% if 'Rose' in quiz_answers.notes %}checked{% endif %}>
+                                <span>Rose</span>
+                            </label>
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="Jasmine" {% if 'Jasmine' in quiz_answers.notes %}checked{% endif %}>
+                                <span>Jasmine</span>
+                            </label>
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="Sandalwood" {% if 'Sandalwood' in quiz_answers.notes %}checked{% endif %}>
+                                <span>Sandalwood</span>
+                            </label>
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="Musk" {% if 'Musk' in quiz_answers.notes %}checked{% endif %}>
+                                <span>Musk</span>
+                            </label>
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="Amber" {% if 'Amber' in quiz_answers.notes %}checked{% endif %}>
+                                <span>Amber</span>
+                            </label>
+                            <label class="scent-pill-label">
+                                <input type="checkbox" name="notes" value="No Preference" id="note-no-pref" onchange="handleNoPref(this)" {% if 'No Preference' in quiz_answers.notes %}checked{% endif %}>
+                                <span>No Preference</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 3: What vibe are you going for? -->
+                    <div class="scent-quiz-group">
+                        <div class="scent-quiz-qlabel">
+                            <span>3. Intended Vibe</span>
+                        </div>
+                        <div class="scent-quiz-options">
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="vibe" value="Everyday" {% if quiz_answers.vibe == 'Everyday' %}checked{% endif %}>
+                                <span>Everyday</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="vibe" value="Elegant" {% if quiz_answers.vibe == 'Elegant' or not is_quiz %}checked{% endif %}>
+                                <span>Elegant</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="vibe" value="Romantic" {% if quiz_answers.vibe == 'Romantic' %}checked{% endif %}>
+                                <span>Romantic</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="vibe" value="Bold" {% if quiz_answers.vibe == 'Bold' %}checked{% endif %}>
+                                <span>Bold</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="vibe" value="Mysterious" {% if quiz_answers.vibe == 'Mysterious' %}checked{% endif %}>
+                                <span>Mysterious</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 4: When will you mostly wear it? -->
+                    <div class="scent-quiz-group">
+                        <div class="scent-quiz-qlabel">
+                            <span>4. When To Wear</span>
+                        </div>
+                        <div class="scent-quiz-options">
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="wear_time" value="Day" {% if quiz_answers.wear_time == 'Day' %}checked{% endif %}>
+                                <span>Day</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="wear_time" value="Night" {% if quiz_answers.wear_time == 'Night' %}checked{% endif %}>
+                                <span>Night</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="wear_time" value="Both" {% if quiz_answers.wear_time == 'Both' or not is_quiz %}checked{% endif %}>
+                                <span>Both (Day &amp; Night)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 5: How strong do you like your fragrance? -->
+                    <div class="scent-quiz-group">
+                        <div class="scent-quiz-qlabel">
+                            <span>5. Fragrance Strength</span>
+                        </div>
+                        <div class="scent-quiz-options">
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="strength" value="Light" {% if quiz_answers.strength == 'Light' %}checked{% endif %}>
+                                <span>Light (Subtle sillage)</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="strength" value="Moderate" {% if quiz_answers.strength == 'Moderate' or not is_quiz %}checked{% endif %}>
+                                <span>Moderate (Eau de Parfum)</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="strength" value="Strong" {% if quiz_answers.strength == 'Strong' %}checked{% endif %}>
+                                <span>Strong (Parfum Extrait)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 6: What's your budget? -->
+                    <div class="scent-quiz-group">
+                        <div class="scent-quiz-qlabel">
+                            <span>6. Desired Budget</span>
+                        </div>
+                        <div class="scent-quiz-options">
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="budget" value="Under ₹1,000" {% if quiz_answers.budget == 'Under ₹1,000' %}checked{% endif %}>
+                                <span>Under &#8377;1,000</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="budget" value="₹1,000–₹2,500" {% if quiz_answers.budget == '₹1,000–₹2,500' %}checked{% endif %}>
+                                <span>&#8377;1,000 &ndash; &#8377;2,500</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="budget" value="₹2,500+" {% if quiz_answers.budget == '₹2,500+' or not is_quiz %}checked{% endif %}>
+                                <span>&#8377;2,500+ (Artisan Luxury)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 7: Who is it for? -->
+                    <div class="scent-quiz-group">
+                        <div class="scent-quiz-qlabel">
+                            <span>7. Who Is It For?</span>
+                        </div>
+                        <div class="scent-quiz-options">
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="target_audience" value="Men" {% if quiz_answers.target_audience == 'Men' %}checked{% endif %}>
+                                <span>Men</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="target_audience" value="Women" {% if quiz_answers.target_audience == 'Women' %}checked{% endif %}>
+                                <span>Women</span>
+                            </label>
+                            <label class="scent-quiz-radio">
+                                <input type="radio" name="target_audience" value="Unisex" {% if quiz_answers.target_audience == 'Unisex' or not is_quiz %}checked{% endif %}>
+                                <span>Unisex</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="scent-quiz-submit-btn">
+                        &rarr; Find My Scent
+                    </button>
+                    {% if is_quiz %}
+                        <a href="{% url 'catalog:product_list' %}" class="scent-quiz-reset-link">Clear Scent Profile</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Manual Filters Accordion -->
+            <details class="sf-filter-group" {% if not is_quiz %}open{% endif %} style="border-top: 1px solid var(--border); padding-top: 16px;">
+                <summary class="sf-filter-title" style="cursor: pointer;">Filter by Attribute</summary>
                 
-                <!-- Category Filter -->
-                <details class="sf-filter-group" open>
-                    <summary class="sf-filter-title">Category</summary>
-                    <div class="sf-filter-content">
-                        <label class="sf-radio">
-                            <input type="radio" name="category" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.category %}checked{% endif %}>
-                            <span>All Categories</span>
-                        </label>
-                        {% for cat in categories %}
-                        <label class="sf-radio">
-                            <input type="radio" name="category" value="{{ cat.slug }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.category == cat.slug %}checked{% endif %}>
-                            <span>{{ cat.name }}</span>
-                        </label>
-                        {% endfor %}
+                <form id="filter-form" method="GET" action="{% url 'catalog:product_list' %}" style="margin-top: 16px;">
+                    <input type="hidden" name="sort" value="{{ current_sort }}">
+                    
+                    <!-- Search Filter -->
+                    <div class="sf-filter-group" style="margin-bottom: 24px;">
+                        <div style="position: relative;">
+                            <input type="search" name="q" value="{{ current_query }}" placeholder="Search fragrances..." 
+                                   style="width: 100%; padding: 12px 16px 12px 40px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); background: var(--warm-beige); font-family: var(--font-body); font-size: 14px; color: var(--charcoal); outline: none; transition: border-color 250ms var(--ease-soft);"
+                                   onfocus="this.style.borderColor='var(--deep-navy)'"
+                                   onblur="this.style.borderColor='var(--border-strong)'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 16px; top: 14px;">
+                                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
                     </div>
-                </details>
-                
-                <!-- Fragrance Family Filter -->
-                <details class="sf-filter-group" open>
-                    <summary class="sf-filter-title">Fragrance Family</summary>
-                    <div class="sf-filter-content">
-                        <label class="sf-radio">
-                            <input type="radio" name="family" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.family %}checked{% endif %}>
-                            <span>All Families</span>
-                        </label>
-                        {% for value, label in families %}
-                        <label class="sf-radio">
-                            <input type="radio" name="family" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.family == value %}checked{% endif %}>
-                            <span>{{ label }}</span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                </details>
+                    
+                    <!-- Category Filter -->
+                    <details class="sf-filter-group" open>
+                        <summary class="sf-filter-title">Category</summary>
+                        <div class="sf-filter-content">
+                            <label class="sf-radio">
+                                <input type="radio" name="category" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.category %}checked{% endif %}>
+                                <span>All Categories</span>
+                            </label>
+                            {% for cat in categories %}
+                            <label class="sf-radio">
+                                <input type="radio" name="category" value="{{ cat.slug }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.category == cat.slug %}checked{% endif %}>
+                                <span>{{ cat.name }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    
+                    <!-- Fragrance Family Filter -->
+                    <details class="sf-filter-group" open>
+                        <summary class="sf-filter-title">Fragrance Family</summary>
+                        <div class="sf-filter-content">
+                            <label class="sf-radio">
+                                <input type="radio" name="family" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.family %}checked{% endif %}>
+                                <span>All Families</span>
+                            </label>
+                            {% for value, label in families %}
+                            <label class="sf-radio">
+                                <input type="radio" name="family" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.family == value %}checked{% endif %}>
+                                <span>{{ label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </details>
 
-                <!-- Gender Filter -->
-                <details class="sf-filter-group" open>
-                    <summary class="sf-filter-title">Gender</summary>
-                    <div class="sf-filter-content">
-                        <label class="sf-radio">
-                            <input type="radio" name="gender" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.gender %}checked{% endif %}>
-                            <span>All</span>
-                        </label>
-                        {% for value, label in genders %}
-                        <label class="sf-radio">
-                            <input type="radio" name="gender" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.gender == value %}checked{% endif %}>
-                            <span>{{ label }}</span>
-                        </label>
-                        {% endfor %}
-                    </div>
-                </details>
+                    <!-- Gender Filter -->
+                    <details class="sf-filter-group" open>
+                        <summary class="sf-filter-title">Gender</summary>
+                        <div class="sf-filter-content">
+                            <label class="sf-radio">
+                                <input type="radio" name="gender" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.gender %}checked{% endif %}>
+                                <span>All</span>
+                            </label>
+                            {% for value, label in genders %}
+                            <label class="sf-radio">
+                                <input type="radio" name="gender" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.gender == value %}checked{% endif %}>
+                                <span>{{ label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </details>
 
-
-
-                <!-- Graceful Fallback Submit Button -->
-                <noscript>
-                    <button type="submit" class="primary-btn" style="width: 100%; margin-top: 24px;">Apply Filters</button>
-                </noscript>
-            </form>
+                    <noscript>
+                        <button type="submit" class="primary-btn" style="width: 100%; margin-top: 24px;">Apply Filters</button>
+                    </noscript>
+                </form>
+            </details>
         </aside>
 
-        <!-- Product Grid -->
+        <!-- Product Grid / Scent Quiz Recommendations -->
         <div class="sf-catalog-grid">
-            {% if page_obj %}
+            {% if is_quiz and quiz_results %}
+                <!-- Recommendation Engine Quiz Results Banner -->
+                <div class="sf-quiz-results-banner">
+                    <div class="sf-quiz-banner-eyebrow">
+                        {% if quiz_purpose == 'gifting' %}&#127873; Gifting Curation Formulation{% else %}&#127800; Scent Profile Recommendations{% endif %}
+                    </div>
+                    <h2 class="sf-quiz-banner-title">
+                        {% if quiz_purpose == 'gifting' %}
+                            Curated Gift Recommendations
+                        {% else %}
+                            Your Signature Scent Matches
+                        {% endif %}
+                    </h2>
+                    <p class="sf-quiz-banner-desc">
+                        {% if quiz_purpose == 'gifting' %}
+                            Ranked by our Olfactory Engine for gifting distinction, tailored to your recipient's profile, wear occasion, and desired notes.
+                        {% else %}
+                            Ranked by our Olfactory Recommendation Engine based on your scent accord preference, desired strength, and chosen fragrance notes.
+                        {% endif %}
+                    </p>
+                    <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                        <span style="font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #e5cd96; font-weight: 700;">
+                            {{ quiz_results|length }} Formulations Matched
+                        </span>
+                        <a href="{% url 'catalog:product_list' %}" style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #ffffff; text-decoration: underline;">
+                            Reset Questionnaire / View All
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sf-grid">
+                    {% for item in quiz_results %}
+                        <div style="position: relative; display: flex; flex-direction: column;">
+                            <div class="sf-quiz-match-badge">
+                                {{ item.match_percentage }}% Match
+                            </div>
+                            {% include "catalog/includes/product_card.html" with product=item.product %}
+                            <div style="padding: 0 4px 16px;">
+                                <span class="sf-quiz-reason-pill">
+                                    {% if item.is_gifting %}&#127873; Gift Choice &bull; {% endif %}{{ item.match_reason }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            {% elif page_obj %}
                 <div class="sf-grid">
                     {% for product in page_obj %}
                         {% include "catalog/includes/product_card.html" %}
@@ -269,5 +537,42 @@
         {% endif %}
     </div>
 {% endif %}
+
+<!-- Scent Finder Questionnaire Helper Scripts -->
+<script>
+    // Purpose Tab Switcher: Myself vs Gifting
+    function setQuizPurpose(purpose) {
+        const input = document.getElementById('scent-purpose-input');
+        if (input) input.value = purpose;
+
+        const myselfTab = document.getElementById('tab-purpose-myself');
+        const giftingTab = document.getElementById('tab-purpose-gifting');
+
+        if (purpose === 'gifting') {
+            if (giftingTab) giftingTab.classList.add('is-active');
+            if (myselfTab) myselfTab.classList.remove('is-active');
+        } else {
+            if (myselfTab) myselfTab.classList.add('is-active');
+            if (giftingTab) giftingTab.classList.remove('is-active');
+        }
+    }
+
+    // "No Preference" mutual exclusion for note checkboxes
+    function handleNoPref(el) {
+        const form = el.closest('form') || document;
+        const noteCheckboxes = form.querySelectorAll('input[name="notes"]');
+
+        if (el.value === 'No Preference' && el.checked) {
+            // Uncheck all specific notes
+            noteCheckboxes.forEach(cb => {
+                if (cb.value !== 'No Preference') cb.checked = false;
+            });
+        } else if (el.value !== 'No Preference' && el.checked) {
+            // Uncheck "No Preference" when a specific note is selected
+            const noPrefCb = form.querySelector('#note-no-pref');
+            if (noPrefCb) noPrefCb.checked = false;
+        }
+    }
+</script>
 
 {% endblock %}

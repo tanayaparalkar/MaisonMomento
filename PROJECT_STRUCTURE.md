@@ -4,14 +4,13 @@ Maison Momento is a Django-based premium fragrance e-commerce platform. It provi
 
 Key features include:
 - **Customer Storefront**: Premium catalogue, shopping cart, and checkout flow.
-- **Admin Dashboard**: Operational center for managing the business.
+- **Staff Dashboard**: Operational center for managing the business.
 - **Recommendation Engine**: Provides related product suggestions.
 - **Inventory Management**: Tracks stock and historical adjustments.
 - **Order Management**: Processes lifecycle states of customer orders.
-- **Notification System**: Internal event-driven alerts for admins and customers.
-- **Analytics**: Business insights and metrics.
+- **Notification System**: Internal event-driven alerts for staff and customers.
 - **CSV Export**: Data export capabilities for reporting.
-- **PostgreSQL**: Primary relational database.
+- **SQLite / PostgreSQL**: Relational database storage.
 
 ---
 
@@ -33,7 +32,6 @@ Browser → URLs → Views → Service Layer → Domain Apps (Models) → Databa
 ```
 MaisonMomento/
 ├── apps/
-│   ├── analytics/
 │   ├── catalog/
 │   ├── customers/
 │   ├── inventory/
@@ -57,10 +55,6 @@ MaisonMomento/
 ---
 
 # 4. Apps
-
-### apps/analytics
-- **Purpose**: Calculates and aggregates business metrics and insights.
-- **Contains**: `models.py`, `views.py`, `urls.py`
 
 ### apps/catalog
 - **Purpose**: Responsible for the product catalogue, categories, browsing, filtering, and product detail pages.
@@ -169,18 +163,16 @@ The project currently passes **76 tests** across the suite.
 - Account (Profile)
 - Login
 
-### Admin (Dashboard)
+### Staff Dashboard
 - Dashboard (Overview)
 - Products (Catalogue Management)
 - Inventory
 - Orders
 - Clients
 - Recommendations (Health & Tuning)
-- Insights (Analytics)
 - Exports
 - Notifications (System & Operational)
 - Settings
-- Django Admin (Categories)
 
 ---
 
@@ -207,7 +199,6 @@ The project currently passes **76 tests** across the suite.
 - **Buttons**: `storefront.css`, `dashboard.css`
 - **Search**: `templates/catalog/base.html`, `templates/catalog/product_list.html`
 - **Animations**: Defined within `storefront.css` and `dashboard.css`
-- **Charts**: Rendered in `templates/admin/analytics/dashboard.html` (Legacy) / Dashboard templates
 - **Typography & Theme**: CSS custom properties in `dashboard.css` (inherited by storefront)
 - **Notifications**: `dashboard/templates/dashboard/notifications.html`, `templates/customers/notifications.html`, `base.html` (for badges)
 - **Wishlist**: `templates/catalog/base.html` (JS logic and badge), `product_detail.html`

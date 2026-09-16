@@ -76,10 +76,10 @@
                         <span class="sf-summary-total">₹{{ cart.subtotal }}</span>
                     </div>
                     
-                    <button class="primary-btn sf-btn-large" style="width: 100%; opacity: 0.5; cursor: not-allowed;">
-                        Proceed to Checkout
-                    </button>
-                    <p style="text-align: center; font-size: 12px; color: var(--muted); margin-top: 16px;">Checkout functionality coming soon.</p>
+                    <a href="{% url 'sales:checkout' %}" class="primary-btn sf-btn-large" style="display: flex; align-items: center; justify-content: center; width: 100%; text-decoration: none; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">
+                        Proceed to Checkout &rarr;
+                    </a>
+                    <p style="text-align: center; font-size: 11px; color: var(--muted); margin-top: 14px; letter-spacing: 0.05em;">Complimentary secure insured delivery included.</p>
                 </div>
             </div>
         {% else %}

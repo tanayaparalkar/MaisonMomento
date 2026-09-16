@@ -44,8 +44,7 @@
                                 Fragrances
                             </a>
 
-                            <!-- TODO(Phase 10C): Build a custom dashboard categories page. Currently temporarily routing to Django Admin until this module is built. -->
-                            <a href="{% url 'admin:catalog_category_changelist' %}" role="menuitem" title="Temporary admin interface">
+                            <a href="{% url 'collections' %}" role="menuitem">
                                 Categories
                             </a>
 
@@ -65,10 +64,6 @@
 
                     <a href="{% url 'dashboard:recommendations' %}" class="nav-item">
                         Recommendations
-                    </a>
-
-                    <a href="{% url 'dashboard:analytics' %}" class="nav-item">
-                        Insights
                     </a>
                     
                     <a href="{% url 'dashboard:export_data' %}" class="nav-item">

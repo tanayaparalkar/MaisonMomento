@@ -12,8 +12,10 @@ import re
 
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
+from apps.recommendations.engine import RecommendationEngine
 from apps.recommendations.services import (
     RecommendationLogger,
     RecommendationService,
@@ -160,34 +162,85 @@ def product_list(request):
         request, query, category_slug, family, gender, categories
     )
 
-    # Recommendations are suppressed while filters are active
+    # Check for Scent Finder Questionnaire submission
+    is_quiz = request.GET.get('scent_quiz') == '1' or bool(request.GET.get('scent_pref'))
+    quiz_results = None
+    quiz_answers = {}
+    purpose = request.GET.get('purpose', 'myself')
+
+    if is_quiz:
+        notes_raw = request.GET.getlist('notes')
+        if not notes_raw and request.GET.get('notes_csv'):
+            notes_raw = [n.strip() for n in request.GET.get('notes_csv').split(',') if n.strip()]
+
+        quiz_answers = {
+            'purpose': purpose,
+            'scent_pref': request.GET.get('scent_pref', ''),
+            'notes': notes_raw,
+            'vibe': request.GET.get('vibe', ''),
+            'wear_time': request.GET.get('wear_time', ''),
+            'strength': request.GET.get('strength', ''),
+            'budget': request.GET.get('budget', ''),
+            'target_audience': request.GET.get('target_audience', ''),
+        }
+        quiz_results = RecommendationEngine.recommend_from_quiz(quiz_answers, purpose=purpose, limit=12)
+
+        chip_title = "🎁 Curated Gifting Scent Profile" if purpose == "gifting" else "🌸 Personalized Scent Profile"
+        active_filters.append({
+            'name': chip_title,
+            'remove_url': '?'
+        })
+
+    # Recommendations are suppressed while filters or quiz are active
     is_filtering = bool(
         query or category_slug or family or gender
+        or is_quiz
         or (page_number and page_number != '1')
         or (sort != 'featured')
     )
 
     rec_payload = {"trending": [], "recent": [], "recommended": []}
-    if not is_filtering:
+    if not is_filtering and not is_quiz:
         visitor = getattr(request, 'visitor', None)
         rec_payload = RecommendationService.get_homepage_context(visitor)
 
-    return render(
-        request,
-        "catalog/product_list.html",
-        {
-            "page_obj":      page_obj,
-            "categories":    categories,
-            "families":      Product.FRAGRANCE_FAMILY_CHOICES,
-            "genders":       Product.GENDER_CHOICES,
-            "active_filters": active_filters,
-            "query_string":  query_string,
-            "current_sort":  sort,
-            "current_query": query,
-            "is_filtering":  is_filtering,
-            **rec_payload,
-        }
-    )
+    context = {
+        "page_obj":       page_obj,
+        "categories":     categories,
+        "families":       Product.FRAGRANCE_FAMILY_CHOICES,
+        "genders":        Product.GENDER_CHOICES,
+        "active_filters": active_filters,
+        "query_string":   query_string,
+        "current_sort":   sort,
+        "current_query":  query,
+        "is_filtering":   is_filtering,
+        "is_quiz":        is_quiz,
+        "quiz_results":   quiz_results,
+        "quiz_answers":   quiz_answers,
+        "quiz_purpose":   purpose,
+        **rec_payload,
+    }
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' and request.GET.get('format') == 'json':
+        items_data = []
+        if quiz_results:
+            for item in quiz_results:
+                prod = item['product']
+                img_url = prod.primary_image.image.url if prod.primary_image and prod.primary_image.image else None
+                items_data.append({
+                    'id': prod.id,
+                    'name': prod.name,
+                    'brand': prod.brand,
+                    'price': f"{prod.effective_price:.2f}",
+                    'image': img_url,
+                    'detail_url': f"/products/{prod.id}/",
+                    'match_percentage': item['match_percentage'],
+                    'match_reason': item['match_reason'],
+                    'is_gifting': item['is_gifting'],
+                })
+        return JsonResponse({'is_quiz': True, 'results': items_data})
+
+    return render(request, "catalog/product_list.html", context)
 
 
 def product_detail(request, pk):

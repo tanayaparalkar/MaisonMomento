@@ -1,6 +1,6 @@
-# Maison Momento — Vintage Parfumeur & Apothécaire Admin Panel
+# Maison Momento — Vintage Parfumeur & Apothécaire Platform
 
-A vintage, old-school retailer-focused **Django Admin Panel** and business intelligence ledger engineered for **Maison Momento** (Haute Parfumerie, Attar & Fine Fragrances).
+A vintage, old-school retailer-focused platform and operations center engineered for **Maison Momento** (Haute Parfumerie, Attar & Fine Fragrances).
 
 ---
 
@@ -36,10 +36,6 @@ A vintage, old-school retailer-focused **Django Admin Panel** and business intel
 - Modular recency-weighted category scoring in `apps/recommendations/services.py` (`get_recommendations`).
 - Prioritizes top-affinity categories and filters out out-of-stock items.
 
-### 8. Analytics & Retail Intelligence Ledger (`/admin/analytics/`)
-- Date filters: *Today*, *Yesterday*, *Last 7 Days*, *Last 30 Days*, *This Month*, *All Time*.
-- Executive KPI cards, interactive Chart.js revenue & orders timeline, leading formulations, and stock health ledger.
-
 ---
 
 ## 🚀 Quickstart: Running Locally
@@ -58,8 +54,8 @@ python manage.py seed_dev_data
 python manage.py runserver
 ```
 
-**Credentials**:
-- **Admin Portal**: [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
-- **Analytics Ledger**: [http://127.0.0.1:8000/admin/analytics/](http://127.0.0.1:8000/admin/analytics/)
+**Credentials & Access**:
+- **Storefront**: [http://127.0.0.1:8000/products/](http://127.0.0.1:8000/products/)
+- **Staff Dashboard**: [http://127.0.0.1:8000/dashboard/](http://127.0.0.1:8000/dashboard/)
 - **Username**: `admin`
 - **Password**: `admin123`

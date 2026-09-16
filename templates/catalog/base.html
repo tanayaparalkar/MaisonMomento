@@ -204,16 +204,123 @@
                         
                         updateCartBadge(data.cart_total_items);
                         
-                        // Visual feedback
-                        const originalText = btn.textContent;
-                        btn.textContent = 'Added to Bag';
-                        setTimeout(() => btn.textContent = originalText, 2000);
+                        // Swap button for quantity counter
+                        const wrapper = btn.closest('.sf-card-cart-controls');
+                        if (wrapper) {
+                            btn.style.display = 'none';
+                            const qtyControl = wrapper.querySelector('.sf-card-qty-control');
+                            if (qtyControl) {
+                                qtyControl.style.display = 'flex';
+                                qtyControl.querySelector('.sf-card-qty-value').textContent = '1';
+                            }
+                        } else {
+                            // Fallback for product detail page button (no wrapper)
+                            btn.textContent = '✓ In Bag';
+                            btn.classList.add('sf-btn-in-bag');
+                        }
+                        
+                        // Show sticky bottom checkout bar
+                        showCheckoutBar(data);
                         
                     } catch (err) {
                         console.error('Cart add error:', err);
                     }
                 });
             });
+
+            // Quantity +/- on product cards (delegated)
+            document.addEventListener('click', async (e) => {
+                const plusBtn = e.target.closest('.sf-card-qty-plus');
+                const minusBtn = e.target.closest('.sf-card-qty-minus');
+                const qtyBtn = plusBtn || minusBtn;
+                if (!qtyBtn) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const productId = qtyBtn.dataset.product;
+                const wrapper = qtyBtn.closest('.sf-card-cart-controls');
+                const qtyControl = qtyBtn.closest('.sf-card-qty-control');
+                const qtyDisplay = qtyControl.querySelector('.sf-card-qty-value');
+                let currentQty = parseInt(qtyDisplay.textContent) || 1;
+
+                if (plusBtn) {
+                    currentQty++;
+                } else {
+                    currentQty = Math.max(0, currentQty - 1);
+                }
+
+                try {
+                    const action = currentQty === 0 ? 'REMOVE' : 'UPDATE';
+                    const response = await fetch('/cart/api/action/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            action: action,
+                            product_id: productId,
+                            quantity: currentQty
+                        })
+                    });
+
+                    const data = await response.json();
+                    updateCartBadge(data.cart_total_items);
+
+                    if (currentQty === 0) {
+                        // Removed — show Add to Bag button again
+                        if (wrapper) {
+                            qtyControl.style.display = 'none';
+                            const addBtn = wrapper.querySelector('.sf-add-to-cart');
+                            if (addBtn) {
+                                addBtn.style.display = '';
+                                addBtn.textContent = 'Add to Bag';
+                                addBtn.classList.remove('sf-btn-in-bag');
+                            }
+                        }
+                        // Hide checkout bar if cart is empty
+                        if (data.cart_total_items === 0) {
+                            const bar = document.getElementById('sf-checkout-bar');
+                            if (bar) bar.classList.remove('is-visible');
+                        }
+                    } else {
+                        qtyDisplay.textContent = currentQty;
+                        showCheckoutBar(data);
+                    }
+                } catch (err) {
+                    console.error('Qty update error:', err);
+                }
+            });
+
+            // Sticky Bottom Checkout Bar
+            function showCheckoutBar(data) {
+                const bar = document.getElementById('sf-checkout-bar');
+                if (!bar) return;
+
+                const nameEl = document.getElementById('sf-bar-product-name');
+                const countEl = document.getElementById('sf-bar-count');
+
+                if (nameEl && data.product_name) {
+                    nameEl.textContent = data.product_name;
+                }
+                if (countEl && data.cart_total_items) {
+                    const c = data.cart_total_items;
+                    countEl.textContent = c + (c === 1 ? ' item' : ' items');
+                }
+
+                bar.classList.add('is-visible');
+            }
+
+            // Dismiss bar
+            const barDismiss = document.getElementById('sf-checkout-bar-dismiss');
+            if (barDismiss) {
+                barDismiss.addEventListener('click', () => {
+                    const bar = document.getElementById('sf-checkout-bar');
+                    if (bar) bar.classList.remove('is-visible');
+                });
+            }
 
             // Cart Page Item Updates
             document.querySelectorAll('.sf-cart-item').forEach(itemEl => {
@@ -246,8 +353,6 @@
                             }
                         } else {
                             input.value = newQty;
-                            // Line total is trickier to calculate here accurately without returning it from server, 
-                            // so we rely on page reload if we want strict accuracy, or we just reload
                             window.location.reload(); 
                         }
                         
@@ -278,5 +383,23 @@
             });
         });
     </script>
+
+    <!-- Sticky Bottom Checkout Bar -->
+    <div id="sf-checkout-bar" class="sf-checkout-bar">
+        <div class="sf-checkout-bar-inner">
+            <div class="sf-checkout-bar-info">
+                <span class="sf-checkout-bar-check">✓</span>
+                <span class="sf-checkout-bar-text">
+                    <strong id="sf-bar-product-name">Item</strong> added to bag
+                    <span class="sf-checkout-bar-count">(<span id="sf-bar-count">1 item</span> in bag)</span>
+                </span>
+            </div>
+            <div class="sf-checkout-bar-actions">
+                <a href="{% url 'sales:cart' %}" class="sf-checkout-bar-bag-link">View Bag</a>
+                <a href="{% url 'sales:checkout' %}" class="sf-checkout-bar-btn">Go to Checkout &rarr;</a>
+                <button type="button" id="sf-checkout-bar-dismiss" class="sf-checkout-bar-dismiss" aria-label="Dismiss">&times;</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

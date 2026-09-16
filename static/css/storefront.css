@@ -787,3 +787,516 @@ details[open] .sf-filter-title::after {
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
 }
+
+/* ==========================================================================
+   SCENT FINDER QUESTIONNAIRE (SIDEBAR WIDGET)
+   ========================================================================== */
+.scent-finder-widget {
+    background: linear-gradient(165deg, #fdfbf7 0%, #f6f0e6 100%);
+    border: 1px solid #dcd2bf;
+    border-radius: var(--radius-sm, 6px);
+    padding: 24px 20px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 20px rgba(74, 52, 33, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.scent-finder-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #b89047 0%, #e2cf98 50%, #b89047 100%);
+}
+
+.scent-finder-header {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.scent-finder-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #926f34;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.scent-finder-title {
+    font-family: var(--font-display, serif);
+    font-size: 22px;
+    color: var(--charcoal, #1f1b18);
+    font-weight: 400;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.scent-finder-desc {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #6d645a;
+    margin: 0;
+}
+
+/* Purpose Tabs: Myself vs Gifting */
+.scent-purpose-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: rgba(220, 210, 191, 0.35);
+    padding: 4px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(210, 198, 175, 0.6);
+}
+
+.scent-purpose-tab {
+    background: transparent;
+    border: none;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #5a5146;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 200ms var(--ease-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.scent-purpose-tab.is-active {
+    background: #ffffff;
+    color: #1a1613;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-weight: 700;
+    border: 1px solid #d4c7b0;
+}
+
+/* Question Section */
+.scent-quiz-group {
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(220, 210, 191, 0.5);
+}
+
+.scent-quiz-group:last-of-type {
+    border-bottom: none;
+    padding-bottom: 6px;
+}
+
+.scent-quiz-qlabel {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #2e261f;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.scent-quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.scent-quiz-pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.scent-quiz-radio,
+.scent-quiz-checkbox {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #403831;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+    transition: color 150ms ease;
+}
+
+.scent-quiz-radio:hover,
+.scent-quiz-checkbox:hover {
+    color: #000;
+}
+
+.scent-quiz-radio input,
+.scent-quiz-checkbox input {
+    margin-right: 9px;
+    accent-color: #9c7336;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.scent-pill-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 11px;
+    background: #ffffff;
+    border: 1px solid #dcd2bf;
+    border-radius: 16px;
+    font-size: 11.5px;
+    color: #544a40;
+    cursor: pointer;
+    transition: all 180ms ease;
+    user-select: none;
+}
+
+.scent-pill-label:hover {
+    border-color: #9c7336;
+    color: #1a1613;
+    background: #fdfaf3;
+}
+
+.scent-pill-label input {
+    display: none;
+}
+
+.scent-pill-label:has(input:checked) {
+    background: #2a2016;
+    color: #f7eedb;
+    border-color: #2a2016;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(42, 32, 22, 0.2);
+}
+
+.scent-quiz-submit-btn {
+    width: 100%;
+    padding: 13px 18px;
+    background: linear-gradient(135deg, #9c7336 0%, #b89047 50%, #896229 100%);
+    color: #ffffff;
+    border: 1px solid #cbb382;
+    border-radius: 4px;
+    font-family: var(--font-body, sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(156, 115, 54, 0.35);
+    transition: all 250ms var(--ease-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.scent-quiz-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(156, 115, 54, 0.45);
+    filter: brightness(1.06);
+}
+
+.scent-quiz-reset-link {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: #8c8172;
+    text-decoration: underline;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: color 150ms ease;
+}
+
+.scent-quiz-reset-link:hover {
+    color: #2a2016;
+}
+
+/* Quiz Result Showcase Area */
+.sf-quiz-results-banner {
+    background: linear-gradient(135deg, #241a13 0%, #34261c 100%);
+    color: #fff9f0;
+    border: 1px solid #b89047;
+    border-radius: var(--radius-sm, 6px);
+    padding: 28px 32px;
+    margin-bottom: 36px;
+    position: relative;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.sf-quiz-banner-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #e5cd96;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.sf-quiz-banner-title {
+    font-family: var(--font-display, serif);
+    font-size: clamp(22px, 2.5vw, 32px);
+    color: #ffffff;
+    font-weight: 400;
+    margin: 0 0 10px 0;
+}
+
+.sf-quiz-banner-desc {
+    font-size: 13.5px;
+    color: #d1c5b4;
+    max-width: 680px;
+    margin: 0 0 18px 0;
+    line-height: 1.6;
+}
+
+.sf-quiz-match-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(184, 144, 71, 0.95);
+    color: #1a140d;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 5;
+}
+
+.sf-quiz-reason-pill {
+    font-size: 11px;
+    color: #8c6a38;
+    background: #fdf6ea;
+    border: 1px solid #ebd9b5;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 6px;
+}
+
+/* ==========================================================================
+   PRODUCT CARD INLINE QUANTITY COUNTER
+   ========================================================================== */
+.sf-card-cart-controls {
+    position: relative;
+    z-index: 2;
+}
+
+.sf-card-qty-control {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-strong, #c7bba5);
+    border-radius: 4px;
+    overflow: hidden;
+    min-height: 36px;
+}
+
+.sf-card-qty-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 34px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--charcoal, #1a1613);
+    transition: background 150ms ease, color 150ms ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.sf-card-qty-btn:hover {
+    background: var(--warm-beige, #f8f3ea);
+    color: var(--deep-navy, #1a1613);
+}
+
+.sf-card-qty-btn:active {
+    background: #e8dfce;
+}
+
+.sf-card-qty-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 34px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--charcoal, #1a1613);
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    border-left: 1px solid var(--border, #e5ddd0);
+    border-right: 1px solid var(--border, #e5ddd0);
+    user-select: none;
+}
+
+/* ==========================================================================
+   STICKY BOTTOM CHECKOUT BAR
+   ========================================================================== */
+.sf-checkout-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    transform: translateY(100%);
+    transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sf-checkout-bar.is-visible {
+    transform: translateY(0);
+}
+
+.sf-checkout-bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #1f1812 0%, #2e2118 100%);
+    border-top: 1px solid #9c7336;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.sf-checkout-bar-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.sf-checkout-bar-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #276749;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.sf-checkout-bar-text {
+    font-size: 14px;
+    color: #f5eedf;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sf-checkout-bar-text strong {
+    font-weight: 600;
+    color: #fff;
+}
+
+.sf-checkout-bar-count {
+    color: #a89980;
+    font-size: 13px;
+    margin-left: 4px;
+}
+
+.sf-checkout-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.sf-checkout-bar-bag-link {
+    color: #d4c5a9 !important;
+    text-decoration: none !important;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid rgba(156, 115, 54, 0.4);
+    border-radius: 4px;
+    transition: all 200ms ease;
+}
+
+.sf-checkout-bar-bag-link:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #9c7336;
+    color: #fff !important;
+}
+
+.sf-checkout-bar-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #c09548 0%, #a67c38 100%);
+    color: #1a1410 !important;
+    text-decoration: none !important;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0 2px 10px rgba(192, 149, 72, 0.3);
+    transition: all 250ms ease;
+    cursor: pointer;
+}
+
+.sf-checkout-bar-btn:hover {
+    background: linear-gradient(135deg, #d4a550 0%, #b8893e 100%);
+    box-shadow: 0 4px 16px rgba(192, 149, 72, 0.5);
+    transform: translateY(-1px);
+}
+
+.sf-checkout-bar-dismiss {
+    background: none;
+    border: none;
+    color: #7d7265;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color 150ms ease;
+}
+
+.sf-checkout-bar-dismiss:hover {
+    color: #f5eedf;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 640px) {
+    .sf-checkout-bar-inner {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 20px;
+        text-align: center;
+    }
+
+    .sf-checkout-bar-info {
+        justify-content: center;
+    }
+
+    .sf-checkout-bar-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+

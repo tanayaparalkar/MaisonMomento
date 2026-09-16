@@ -10,7 +10,7 @@ import logging
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Sum
-from django.contrib.admin.views.decorators import staff_member_required
+from .decorators import staff_member_required
 from django.shortcuts import render
 
 from apps.catalog.models import Product
@@ -179,11 +179,6 @@ def clients(request):
 @staff_member_required
 def recommendations(request):
     return render(request, "dashboard/recommendations.html")
-
-
-@staff_member_required
-def analytics(request):
-    return render(request, "dashboard/analytics.html")
 
 
 @staff_member_required

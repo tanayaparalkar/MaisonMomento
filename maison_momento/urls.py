@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -7,19 +6,11 @@ from django.contrib.auth import views as auth_views
 
 from apps.catalog import views as catalog_views
 
-# Customize Django Admin branding
-admin.site.site_header = "MAISON MOMENTO"
-admin.site.site_title = "Maison Momento Luxury Perfumerie"
-admin.site.index_title = "Retailer Administration Portal"
-
 urlpatterns = [
     path("", RedirectView.as_view(url="/products/", permanent=True), name="home"),
     path("about/", catalog_views.about, name="about"),
     path("contact/", catalog_views.contact, name="contact"),
     path("collections/", catalog_views.collections, name="collections"),
-    path("admin/analytics/", include("apps.analytics.urls")),
-    # Standard Django Admin
-    path("admin/", admin.site.urls),
     path("dashboard/", include("dashboard.urls")),
     path(
     "login/",

@@ -38,6 +38,5 @@ urlpatterns = [
     # Others
     path("recommendations/", views.recommendations, name="recommendations"),
     path("clients/", views.clients, name="clients"),
-    path("analytics/", views.analytics, name="analytics"),
     path("settings/", views.settings, name="settings"),
 ]

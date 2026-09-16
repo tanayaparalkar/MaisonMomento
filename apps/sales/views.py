@@ -93,10 +93,23 @@ def cart_action(request):
             return JsonResponse({"error": "Invalid action"}, status=400)
 
         # Refresh cart for totals
+        product_image_url = None
+        if product.primary_image and product.primary_image.image:
+            product_image_url = product.primary_image.image.url
+        elif product.images.first() and product.images.first().image:
+            product_image_url = product.images.first().image.url
+
         return JsonResponse({
             "authenticated": True,
             "cart_total_items": cart.total_items,
-            "cart_subtotal": f"{cart.subtotal:.2f}"
+            "cart_subtotal": f"{cart.subtotal:.2f}",
+            "product_id": product.id,
+            "product_name": product.name,
+            "product_brand": product.brand,
+            "product_price": f"{product.effective_price:.2f}",
+            "product_image": product_image_url,
+            "checkout_url": reverse("sales:checkout"),
+            "cart_url": reverse("sales:cart"),
         })
 
     except Exception as e:
