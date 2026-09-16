@@ -234,6 +234,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # All security headers and cookie flags are automatically enabled when
 # DEBUG=False. No manual toggling is required across environments.
 # ---------------------------------------------------------------------------
+# Tell Django it is behind a reverse proxy (Render / AWS / Cloudflare)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 if not DEBUG:
     # Force all traffic over HTTPS
     SECURE_SSL_REDIRECT = True
