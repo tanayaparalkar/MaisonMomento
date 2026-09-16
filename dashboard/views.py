@@ -164,6 +164,13 @@ def dashboard(request):
 
 
 @staff_member_required
+def insights(request):
+    """Analytics and Charts for Insights page."""
+    # We can pass dummy data here for now, or just render the template since JS is hardcoded, 
+    # but let's pass real data later if needed. For now, JS expects elements with IDs `#analyticsChart` and `#pieChart`.
+    return render(request, "dashboard/insights.html")
+
+@staff_member_required
 def inventory(request):
     """Dedicated inventory page with full low-stock and out-of-stock listings."""
     summary = get_inventory_summary()

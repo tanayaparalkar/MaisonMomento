@@ -4,7 +4,7 @@
     --leather-brown-deep: #6E411E;
     --burgundy: #701B25;
     --forest-green: #184C45;
-    --deep-navy: #0D2538;
+    --deep-navy: #112a3d;
     --charcoal: #463833;
     --charcoal-soft: #625A56;
     --muted: #817C78;
@@ -112,6 +112,8 @@ img {
 
 .layout {
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ==========================================================================

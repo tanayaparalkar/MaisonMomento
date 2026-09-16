@@ -1,0 +1,84 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Insights - Analytics{% endblock %}
+
+{% block content %}
+<section class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <p class="eyebrow">Maison Momento · Analytics</p>
+        <h1>Insights & Performance</h1>
+        <p class="subtitle">
+            A detailed look into revenue trends and sales distribution.
+        </p>
+    </div>
+</section>
+
+<section class="dashboard-grid">
+    <article class="panel" style="grid-column: span 2;">
+        <h3 style="margin-bottom: 24px; font-weight: 400;">Revenue trend</h3>
+        <div class="chart-wrapper" style="position: relative; height: 350px; width: 100%;">
+            <canvas id="analyticsChart"></canvas>
+        </div>
+    </article>
+
+    <article class="panel">
+        <h3 style="margin-bottom: 24px; font-weight: 400;">Sales distribution</h3>
+        <div class="chart-wrapper" style="position: relative; height: 350px; width: 100%; display: flex; justify-content: center; align-items: center;">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </article>
+</section>
+
+<section class="panel" style="margin-top: 32px;">
+    <p class="eyebrow" style="text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px;">Revenue Archive</p>
+    <h3 style="margin-bottom: 24px; font-weight: 400;">Monthly performance</h3>
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th scope="col">MONTH</th>
+                <th scope="col" style="text-align: right;">REVENUE</th>
+                <th scope="col" style="text-align: right;">ORDERS</th>
+                <th scope="col" style="text-align: right;">GROWTH</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="stagger-item">
+                <td>January</td>
+                <td style="text-align: right; font-weight: 600;">₹2.4L</td>
+                <td style="text-align: right;">185</td>
+                <td style="text-align: right; color:#10b981; font-weight: 600;">+8%</td>
+            </tr>
+            <tr class="stagger-item">
+                <td>February</td>
+                <td style="text-align: right; font-weight: 600;">₹2.8L</td>
+                <td style="text-align: right;">201</td>
+                <td style="text-align: right; color:#10b981; font-weight: 600;">+14%</td>
+            </tr>
+            <tr class="stagger-item">
+                <td>March</td>
+                <td style="text-align: right; font-weight: 600;">₹3.6L</td>
+                <td style="text-align: right;">226</td>
+                <td style="text-align: right; color:#10b981; font-weight: 600;">+18%</td>
+            </tr>
+            <tr class="stagger-item">
+                <td>April</td>
+                <td style="text-align: right; font-weight: 600;">₹4.2L</td>
+                <td style="text-align: right;">245</td>
+                <td style="text-align: right; color:#10b981; font-weight: 600;">+12%</td>
+            </tr>
+            <tr class="stagger-item">
+                <td>May</td>
+                <td style="text-align: right; font-weight: 600;">₹5.4L</td>
+                <td style="text-align: right;">280</td>
+                <td style="text-align: right; color:#10b981; font-weight: 600;">+22%</td>
+            </tr>
+            <tr class="stagger-item">
+                <td>June</td>
+                <td style="text-align: right; font-weight: 600;">₹6.1L</td>
+                <td style="text-align: right;">312</td>
+                <td style="text-align: right; color:#10b981; font-weight: 600;">+15%</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -4,9 +4,17 @@ from .decorators import staff_member_required
 from django.contrib import messages
 from django.db import transaction
 
-from apps.catalog.models import Product
+from apps.catalog.models import Product, Category
 from dashboard.forms import ProductForm, ProductImageFormSet
 from apps.inventory.services import adjust_stock
+
+@staff_member_required
+def categories(request):
+    """
+    List view for all categories/collections in the admin dashboard.
+    """
+    categories_qs = Category.objects.order_by("name")
+    return render(request, "dashboard/categories.html", {"categories": categories_qs})
 
 @staff_member_required
 def products(request):

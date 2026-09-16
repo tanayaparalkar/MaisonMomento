@@ -44,7 +44,7 @@
                                 Fragrances
                             </a>
 
-                            <a href="{% url 'collections' %}" role="menuitem">
+                            <a href="{% url 'dashboard:categories' %}" role="menuitem">
                                 Categories
                             </a>
 
@@ -66,6 +66,10 @@
                         Recommendations
                     </a>
                     
+                    <a href="{% url 'dashboard:insights' %}" class="nav-item">
+                        Insights
+                    </a>
+
                     <a href="{% url 'dashboard:export_data' %}" class="nav-item">
                         Exports
                     </a>
@@ -100,22 +104,27 @@
                         {% endif %}
                     </a>
 
-                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                        {% csrf_token %}
+                    <div class="dropdown" style="margin-left: 12px;">
                         <button
-                            class="profile"
-                            type="submit"
-                            aria-label="Log out"
-                            title="Click to log out"
+                            class="dropbtn profile"
+                            type="button"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            aria-label="Profile menu"
+                            style="padding: 0; min-height: auto;"
                         >
                             <span class="avatar" aria-hidden="true">T</span>
-
-                            <span class="profile-details">
-                                <span class="profile-name">Admin</span>
-                                <span class="profile-role">Log out</span>
-                            </span>
                         </button>
-                    </form>
+
+                        <div class="dropdown-content" role="menu" style="right: 0; left: auto; min-width: 140px; top: 100%;">
+                            <form action="{% url 'logout' %}" method="post" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; padding: 12px 16px; cursor: pointer; font-size: 12px; color: var(--charcoal-soft); font-weight: 500;">
+                                    Log out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -124,6 +133,9 @@
             {% block content %}
             {% endblock %}
         </main>
+        <footer style="text-align: center; padding: 24px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); margin-top: auto;">
+            Powered by NobleNet Software Technologies
+        </footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -61,15 +61,15 @@
 <section class="stats-grid" aria-label="Revenue metrics" style="margin-bottom: 32px;">
     <article class="stat-card" style="background: #f8fafc;">
         <span class="stat-title">Today's Revenue</span>
-        <h2 style="color: var(--accent);">₹{{ revenue_today|floatformat:0 }}</h2>
+        <h2 style="color: var(--accent);" data-counter="{{ revenue_today|floatformat:0 }}" data-prefix="₹">₹0</h2>
     </article>
     <article class="stat-card">
         <span class="stat-title">Weekly Revenue</span>
-        <h2>₹{{ revenue_weekly|floatformat:0 }}</h2>
+        <h2 data-counter="{{ revenue_weekly|floatformat:0 }}" data-prefix="₹">₹0</h2>
     </article>
     <article class="stat-card">
         <span class="stat-title">Monthly Revenue</span>
-        <h2>₹{{ revenue_monthly|floatformat:0 }}</h2>
+        <h2 data-counter="{{ revenue_monthly|floatformat:0 }}" data-prefix="₹">₹0</h2>
     </article>
     <article class="stat-card" style="border-color: var(--charcoal);">
         <span class="stat-title">
@@ -80,7 +80,7 @@
             {% elif date_filter == 'last_30_days' %}Last 30 Days
             {% else %}{{ date_filter|title }}{% endif %})
         </span>
-        <h2>₹{{ revenue_filtered|floatformat:0 }}</h2>
+        <h2 data-counter="{{ revenue_filtered|floatformat:0 }}" data-prefix="₹">₹0</h2>
     </article>
 </section>
 
@@ -91,7 +91,7 @@
             <div class="stat-icon" aria-hidden="true">◈</div>
         </div>
         <span class="stat-title">Pending Orders</span>
-        <h2>{{ pending_orders_count }}</h2>
+        <h2 data-counter="{{ pending_orders_count }}">0</h2>
         <small>Needs confirmation</small>
     </article>
 
@@ -100,7 +100,7 @@
             <div class="stat-icon" aria-hidden="true">📦</div>
         </div>
         <span class="stat-title">Awaiting Packing</span>
-        <h2>{{ awaiting_packing_count }}</h2>
+        <h2 data-counter="{{ awaiting_packing_count }}">0</h2>
         <small>Confirmed & ready</small>
     </article>
 
@@ -109,7 +109,7 @@
             <div class="stat-icon" aria-hidden="true">✈️</div>
         </div>
         <span class="stat-title">Shipped Today</span>
-        <h2>{{ shipped_today_count }}</h2>
+        <h2 data-counter="{{ shipped_today_count }}">0</h2>
     </article>
 
     <article class="stat-card customers">
@@ -117,7 +117,7 @@
             <div class="stat-icon" aria-hidden="true">◎</div>
         </div>
         <span class="stat-title">Delivered Today</span>
-        <h2>{{ delivered_today_count }}</h2>
+        <h2 data-counter="{{ delivered_today_count }}">0</h2>
     </article>
 </section>
 

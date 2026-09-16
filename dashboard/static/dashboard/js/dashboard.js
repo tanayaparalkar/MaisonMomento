@@ -117,77 +117,46 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const createGrowthLineAnimation = () => {
-        const lineDuration = 2000;
-        const pointDelayStart = 220;
-        const pointDelayStep = 300;
+        const totalDuration = 2000;
+        const delayBetweenPoints = totalDuration / 6;
 
         return {
             x: {
                 type: "number",
-                duration: lineDuration,
-                easing: "easeOutCubic",
+                easing: "linear",
+                duration: delayBetweenPoints,
                 from: Number.NaN,
                 delay(context) {
                     if (context.type !== "data" || context.xStarted) {
                         return 0;
                     }
-
                     context.xStarted = true;
-                    return 0;
+                    return context.index * delayBetweenPoints;
                 },
             },
-
             y: {
                 type: "number",
-                duration: lineDuration,
-                easing: "easeOutCubic",
-                from: (context) => context.chart.scales.y.getPixelForValue(0),
+                easing: "linear",
+                duration: delayBetweenPoints,
+                from: (context) => {
+                    if (context.index === 0) {
+                        return context.chart.scales.y.getPixelForValue(0);
+                    }
+                    const meta = context.chart.getDatasetMeta(context.datasetIndex);
+                    const prev = meta.data[context.index - 1];
+                    return prev ? prev.getProps(["y"], true).y : 0;
+                },
                 delay(context) {
                     if (context.type !== "data" || context.yStarted) {
                         return 0;
                     }
-
                     context.yStarted = true;
-                    return 0;
+                    return context.index * delayBetweenPoints;
                 },
-            },
-
-            pointRadius: {
-                type: "number",
-                duration: 280,
-                easing: "easeOutCubic",
-                from: 0,
-                delay(context) {
-                    if (context.type !== "data" || context.datasetIndex !== 0) {
-                        return 0;
-                    }
-
-                    return pointDelayStart + context.index * pointDelayStep;
-                },
-            },
-
-            pointBorderWidth: {
-                type: "number",
-                duration: 280,
-                easing: "easeOutCubic",
-                from: 0,
-                to: 1.5,
-                delay(context) {
-                    if (context.type !== "data" || context.datasetIndex !== 0) {
-                        return 0;
-                    }
-
-                    return pointDelayStart + context.index * pointDelayStep;
-                },
-            },
-
-            tension: {
-                duration: lineDuration,
-                easing: "easeOutCubic",
-                from: 0.16,
-                to: 0.46,
             },
         };
+    };
+
     };
 
     const createLineChartOptions = (valueFormatter) => {
@@ -405,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         borderWidth: 3,
                         borderRadius: 3,
                         spacing: 2,
-                        hoverOffset: 3,
+                        hoverOffset: 15,
                     },
                 ],
             },
@@ -423,22 +392,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     duration: 1800,
                     easing: "easeOutQuart",
                     delay: 0,
-                },
-
-                animations: {
-                    numbers: {
-                        type: "number",
-                        duration: 1800,
-                        easing: "easeOutQuart",
-                        from: 0,
-                        delay(context) {
-                            if (context.type !== "data" || context.datasetIndex !== 0) {
-                                return 0;
-                            }
-
-                            return 0;
-                        },
-                    },
                 },
 
                 plugins: {

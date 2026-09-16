@@ -12,15 +12,19 @@ urlpatterns = [
     # Dashboard Home
     path("", views.dashboard, name="dashboard"),
     
+    # Insights (Analytics & Charts)
+    path("insights/", views.insights, name="insights"),
+    
     # Notifications (Phase 11)
     path("notifications/", notification_views.notification_center, name="notifications"),
     path("notifications/<int:pk>/read/", notification_views.mark_read, name="notification_mark_read"),
     path("notifications/read-all/", notification_views.mark_all_read, name="notification_mark_all_read"),
     
-    # Products (Phase 10A)
+    # Catalogue Management
     path("products/", product_views.products, name="products"),
-    path("products/create/", product_views.product_create, name="product_create"),
+    path("products/new/", product_views.product_create, name="product_create"),
     path("products/<int:pk>/edit/", product_views.product_edit, name="product_edit"),
+    path("categories/", product_views.categories, name="categories"),
     
     # Orders (Phase 10B)
     path("orders/", order_views.orders, name="orders"),

@@ -42,9 +42,9 @@
             </div>
 
             <!-- Products Grid (Max 6) -->
-            <div class="sf-grid">
+            <div class="sf-grid" {% if category.num_products == 1 %}style="grid-template-columns: 1fr;"{% elif category.num_products == 2 %}style="grid-template-columns: repeat(2, 1fr);"{% endif %}>
                 {% for product in category.products.all|slice:":6" %}
-                {% include "catalog/includes/product_card.html" with product=product custom_style="background: var(--white); border: 1px solid var(--border);" no_border_radius=True custom_padding="padding: 24px;" large_title=True large_desc_margin=True alternate_footer=True hide_badge=True %}
+                {% include "catalog/includes/product_card.html" with product=product custom_style="background: var(--white); border: 1px solid var(--border);" no_border_radius=True custom_padding="padding: 24px;" large_title=True large_desc_margin=True hide_badge=True %}
                 {% endfor %}
             </div>
 

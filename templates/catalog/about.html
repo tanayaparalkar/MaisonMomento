@@ -1,10 +1,11 @@
 {% extends "catalog/base.html" %}
+{% load static %}
 
 {% block title %}About Us | Maison Momento Parfumeur{% endblock %}
 
 {% block content %}
 <!-- About Hero -->
-<section class="sf-hero" style="min-height: 60vh; background-image: url('https://images.unsplash.com/photo-1595425970377-c9703bc48bca?q=80&w=2000&auto=format&fit=crop');">
+<section class="sf-hero" style="min-height: 60vh; background-image: url('{% static "images/about/golden.jpg" %}'); background-size: cover; background-position: center;">
     <div class="sf-hero-content">
         <div class="sf-hero-eyebrow">The Maison</div>
         <h1>Our Story</h1>
@@ -28,7 +29,7 @@
 <section class="sf-section" style="background: var(--warm-beige);">
     <div class="sf-container sf-pdp-grid">
         <div class="sf-pdp-image-col" style="top: calc(var(--nav-height) + 20px);">
-            <img src="https://images.unsplash.com/photo-1615634260167-c8cdede054de?q=80&w=800&auto=format&fit=crop" alt="Craftsmanship" class="sf-pdp-image">
+            <img src="{% static 'images/about/forest.jpg' %}" alt="Craftsmanship" class="sf-pdp-image">
         </div>
         <div class="sf-pdp-info-col" style="justify-content: center; padding-top: 0;">
             <div class="sf-hero-eyebrow" style="color: var(--muted); margin-bottom: 16px;">The Process</div>
@@ -64,7 +65,7 @@
             </p>
         </div>
         <div class="sf-pdp-image-col" style="top: calc(var(--nav-height) + 20px);">
-            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop" alt="Sustainability" class="sf-pdp-image">
+            <img src="{% static 'images/about/echoes.jpg' %}" alt="Sustainability" class="sf-pdp-image">
         </div>
     </div>
 </section>

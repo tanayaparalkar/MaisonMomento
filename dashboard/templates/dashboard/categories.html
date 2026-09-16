@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Categories - Maison Momento{% endblock %}
+
+{% block content %}
+<section class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <p class="eyebrow">Maison Momento · Catalogue</p>
+        <h1>Categories & Collections</h1>
+        <p class="subtitle">
+            Manage your product collections and olfactory families.
+        </p>
+    </div>
+</section>
+
+<section class="dashboard-grid" style="margin-top: 32px;">
+    {% for category in categories %}
+    <article class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <h3 style="margin-bottom: 8px;">{{ category.name }}</h3>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 16px;">
+                {{ category.description|default:"No description provided." }}
+            </p>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 16px; margin-top: auto;">
+            <span style="font-weight: 600; font-size: 13px;">{{ category.product_count }} Products</span>
+            <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background: {% if category.is_active %}#e6f4ea; color: #1e8e3e;{% else %}#fce8e6; color: #d93025;{% endif %}; font-weight: 600; text-transform: uppercase;">
+                {% if category.is_active %}Active{% else %}Inactive{% endif %}
+            </span>
+        </div>
+    </article>
+    {% empty %}
+    <p>No categories found.</p>
+    {% endfor %}
+</section>
+{% endblock %}

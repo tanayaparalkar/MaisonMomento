@@ -285,7 +285,7 @@
 
 .sf-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: clamp(18px, 2vw, 30px);
 }
 
@@ -298,6 +298,13 @@
 
 .sf-product-card:hover {
     transform: translateY(-6px);
+}
+
+.sf-product-card:hover .sf-card-footer,
+.sf-product-card:focus-within .sf-card-footer {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .sf-product-card:focus-within {
@@ -383,6 +390,10 @@
     align-items: center;
     margin-top: auto;
     padding-top: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 300ms var(--ease-luxury);
 }
 
 .sf-card-price {
@@ -778,7 +789,7 @@ details[open] .sf-filter-title::after {
 @media (min-width: 1024px) {
     .sf-scroll-row {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 40px;
         overflow-x: visible;
         scroll-snap-type: none;
@@ -866,12 +877,14 @@ details[open] .sf-filter-title::after {
    SCENT FINDER QUESTIONNAIRE (SIDEBAR WIDGET)
    ========================================================================== */
 .scent-finder-widget {
-    background: linear-gradient(165deg, #fdfbf7 0%, #f6f0e6 100%);
-    border: 1px solid #dcd2bf;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: var(--radius-sm, 6px);
     padding: 20px 18px;
     margin-bottom: 32px;
-    box-shadow: 0 4px 20px rgba(74, 52, 33, 0.05);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
     position: relative;
     overflow: hidden;
     transition: all 250ms var(--ease-soft);
@@ -902,9 +915,9 @@ details[open] .sf-filter-title::after {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-weight: 700;
-    color: #8c6a38;
-    background: #fdf5e6;
-    border: 1px solid #e8decb;
+    color: #ffffff;
+    background: #0f4c81;
+    border: 1px solid #0f4c81;
     padding: 3px 8px;
     border-radius: 12px;
     white-space: nowrap;
@@ -912,7 +925,7 @@ details[open] .sf-filter-title::after {
 
 .scent-finder-chevron {
     font-size: 11px;
-    color: #8c8172;
+    color: #112a3d;
     transition: transform 200ms ease;
 }
 
@@ -931,7 +944,7 @@ details[open] .sf-filter-title::after {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #b89047 0%, #e2cf98 50%, #b89047 100%);
+    display: none;
 }
 
 .scent-finder-header {
@@ -943,7 +956,7 @@ details[open] .sf-filter-title::after {
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: #926f34;
+    color: #0f4c81;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -954,7 +967,7 @@ details[open] .sf-filter-title::after {
 .scent-finder-title {
     font-family: var(--font-display, serif);
     font-size: 22px;
-    color: var(--charcoal, #1f1b18);
+    color: #112a3d;
     font-weight: 400;
     margin: 0 0 6px 0;
     display: flex;
@@ -965,7 +978,7 @@ details[open] .sf-filter-title::after {
 .scent-finder-desc {
     font-size: 12px;
     line-height: 1.5;
-    color: #6d645a;
+    color: #3b5063;
     margin: 0;
 }
 
@@ -974,11 +987,11 @@ details[open] .sf-filter-title::after {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
-    background: rgba(220, 210, 191, 0.35);
+    background: rgba(17, 42, 61, 0.08);
     padding: 4px;
     border-radius: 4px;
     margin-bottom: 20px;
-    border: 1px solid rgba(210, 198, 175, 0.6);
+    border: 1px solid rgba(17, 42, 61, 0.1);
 }
 
 .scent-purpose-tab {
@@ -989,7 +1002,7 @@ details[open] .sf-filter-title::after {
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #5a5146;
+    color: #2b3d4f;
     cursor: pointer;
     border-radius: 3px;
     transition: all 200ms var(--ease-soft);
@@ -1000,18 +1013,20 @@ details[open] .sf-filter-title::after {
 }
 
 .scent-purpose-tab.is-active {
-    background: #ffffff;
-    color: #1a1613;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    background: #112a3d;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(17, 42, 61, 0.15);
     font-weight: 700;
-    border: 1px solid #d4c7b0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Question Section */
 .scent-quiz-group {
     margin-bottom: 18px;
     padding-bottom: 16px;
-    border-bottom: 1px solid rgba(220, 210, 191, 0.5);
+    border-bottom: 1px solid rgba(17, 42, 61, 0.15);
 }
 
 .scent-quiz-group:last-of-type {
@@ -1024,7 +1039,7 @@ details[open] .sf-filter-title::after {
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    color: #2e261f;
+    color: #112a3d;
     margin-bottom: 10px;
     display: flex;
     align-items: center;
@@ -1048,7 +1063,7 @@ details[open] .sf-filter-title::after {
     display: flex;
     align-items: center;
     font-size: 13px;
-    color: #403831;
+    color: #2b3d4f;
     cursor: pointer;
     user-select: none;
     padding: 4px 0;
@@ -1063,7 +1078,7 @@ details[open] .sf-filter-title::after {
 .scent-quiz-radio input,
 .scent-quiz-checkbox input {
     margin-right: 9px;
-    accent-color: #9c7336;
+    accent-color: #0f4c81;
     width: 15px;
     height: 15px;
     cursor: pointer;
@@ -1074,19 +1089,19 @@ details[open] .sf-filter-title::after {
     align-items: center;
     padding: 5px 11px;
     background: #ffffff;
-    border: 1px solid #dcd2bf;
+    border: 1px solid #bcd1e6;
     border-radius: 16px;
     font-size: 11.5px;
-    color: #544a40;
+    color: #2b3d4f;
     cursor: pointer;
     transition: all 180ms ease;
     user-select: none;
 }
 
 .scent-pill-label:hover {
-    border-color: #9c7336;
-    color: #1a1613;
-    background: #fdfaf3;
+    border-color: #0f4c81;
+    color: #112a3d;
+    background: #eef5fb;
 }
 
 .scent-pill-label input {
@@ -1094,19 +1109,21 @@ details[open] .sf-filter-title::after {
 }
 
 .scent-pill-label:has(input:checked) {
-    background: #2a2016;
-    color: #f7eedb;
-    border-color: #2a2016;
+    background: #112a3d;
+    color: #ffffff;
+    border-color: #112a3d;
     font-weight: 600;
-    box-shadow: 0 2px 5px rgba(42, 32, 22, 0.2);
+    box-shadow: 0 2px 5px rgba(17, 42, 61, 0.2);
 }
 
 .scent-quiz-submit-btn {
     width: 100%;
     padding: 13px 18px;
-    background: linear-gradient(135deg, #9c7336 0%, #b89047 50%, #896229 100%);
-    color: #ffffff;
-    border: 1px solid #cbb382;
+    background: #112a3d;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--ivory, #f4f4f2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 4px;
     font-family: var(--font-body, sans-serif);
     font-size: 12px;
@@ -1114,7 +1131,7 @@ details[open] .sf-filter-title::after {
     letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(156, 115, 54, 0.35);
+    box-shadow: 0 4px 14px rgba(17, 42, 61, 0.25);
     transition: all 250ms var(--ease-soft);
     display: flex;
     align-items: center;
@@ -1125,7 +1142,7 @@ details[open] .sf-filter-title::after {
 
 .scent-quiz-submit-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(156, 115, 54, 0.45);
+    box-shadow: 0 6px 18px rgba(17, 42, 61, 0.35);
     filter: brightness(1.06);
 }
 
@@ -1133,7 +1150,7 @@ details[open] .sf-filter-title::after {
     display: block;
     text-align: center;
     font-size: 11px;
-    color: #8c8172;
+    color: #3b5063;
     text-decoration: underline;
     margin-top: 10px;
     cursor: pointer;
@@ -1141,7 +1158,7 @@ details[open] .sf-filter-title::after {
 }
 
 .scent-quiz-reset-link:hover {
-    color: #2a2016;
+    color: #112a3d;
 }
 
 /* Subtle Fragrance Suggestion Strip (Boutique Consultation) */
@@ -1194,7 +1211,7 @@ details[open] .sf-filter-title::after {
 
 .sf-suggestion-notes {
     font-size: 12px;
-    color: #8c8172;
+    color: #3b5063;
     margin: 2px 0 0 0;
 }
 
