@@ -4,7 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Maison Momento</title>
+    <title>Login | Maison Momènto</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/momento_fevicon.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/momento_fevicon.png' %}">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +101,10 @@
 </head>
 <body>
     <div class="login-card">
-        <h1>Maison Momento</h1>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
+            <img src="{% static 'images/momento_fevicon.png' %}" alt="Maison Momènto Logo" style="width: 36px; height: 36px; object-fit: contain; border-radius: 50%; mix-blend-mode: multiply;">
+            <h1 style="margin: 0;">Maison Momènto</h1>
+        </div>
         <div class="login-subtitle">Authentication</div>
         
         <form method="post">

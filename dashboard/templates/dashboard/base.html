@@ -5,7 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Maison Momento{% endblock %}</title>
+    <title>{% block title %}Maison Momènto{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/momento_fevicon.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/momento_fevicon.png' %}">
 
     <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
 
@@ -19,9 +24,9 @@
     <div class="layout">
         <header class="sidebar">
             <div class="nav-shell">
-                <a href="{% url 'dashboard:dashboard' %}" class="logo" aria-label="Maison Momento dashboard">
-                    <span class="logo-mark" aria-hidden="true"></span>
-                    <span class="logo-wordmark">Maison Momento</span>
+                <a href="{% url 'dashboard:dashboard' %}" class="logo" aria-label="Maison Momènto dashboard">
+                    <img src="{% static 'images/momento_fevicon.png' %}" alt="Maison Momènto Logo" class="logo-brand-img">
+                    <span class="logo-wordmark">Maison Momènto</span>
                 </a>
 
                 <nav class="main-nav" aria-label="Main navigation">

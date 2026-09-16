@@ -41,6 +41,17 @@
     transition: opacity 250ms var(--ease-soft);
 }
 
+.sf-brand-logo {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    border-radius: 50%;
+    mix-blend-mode: multiply;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
 .sf-brand:hover, .sf-brand:focus-visible {
     opacity: 0.72;
     outline: 2px solid var(--deep-navy);

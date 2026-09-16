@@ -57,7 +57,7 @@ class Product(models.Model):
 
     name = models.CharField(max_length=255, db_index=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-    brand = models.CharField(max_length=150, default="Maison Momento", db_index=True)
+    brand = models.CharField(max_length=150, default="Maison Momènto", db_index=True)
     sku = models.CharField(max_length=64, unique=True, help_text="Unique Stock Keeping Unit")
     description = models.TextField(help_text="Detailed scent notes, accord composition, and description")
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Retail price in INR (₹)")

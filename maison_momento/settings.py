@@ -76,9 +76,14 @@ if _allowed_hosts_env:
 elif DEBUG:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
 else:
-    raise RuntimeError(
-        "DJANGO_ALLOWED_HOSTS environment variable must be set when DEBUG=False."
-    )
+    # Default Render support when running in production
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
+
+_csrf_origins = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(",") if o.strip()]
+else:
+    CSRF_TRUSTED_ORIGINS = ["https://*.onrender.com", "http://localhost:8000", "http://127.0.0.1:8000"]
 
 # ---------------------------------------------------------------------------
 # Application definition
@@ -103,6 +108,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -138,29 +144,39 @@ WSGI_APPLICATION = "maison_momento.wsgi.application"
 
 # ---------------------------------------------------------------------------
 # Database
-# Credentials are read from environment variables. Defaults to SQLite for local dev.
+# Supports DATABASE_URL (Render PostgreSQL) or local SQLite / PostgreSQL
 # ---------------------------------------------------------------------------
-_db_engine = os.environ.get("DB_ENGINE", "sqlite3")
-if _db_engine in ("sqlite3", "django.db.backends.sqlite3"):
+import dj_database_url
+
+_db_url = os.environ.get("DATABASE_URL")
+if _db_url:
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+        "default": dj_database_url.config(
+            default=_db_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
 else:
-    DATABASES = {
-        "default": {
-            "ENGINE": _db_engine if "." in _db_engine else f"django.db.backends.{_db_engine}",
-            "NAME": os.environ.get("DB_NAME", "maison_momento"),
-            "USER": os.environ.get("DB_USER", "tanaya"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
-            # Extension point: add CONN_MAX_AGE for persistent connections in production
-            # "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "0")),
+    _db_engine = os.environ.get("DB_ENGINE", "sqlite3")
+    if _db_engine in ("sqlite3", "django.db.backends.sqlite3"):
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
         }
-    }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": _db_engine if "." in _db_engine else f"django.db.backends.{_db_engine}",
+                "NAME": os.environ.get("DB_NAME", "maison_momento"),
+                "USER": os.environ.get("DB_USER", "tanaya"),
+                "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+                "HOST": os.environ.get("DB_HOST", "localhost"),
+                "PORT": os.environ.get("DB_PORT", "5432"),
+            }
+        }
 
 # ---------------------------------------------------------------------------
 # Password validation
@@ -182,20 +198,15 @@ USE_TZ = True
 
 # ---------------------------------------------------------------------------
 # Task 5 — Static & Media files
-#
-# Extension points for future cloud storage:
-#   1. Install django-storages + boto3  (pip install django-storages[boto3])
-#   2. Set DEFAULT_FILE_STORAGE and STATICFILES_STORAGE to S3 backends
-#   3. Set AWS_STORAGE_BUCKET_NAME, AWS_S3_REGION_NAME, etc. via env vars
-#   4. Replace MEDIA_URL / STATIC_URL with the CDN/S3 public base URL
-#
-# For now, local filesystem storage is used in both dev and production.
 # ---------------------------------------------------------------------------
 
 # Static files
 STATIC_URL = os.environ.get("STATIC_URL", "/static/")
 STATICFILES_DIRS = [BASE_DIR / "static"]     # Source files (not collected)
 STATIC_ROOT = BASE_DIR / "staticfiles"        # Destination for collectstatic
+
+# WhiteNoise compressed storage for production
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Media files (user-uploaded content)
 MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")

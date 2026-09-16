@@ -154,6 +154,17 @@ img {
     opacity: 0.72;
 }
 
+.logo-brand-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 50%;
+    mix-blend-mode: multiply;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
 .logo-mark {
     position: relative;
     display: inline-block;

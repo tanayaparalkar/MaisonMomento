@@ -4,7 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Maison Momento Parfumeur{% endblock %}</title>
+    <title>{% block title %}Maison Momènto Parfumeur{% endblock %}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/momento_fevicon.png' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/momento_fevicon.png' %}">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,9 +22,9 @@
 <body>
     <header class="sf-header">
         <div class="sf-container sf-nav-wrapper">
-            <a href="{% url 'home' %}" class="sf-brand">
-                <span class="logo-mark"></span>
-                <span class="sf-wordmark">MAISON MOMENTO</span>
+            <a href="{% url 'home' %}" class="sf-brand" aria-label="Maison Momènto">
+                <img src="{% static 'images/momento_fevicon.png' %}" alt="Maison Momènto Logo" class="sf-brand-logo">
+                <span class="sf-wordmark">MAISON MOMÈNTO</span>
             </a>
             
             <nav class="sf-nav-links" aria-label="Main Navigation">
@@ -73,7 +78,7 @@
         <div class="sf-container">
             <div class="sf-footer-grid">
                 <div>
-                    <div class="sf-footer-brand">Maison Momento</div>
+                    <div class="sf-footer-brand">Maison Momènto</div>
                     <p class="sf-footer-text">
                         Apothecary catalog orchestration, and fragrance recommendations. Quiet luxury, timeless sophistication, and emotional warmth.
                     </p>
@@ -93,7 +98,7 @@
             </div>
             <div class="sf-footer-bottom">
                 <div>
-                    &copy; 2026 Maison Momento. All rights reserved.<br>
+                    &copy; 2026 Maison Momènto. All rights reserved.<br>
                     <span style="font-size: 11px; color: var(--muted); margin-top: 4px; display: inline-block;">Powered by NobleNet Software Technologies</span>
                 </div>
                 <div style="display: flex; gap: 16px;">
