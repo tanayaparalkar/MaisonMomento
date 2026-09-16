@@ -1,15 +1,39 @@
 {% extends "catalog/base.html" %}
+{% load static %}
 
 {% block title %}Products | Maison Momento Parfumeur{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="sf-hero" style="min-height: 40vh; margin-bottom: 40px;">
+<!-- Hero Section with Video Banner -->
+<section class="sf-hero sf-catalog-hero has-video" style="min-height: {% if is_quiz %}20vh{% else %}46vh{% endif %}; padding: {% if is_quiz %}32px 0 16px{% else %}64px 0 40px{% endif %}; margin-bottom: 28px;">
+    <!-- Background Video -->
+    <div class="sf-hero-video-wrapper">
+        <video class="sf-hero-video" id="hero-banner-video" autoplay muted loop playsinline preload="auto">
+            <source src="{% static 'videos/app_banner.mp4' %}" type="video/mp4">
+            <source src="{% static 'app_banner.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <!-- Hero Content Overlay -->
     <div class="sf-hero-content">
         <div class="sf-hero-eyebrow">The Collection</div>
-        <h1>Artisan Fragrances</h1>
-        <p>Discover our meticulously crafted selection of Eau de Parfums, Extraits, and home olfactory experiences.</p>
+        <h1 style="margin-bottom: 8px;">Artisan Fragrances</h1>
+        <p style="margin-bottom: 0;">Discover our meticulously crafted selection of Eau de Parfums, Extraits, and home olfactory experiences.</p>
     </div>
+
+    <!-- Video Sound Toggle Control -->
+    <button type="button" class="sf-hero-sound-btn" id="hero-video-sound-toggle" aria-label="Unmute background video" title="Sound Muted - Click to Unmute">
+        <svg class="sound-icon-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+        <svg class="sound-icon-unmuted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+    </button>
 </section>
 
 <!-- Active Filters / Top Bar -->
@@ -57,24 +81,31 @@
         <aside class="sf-sidebar">
 
             <!-- Find Your Scent Questionnaire Widget -->
-            <div class="scent-finder-widget">
-                <div class="scent-finder-header">
-                    <div class="scent-finder-eyebrow">
-                        <span>&#10022; Olfactory Engine</span>
+            <details class="scent-finder-widget sf-scent-accordion" id="scent-finder-accordion" {% if not is_quiz %}open{% endif %}>
+                <summary class="scent-finder-summary">
+                    <div class="scent-finder-summary-text">
+                        <span class="scent-finder-eyebrow">&#10022; Scent Consultation</span>
+                        <h2 class="scent-finder-title">Find Your Scent</h2>
                     </div>
-                    <h2 class="scent-finder-title">Find Your Scent &#127800;</h2>
-                    <p class="scent-finder-desc">Answer 7 signature questions to discover your bespoke fragrance or the ideal gift.</p>
-                </div>
+                    {% if is_quiz %}
+                        <span class="scent-finder-status-badge">Active &bull; Edit</span>
+                    {% else %}
+                        <span class="scent-finder-chevron">&#9662;</span>
+                    {% endif %}
+                </summary>
 
-                <!-- Purpose Switcher: Myself vs Gifting -->
-                <div class="scent-purpose-tabs" role="tablist">
-                    <button type="button" class="scent-purpose-tab {% if quiz_purpose != 'gifting' %}is-active{% endif %}" id="tab-purpose-myself" onclick="setQuizPurpose('myself')">
-                        &#128100; For Myself
-                    </button>
-                    <button type="button" class="scent-purpose-tab {% if quiz_purpose == 'gifting' %}is-active{% endif %}" id="tab-purpose-gifting" onclick="setQuizPurpose('gifting')">
-                        &#127873; For Gifting
-                    </button>
-                </div>
+                <div class="scent-finder-body">
+                    <p class="scent-finder-desc">Select your preferred accords and notes to discover a tailored fragrance suggestion.</p>
+
+                    <!-- Purpose Switcher: Myself vs Gifting -->
+                    <div class="scent-purpose-tabs" role="tablist">
+                        <button type="button" class="scent-purpose-tab {% if quiz_purpose != 'gifting' %}is-active{% endif %}" id="tab-purpose-myself" onclick="setQuizPurpose('myself')">
+                            &#128100; For Myself
+                        </button>
+                        <button type="button" class="scent-purpose-tab {% if quiz_purpose == 'gifting' %}is-active{% endif %}" id="tab-purpose-gifting" onclick="setQuizPurpose('gifting')">
+                            &#127873; For Gifting
+                        </button>
+                    </div>
 
                 <form id="scent-finder-form" method="GET" action="{% url 'catalog:product_list' %}">
                     <input type="hidden" name="scent_quiz" value="1">
@@ -267,13 +298,14 @@
                     </div>
 
                     <button type="submit" class="scent-quiz-submit-btn">
-                        &rarr; Find My Scent
+                        Discover My Fragrance
                     </button>
                     {% if is_quiz %}
-                        <a href="{% url 'catalog:product_list' %}" class="scent-quiz-reset-link">Clear Scent Profile</a>
+                        <a href="{% url 'catalog:product_list' %}" class="scent-quiz-reset-link">Reset Preferences</a>
                     {% endif %}
                 </form>
-            </div>
+                </div>
+            </details>
 
             <!-- Manual Filters Accordion -->
             <details class="sf-filter-group" {% if not is_quiz %}open{% endif %} style="border-top: 1px solid var(--border); padding-top: 16px;">
@@ -356,48 +388,35 @@
         <!-- Product Grid / Scent Quiz Recommendations -->
         <div class="sf-catalog-grid">
             {% if is_quiz and quiz_results %}
-                <!-- Recommendation Engine Quiz Results Banner -->
-                <div class="sf-quiz-results-banner">
-                    <div class="sf-quiz-banner-eyebrow">
-                        {% if quiz_purpose == 'gifting' %}&#127873; Gifting Curation Formulation{% else %}&#127800; Scent Profile Recommendations{% endif %}
+                <!-- Subtle Fragrance Suggestion Header -->
+                <div class="sf-suggestion-bar">
+                    <div class="sf-suggestion-meta">
+                        <span class="sf-suggestion-eyebrow">&#10022; Suggested For You</span>
+                        <h2 class="sf-suggestion-title">
+                            {% if quiz_purpose == 'gifting' %}
+                                Curated Gift Suggestions
+                            {% else %}
+                                Signature Scent Suggestions
+                            {% endif %}
+                            {% if quiz_answers.scent_pref %}
+                                <span class="sf-suggestion-accord">&mdash; {{ quiz_answers.scent_pref }}</span>
+                            {% endif %}
+                        </h2>
+                        {% if quiz_answers.notes %}
+                            <p class="sf-suggestion-notes">Complemented by {{ quiz_answers.notes|join:", " }}</p>
+                        {% endif %}
                     </div>
-                    <h2 class="sf-quiz-banner-title">
-                        {% if quiz_purpose == 'gifting' %}
-                            Curated Gift Recommendations
-                        {% else %}
-                            Your Signature Scent Matches
-                        {% endif %}
-                    </h2>
-                    <p class="sf-quiz-banner-desc">
-                        {% if quiz_purpose == 'gifting' %}
-                            Ranked by our Olfactory Engine for gifting distinction, tailored to your recipient's profile, wear occasion, and desired notes.
-                        {% else %}
-                            Ranked by our Olfactory Recommendation Engine based on your scent accord preference, desired strength, and chosen fragrance notes.
-                        {% endif %}
-                    </p>
-                    <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-                        <span style="font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #e5cd96; font-weight: 700;">
-                            {{ quiz_results|length }} Formulations Matched
-                        </span>
-                        <a href="{% url 'catalog:product_list' %}" style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #ffffff; text-decoration: underline;">
-                            Reset Questionnaire / View All
+                    <div class="sf-suggestion-actions">
+                        <span class="sf-suggestion-count">{{ quiz_results|length }} Curated Selections</span>
+                        <a href="{% url 'catalog:product_list' %}" class="sf-suggestion-reset-btn">
+                            View All Fragrances
                         </a>
                     </div>
                 </div>
 
                 <div class="sf-grid">
                     {% for item in quiz_results %}
-                        <div style="position: relative; display: flex; flex-direction: column;">
-                            <div class="sf-quiz-match-badge">
-                                {{ item.match_percentage }}% Match
-                            </div>
-                            {% include "catalog/includes/product_card.html" with product=item.product %}
-                            <div style="padding: 0 4px 16px;">
-                                <span class="sf-quiz-reason-pill">
-                                    {% if item.is_gifting %}&#127873; Gift Choice &bull; {% endif %}{{ item.match_reason }}
-                                </span>
-                            </div>
-                        </div>
+                        {% include "catalog/includes/product_card.html" with product=item.product badge_text="Suggested" %}
                     {% endfor %}
                 </div>
 
@@ -573,6 +592,32 @@
             if (noPrefCb) noPrefCb.checked = false;
         }
     }
+
+    // Hero Banner Video Audio Toggle
+    (function() {
+        const bannerVideo = document.getElementById('hero-banner-video');
+        const soundToggleBtn = document.getElementById('hero-video-sound-toggle');
+        if (bannerVideo && soundToggleBtn) {
+            const iconMuted = soundToggleBtn.querySelector('.sound-icon-muted');
+            const iconUnmuted = soundToggleBtn.querySelector('.sound-icon-unmuted');
+            
+            soundToggleBtn.addEventListener('click', function() {
+                if (bannerVideo.muted) {
+                    bannerVideo.muted = false;
+                    if (iconMuted) iconMuted.style.display = 'none';
+                    if (iconUnmuted) iconUnmuted.style.display = 'block';
+                    soundToggleBtn.setAttribute('title', 'Sound Active - Click to Mute');
+                    soundToggleBtn.setAttribute('aria-label', 'Mute background video');
+                } else {
+                    bannerVideo.muted = true;
+                    if (iconMuted) iconMuted.style.display = 'block';
+                    if (iconUnmuted) iconUnmuted.style.display = 'none';
+                    soundToggleBtn.setAttribute('title', 'Sound Muted - Click to Unmute');
+                    soundToggleBtn.setAttribute('aria-label', 'Unmute background video');
+                }
+            });
+        }
+    })();
 </script>
 
 {% endblock %}

@@ -185,7 +185,11 @@ def product_list(request):
         }
         quiz_results = RecommendationEngine.recommend_from_quiz(quiz_answers, purpose=purpose, limit=12)
 
-        chip_title = "🎁 Curated Gifting Scent Profile" if purpose == "gifting" else "🌸 Personalized Scent Profile"
+        pref_name = quiz_answers.get('scent_pref')
+        if purpose == "gifting":
+            chip_title = f"Gift Curations: {pref_name}" if pref_name else "Gift Curations"
+        else:
+            chip_title = f"Suggested: {pref_name}" if pref_name else "Curated Suggestions"
         active_filters.append({
             'name': chip_title,
             'remove_url': '?'
