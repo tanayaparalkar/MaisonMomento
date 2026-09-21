@@ -1,0 +1,471 @@
+/* ==========================================================================
+   MAISON MOMENTO — Luxury Animation Layer
+   Ajmal motion language x Subversion colour philosophy
+   - CSS-first, GPU-accelerated (transform + opacity only)
+   - IntersectionObserver scroll triggers (no scroll listeners)
+   - prefers-reduced-motion respected throughout
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   KEYFRAMES
+   -------------------------------------------------------------------------- */
+
+@keyframes lux-reveal-up {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lux-reveal-scale {
+    from { opacity: 0; transform: scale(0.97) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes lux-heading-reveal {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lux-image-reveal {
+    from { opacity: 0; transform: scale(1.04); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lux-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   SCROLL-REVEAL INITIAL STATES
+   Note: .sf-hero * elements are excluded; they use CSS animation directly
+   (not IntersectionObserver) because they are above the fold on load.
+   -------------------------------------------------------------------------- */
+
+.reveal-up:not(.sf-hero *),
+.reveal-scale:not(.sf-hero *),
+.reveal-heading:not(.sf-hero *),
+.reveal-image:not(.sf-hero *),
+.reveal-fade:not(.sf-hero *) {
+    opacity: 0;
+    will-change: opacity, transform;
+}
+
+.reveal-up.is-revealed     { animation: lux-reveal-up    var(--reveal-duration, 700ms) var(--ease-luxury) both; }
+.reveal-scale.is-revealed  { animation: lux-reveal-scale var(--reveal-duration, 700ms) var(--ease-luxury) both; }
+.reveal-heading.is-revealed{ animation: lux-heading-reveal 800ms var(--ease-luxury) both; }
+.reveal-image.is-revealed  { animation: lux-image-reveal 900ms var(--ease-soft) both; }
+.reveal-fade.is-revealed   { animation: lux-fade-in 600ms var(--ease-reveal) both; }
+
+/* Stagger delays */
+.reveal-stagger-1 { animation-delay: calc(1 * var(--reveal-stagger, 80ms)); }
+.reveal-stagger-2 { animation-delay: calc(2 * var(--reveal-stagger, 80ms)); }
+.reveal-stagger-3 { animation-delay: calc(3 * var(--reveal-stagger, 80ms)); }
+.reveal-stagger-4 { animation-delay: calc(4 * var(--reveal-stagger, 80ms)); }
+.reveal-stagger-5 { animation-delay: calc(5 * var(--reveal-stagger, 80ms)); }
+.reveal-stagger-6 { animation-delay: calc(6 * var(--reveal-stagger, 80ms)); }
+
+/* --------------------------------------------------------------------------
+   HERO — Above-the-fold elements animate via CSS (no IntersectionObserver)
+   -------------------------------------------------------------------------- */
+
+.sf-hero-eyebrow {
+    animation: lux-reveal-up 600ms var(--ease-luxury) 100ms both;
+    color: var(--gold-light, #D4A855) !important;
+    letter-spacing: 0.30em !important;
+}
+
+.sf-hero h1 {
+    animation: lux-heading-reveal 800ms var(--ease-luxury) 220ms both;
+    font-size: clamp(52px, 7vw, 96px) !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.02 !important;
+}
+
+.sf-hero p {
+    animation: lux-reveal-up 700ms var(--ease-luxury) 360ms both;
+    line-height: 1.75 !important;
+}
+
+/* Hero cinematic overlay */
+.sf-hero {
+    overflow: hidden;
+}
+
+.sf-hero::before {
+    background: linear-gradient(
+        to bottom,
+        rgba(17, 17, 17, 0.22) 0%,
+        rgba(17, 17, 17, 0.52) 60%,
+        rgba(17, 17, 17, 0.76) 100%
+    ) !important;
+}
+
+.sf-hero.has-video::before {
+    background: linear-gradient(
+        180deg,
+        rgba(17, 17, 17, 0.28) 0%,
+        rgba(17, 17, 17, 0.52) 55%,
+        rgba(17, 17, 17, 0.80) 100%
+    ) !important;
+}
+
+/* Parallax video layer */
+.sf-hero-video-wrapper {
+    will-change: transform;
+}
+
+.sf-hero-sound-btn:hover {
+    border-color: rgba(182, 138, 58, 0.70) !important;
+    color: var(--gold-light, #D4A855) !important;
+}
+
+/* --------------------------------------------------------------------------
+   LUXURY PRODUCT CARD — AJMAL BOTTLE RISE
+   
+   .sf-card-image-wrap  → overflow:visible so image can escape the box
+   .sf-card-image-riser → inner div with overflow:hidden to clip bg/radius
+   .sf-card-image       → rises translateY(-18px) + drop-shadow on hover
+   -------------------------------------------------------------------------- */
+
+.sf-product-card {
+    transition:
+        transform 300ms var(--ease-luxury),
+        box-shadow 300ms var(--ease-luxury);
+    will-change: transform;
+    position: relative;
+    z-index: 1;
+}
+
+.sf-product-card:hover,
+.sf-product-card:focus-within {
+    transform: translateY(-8px) scale(1.045);
+    box-shadow:
+        0 28px 60px rgba(17, 17, 17, 0.13),
+        0 8px 24px rgba(91, 15, 24, 0.08);
+    z-index: 3;
+}
+
+/* Adjacent cards scale down (class added by JS on mouseenter) */
+.sf-product-card.is-sibling {
+    transform: scale(0.978);
+    opacity: 0.87;
+    transition:
+        transform 280ms var(--ease-luxury),
+        opacity 280ms var(--ease-luxury);
+}
+
+/* Allow image to escape the card visually */
+.sf-card-image-wrap {
+    overflow: visible !important;
+    position: relative;
+}
+
+/* Inner clipping container for the image area */
+.sf-card-image-riser {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+    aspect-ratio: 4/5;
+}
+
+/* Image: bottle-rise effect on hover */
+.sf-card-image {
+    transition:
+        transform 320ms var(--ease-luxury),
+        filter 320ms var(--ease-luxury);
+    will-change: transform, filter;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sf-product-card:hover .sf-card-image,
+.sf-product-card:focus-within .sf-card-image {
+    transform: translateY(-18px) scale(1.03);
+    filter:
+        drop-shadow(0 20px 28px rgba(91, 15, 24, 0.20))
+        drop-shadow(0 6px 12px rgba(0, 0, 0, 0.10));
+}
+
+/* --------------------------------------------------------------------------
+   NAVIGATION — Gold accents (non-breaking, additive overrides)
+   -------------------------------------------------------------------------- */
+
+.sf-nav-link::after {
+    background: var(--gold, #B68A3A) !important;
+}
+
+.sf-nav-link:hover,
+.sf-nav-link:focus-visible,
+.sf-nav-link.active {
+    color: var(--charcoal-lux, #2D2D2D) !important;
+}
+
+.sf-brand:hover,
+.sf-brand:focus-visible {
+    outline-color: var(--gold, #B68A3A) !important;
+}
+
+.sf-icon-btn:hover,
+.sf-icon-btn:focus-visible {
+    border-color: rgba(182, 138, 58, 0.45) !important;
+    color: var(--charcoal-lux, #2D2D2D) !important;
+}
+
+/* --------------------------------------------------------------------------
+   BUTTONS — Luxury pill + sweep fill animation
+   -------------------------------------------------------------------------- */
+
+.primary-btn,
+.secondary-btn {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-pill) !important;
+}
+
+.primary-btn {
+    background: var(--rich-black, #111111) !important;
+    border-color: var(--rich-black, #111111) !important;
+}
+
+/* Sweep gold underlay */
+.primary-btn::before,
+.secondary-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(182, 138, 58, 0.12);
+    transform: translateX(-101%);
+    transition: transform 350ms var(--ease-luxury);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.primary-btn:hover::before,
+.secondary-btn:hover::before {
+    transform: translateX(0);
+}
+
+/* Primary: burgundy on hover */
+.primary-btn:hover,
+.primary-btn:focus-visible {
+    border-color: var(--burgundy-deep, #5B0F18) !important;
+    background: var(--burgundy-deep, #5B0F18) !important;
+    box-shadow:
+        0 12px 28px rgba(91, 15, 24, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Secondary: gold border reveal */
+.secondary-btn:hover,
+.secondary-btn:focus-visible {
+    border-color: var(--gold, #B68A3A) !important;
+    color: var(--charcoal-lux, #2D2D2D) !important;
+    box-shadow: inset 0 0 0 1px var(--gold, #B68A3A) !important;
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER — Luxury refinements
+   -------------------------------------------------------------------------- */
+
+.sf-footer {
+    background: var(--rich-black, #111111) !important;
+}
+
+.sf-footer-brand {
+    color: var(--gold, #B68A3A) !important;
+}
+
+.sf-footer-link:hover,
+.sf-footer-link:focus-visible {
+    color: var(--gold-light, #D4A855) !important;
+}
+
+/* "Powered by NobleNet" — subtle gold italic credit */
+.sf-footer-poweredby {
+    font-size: 11px;
+    color: rgba(182, 138, 58, 0.50);
+    font-style: italic;
+    letter-spacing: 0.06em;
+    margin-top: 5px;
+    display: inline-block;
+    transition: color 250ms var(--ease-soft);
+}
+
+.sf-footer-poweredby:hover {
+    color: rgba(182, 138, 58, 0.80);
+}
+
+/* --------------------------------------------------------------------------
+   SCENT FINDER — Red/Gold luxury theme
+   -------------------------------------------------------------------------- */
+
+.scent-finder-eyebrow {
+    color: var(--gold, #B68A3A) !important;
+}
+
+.scent-purpose-tabs {
+    background: rgba(182, 138, 58, 0.08) !important;
+    border-color: rgba(182, 138, 58, 0.15) !important;
+}
+
+.scent-purpose-tab.is-active {
+    background: var(--burgundy-deep, #5B0F18) !important;
+    color: var(--white, #fff) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(91, 15, 24, 0.25) !important;
+}
+
+.scent-quiz-group {
+    border-bottom-color: rgba(182, 138, 58, 0.15) !important;
+}
+
+.scent-quiz-radio input,
+.scent-quiz-checkbox input {
+    accent-color: var(--gold, #B68A3A) !important;
+}
+
+.scent-pill-label {
+    border-color: rgba(182, 138, 58, 0.3) !important;
+}
+
+.scent-pill-label:hover {
+    border-color: var(--gold, #B68A3A) !important;
+    background: rgba(182, 138, 58, 0.05) !important;
+    color: var(--charcoal-lux, #2D2D2D) !important;
+}
+
+.scent-pill-label:has(input:checked) {
+    background: var(--burgundy-deep, #5B0F18) !important;
+    color: var(--white, #fff) !important;
+    border-color: var(--burgundy-deep, #5B0F18) !important;
+    box-shadow: 0 2px 5px rgba(91, 15, 24, 0.25) !important;
+}
+
+.scent-quiz-submit-btn {
+    background: var(--burgundy-deep, #5B0F18) !important;
+    box-shadow: 0 4px 14px rgba(91, 15, 24, 0.25) !important;
+}
+
+/* "ACTIVE EDIT" badge */
+.scent-finder-status-badge {
+    background: var(--burgundy-deep, #5B0F18) !important;
+    border-color: var(--burgundy-deep, #5B0F18) !important;
+}
+
+/* Filter radio dots */
+.sf-radio input[type="radio"]::before {
+    box-shadow: inset 1em 1em var(--gold, #B68A3A) !important;
+}
+   DASHBOARD — Subtle polish (non-breaking)
+   -------------------------------------------------------------------------- */
+
+.stat-card.revenue::before {
+    background: var(--gold, #B68A3A) !important;
+}
+
+.panel:hover {
+    box-shadow:
+        var(--shadow-card),
+        0 0 0 1px rgba(182, 138, 58, 0.07) !important;
+}
+
+/* --------------------------------------------------------------------------
+   PAGINATION — Gold accent on hover
+   -------------------------------------------------------------------------- */
+
+.sf-page-link:not(.sf-page-disabled):hover {
+    border-color: var(--gold, #B68A3A) !important;
+    color: var(--gold, #B68A3A) !important;
+}
+
+/* --------------------------------------------------------------------------
+   PREFERS-REDUCED-MOTION — All animations disabled
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal-up:not(.sf-hero *),
+    .reveal-scale:not(.sf-hero *),
+    .reveal-heading:not(.sf-hero *),
+    .reveal-image:not(.sf-hero *),
+    .reveal-fade:not(.sf-hero *),
+    .reveal-up.is-revealed,
+    .reveal-scale.is-revealed,
+    .reveal-heading.is-revealed,
+    .reveal-image.is-revealed,
+    .reveal-fade.is-revealed {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+    }
+
+    .sf-hero-eyebrow,
+    .sf-hero h1,
+    .sf-hero p {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .sf-product-card,
+    .sf-product-card:hover,
+    .sf-product-card:focus-within {
+        transform: none !important;
+        transition: box-shadow 100ms linear !important;
+    }
+
+    .sf-card-image,
+    .sf-product-card:hover .sf-card-image,
+    .sf-product-card:focus-within .sf-card-image {
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+    .sf-product-card.is-sibling {
+        transform: none !important;
+        opacity: 1 !important;
+        transition: none !important;
+    }
+
+    .primary-btn::before,
+    .secondary-btn::before {
+        display: none !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE — Lighter, performance-safe animations
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    :root {
+        --reveal-duration: 500ms;
+        --reveal-stagger: 60ms;
+    }
+
+    .sf-product-card:hover,
+    .sf-product-card:focus-within {
+        transform: translateY(-4px) scale(1.02) !important;
+    }
+
+    .sf-product-card:hover .sf-card-image,
+    .sf-product-card:focus-within .sf-card-image {
+        transform: translateY(-8px) scale(1.02) !important;
+    }
+
+    .sf-product-card.is-sibling {
+        transform: scale(0.99) !important;
+        opacity: 0.95 !important;
+    }
+
+    .sf-hero h1 {
+        font-size: clamp(36px, 8vw, 56px) !important;
+        letter-spacing: -0.01em !important;
+    }
+}

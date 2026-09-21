@@ -1,20 +1,17 @@
-<article class="sf-product-card" {% if custom_style %}style="{{ custom_style }}"{% endif %}>
+<article class="sf-product-card reveal-up" {% if custom_style %}style="{{ custom_style }}"{% endif %}>
     <div style="position: relative; height: 100%;">
         <a href="{% url 'catalog:product_detail' product.pk %}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
             <div class="sf-card-image-wrap" {% if no_border_radius %}style="margin-bottom: 0; border-radius: 0;"{% endif %}>
-                {% if not hide_badge %}
-                    {% if badge_text %}
-                        <div class="sf-badge-rec">{{ badge_text }}</div>
+
+
+                <!-- sf-card-image-riser: lets image visually rise outside card on hover -->
+                <div class="sf-card-image-riser">
+                    {% if product.primary_image %}
+                        <img src="{{ product.primary_image.image.url }}" alt="{{ product.primary_image.alt_text|default:product.name }}" class="sf-card-image" loading="lazy">
                     {% else %}
-                        <div class="sf-badge">{{ product.category.name }}</div>
+                        <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=600&auto=format&fit=crop" alt="Fallback image for {{ product.name }}" class="sf-card-image" loading="lazy">
                     {% endif %}
-                {% endif %}
-                
-                {% if product.primary_image %}
-                    <img src="{{ product.primary_image.image.url }}" alt="{{ product.primary_image.alt_text|default:product.name }}" class="sf-card-image" loading="lazy">
-                {% else %}
-                    <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=600&auto=format&fit=crop" alt="Fallback image for {{ product.name }}" class="sf-card-image" loading="lazy">
-                {% endif %}
+                </div>
             </div>
             <div class="sf-card-content" {% if custom_padding %}style="{{ custom_padding }}"{% endif %}>
                 <h3 class="sf-card-title" {% if large_title %}style="font-size: 18px;"{% endif %}>{{ product.name }}</h3>
@@ -38,10 +35,10 @@
                 </div>
             </div>
         </a>
-        
-        <!-- Wishlist Heart -->
-        <button class="sf-wishlist-toggle {% if product.id in wishlisted_product_ids %}is-active{% endif %}" 
-                data-url="{% url 'catalog:toggle_wishlist' product.pk %}" 
+
+        <!-- Wishlist Heart — logic unchanged -->
+        <button class="sf-wishlist-toggle {% if product.id in wishlisted_product_ids %}is-active{% endif %}"
+                data-url="{% url 'catalog:toggle_wishlist' product.pk %}"
                 aria-label="Toggle Wishlist"
                 style="position: absolute; top: 12px; right: 12px; z-index: 2;">
             {% if product.id in wishlisted_product_ids %}
