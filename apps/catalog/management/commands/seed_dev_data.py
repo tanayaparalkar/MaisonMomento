@@ -526,19 +526,24 @@ class Command(BaseCommand):
 
         created_orders = []
 
-        # (A) Orders TODAY (to make today's revenue, shipments, deliveries populated)
+        # (A) Orders TODAY (to guarantee today's revenue, shipments, deliveries, pending, confirmed)
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         today_scenarios = [
-            # customer_idx, pay_status, order_status, hours_ago
-            (0, "paid", "delivered", 1),   # Victoria - delivered via boutique courier
-            (3, "paid", "shipped", 3),     # Priya - shipped with tracking
-            (4, "paid", "processing", 5),  # Arjun - processing in packaging room
-            (6, "pending", "pending", 2),  # Elena - awaiting payment
+            # customer_idx, pay_status, order_status
+            (0, "paid", "delivered"),   # Victoria - delivered via boutique courier
+            (1, "paid", "delivered"),   # Alexander - delivered
+            (3, "paid", "shipped"),     # Priya - shipped with tracking
+            (5, "paid", "shipped"),     # Julian - shipped
+            (4, "paid", "confirmed"),   # Arjun - confirmed & awaiting packing
+            (6, "pending", "pending"),  # Elena - pending payment confirmation
+            (8, "pending", "pending"),  # Sophia - pending confirmation
         ]
 
-        for c_idx, p_stat, o_stat, h_ago in today_scenarios:
+        total_seconds_today = max(600, int((now - today_start).total_seconds()))
+        for idx, (c_idx, p_stat, o_stat) in enumerate(today_scenarios):
             c = cust_objs[c_idx]
-            o_date = now - timedelta(hours=h_ago, minutes=random.randint(5, 45))
+            sec_offset = int((total_seconds_today * (idx + 1)) / (len(today_scenarios) + 1))
+            o_date = today_start + timedelta(seconds=max(60, sec_offset))
             date_code = o_date.strftime("%Y%m%d")
             order_num = f"MM-{date_code}-{uuid.uuid4().hex[:6].upper()}"
 
@@ -578,41 +583,21 @@ class Command(BaseCommand):
             order.save(update_fields=["subtotal", "total"])
             created_orders.append(order)
 
-        # (B) Orders Across Past 1 to 45 Days
-        historical_scenarios = [
-            # days_ago, payment_status, order_status
-            (1, "paid", "shipped"),
-            (1, "paid", "delivered"),
-            (2, "paid", "delivered"),
-            (2, "paid", "delivered"),
-            (3, "paid", "delivered"),
-            (3, "paid", "processing"),
-            (4, "paid", "delivered"),
-            (5, "paid", "delivered"),
-            (6, "paid", "delivered"),
-            (7, "paid", "delivered"),
-            (8, "paid", "delivered"),
-            (9, "paid", "delivered"),
-            (10, "paid", "delivered"),
-            (11, "paid", "delivered"),
-            (12, "paid", "delivered"),
-            (14, "paid", "delivered"),
-            (15, "refunded", "refunded"),
-            (16, "paid", "delivered"),
-            (18, "paid", "delivered"),
-            (20, "paid", "delivered"),
-            (22, "paid", "delivered"),
-            (24, "paid", "delivered"),
-            (25, "failed", "cancelled"),
-            (28, "paid", "delivered"),
-            (30, "paid", "delivered"),
-            (32, "paid", "delivered"),
-            (35, "paid", "delivered"),
-            (38, "paid", "delivered"),
-            (40, "paid", "delivered"),
-            (42, "paid", "delivered"),
-            (44, "paid", "delivered"),
+        # (B) Orders Across Past 1 to 180 Days (Spanning last 6 months for complete insights)
+        historical_days = [
+            1, 1, 2, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 18, 20, 22, 24, 25, 28,
+            32, 35, 38, 42, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 165, 175
         ]
+        historical_scenarios = []
+        for days_ago in historical_days:
+            if days_ago == 15:
+                p_stat, o_stat = "refunded", "refunded"
+            elif days_ago == 25:
+                p_stat, o_stat = "failed", "cancelled"
+            else:
+                p_stat = "paid"
+                o_stat = "shipped" if days_ago <= 3 else "delivered"
+            historical_scenarios.append((days_ago, p_stat, o_stat))
 
         for days_ago, p_stat, o_stat in historical_scenarios:
             c = random.choice(cust_objs)

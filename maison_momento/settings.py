@@ -74,7 +74,7 @@ _allowed_hosts_env = os.environ.get("DJANGO_ALLOWED_HOSTS", "")
 if _allowed_hosts_env:
     ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(",") if h.strip()]
 elif DEBUG:
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+    ALLOWED_HOSTS = ["*"]
 else:
     # Default Render support when running in production
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
@@ -234,6 +234,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # All security headers and cookie flags are automatically enabled when
 # DEBUG=False. No manual toggling is required across environments.
 # ---------------------------------------------------------------------------
+# Tell Django it is behind a reverse proxy (Render / AWS / Cloudflare)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 if not DEBUG:
     # Force all traffic over HTTPS
     SECURE_SSL_REDIRECT = True

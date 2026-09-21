@@ -136,6 +136,13 @@ def _build_filter_context(request, query, category_slug, family, gender, categor
 # ---------------------------------------------------------------------------
 
 def product_list(request):
+    if Product.objects.count() == 0:
+        from django.core.management import call_command
+        try:
+            call_command("seed_dev_data")
+        except Exception as e:
+            logger.error("Auto-seeding failed in product_list: %s", e)
+
     queryset = (
         Product.objects
         .filter(is_active=True)

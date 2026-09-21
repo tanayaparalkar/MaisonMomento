@@ -157,8 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     };
 
-    };
-
     const createLineChartOptions = (valueFormatter) => {
         return {
             responsive: true,
@@ -320,21 +318,26 @@ document.addEventListener("DOMContentLoaded", () => {
             "rgba(24, 76, 69, 0)"
         );
 
+        const chartLabels = (window.INSIGHTS_DATA && window.INSIGHTS_DATA.labels && window.INSIGHTS_DATA.labels.length) 
+            ? window.INSIGHTS_DATA.labels 
+            : ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+
+        const chartRevenues = (window.INSIGHTS_DATA && window.INSIGHTS_DATA.revenues && window.INSIGHTS_DATA.revenues.length) 
+            ? window.INSIGHTS_DATA.revenues 
+            : [2.4, 2.8, 3.6, 4.2, 5.4, 6.1];
+
         new Chart(context, {
             type: "line",
-
             data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-
+                labels: chartLabels,
                 datasets: [
                     createLineDataset(
-                        [2.4, 2.8, 3.6, 4.2, 5.4, 6.1],
+                        chartRevenues,
                         colors.forest,
                         areaGradient
                     ),
                 ],
             },
-
             options: createLineChartOptions(
                 (context) => `₹${context.parsed.y.toFixed(1)}L`
             ),
@@ -350,25 +353,28 @@ document.addEventListener("DOMContentLoaded", () => {
     if (pieCanvas && typeof Chart !== "undefined") {
         const context = pieCanvas.getContext("2d");
 
+        const pieLabels = (window.INSIGHTS_DATA && window.INSIGHTS_DATA.categoryLabels && window.INSIGHTS_DATA.categoryLabels.length)
+            ? window.INSIGHTS_DATA.categoryLabels
+            : ["Woody Collection", "Oud Collection", "Musky Collection", "Fresh Collection"];
+
+        const pieData = (window.INSIGHTS_DATA && window.INSIGHTS_DATA.categoryPercentages && window.INSIGHTS_DATA.categoryPercentages.length)
+            ? window.INSIGHTS_DATA.categoryPercentages
+            : [38, 27, 21, 14];
+
         new Chart(context, {
             type: "doughnut",
-
             data: {
-                labels: [
-                    "Oud Collection",
-                    "Amber Collection",
-                    "Citrus Collection",
-                    "Floral Collection",
-                ],
-
+                labels: pieLabels,
                 datasets: [
                     {
-                        data: [38, 27, 21, 14],
+                        data: pieData,
                         backgroundColor: [
                             colors.navy,
                             colors.forest,
                             colors.burgundy,
-                            "#E6E6E3",
+                            "#C5A059",
+                            "#817C78",
+                            "#5A3825",
                         ],
                         borderColor: colors.white,
                         borderWidth: 3,
@@ -382,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: "76%",
+                cutout: "74%",
                 rotation: -90,
                 circumference: 360,
 
@@ -398,26 +404,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     legend: {
                         position: "bottom",
                         align: "center",
-
                         labels: {
-                            boxWidth: 7,
-                            boxHeight: 7,
+                            boxWidth: 8,
+                            boxHeight: 8,
                             borderRadius: 4,
                             padding: 14,
                             color: colors.muted,
                             font: {
                                 family: "Inter",
-                                size: 10,
+                                size: 11,
                                 weight: "500",
                             },
                             usePointStyle: true,
                             pointStyle: "circle",
                         },
                     },
-
                     tooltip: createPremiumTooltip(
                         colors.navy,
-                        (context) => `${context.parsed}% of sales`
+                        (context) => `${context.parsed}% of total sales`
                     ),
                 },
 
@@ -431,12 +435,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* =========================================================================
-       KPI NUMBER ANIMATION
+       CASINO / SLOT-MACHINE ROLLING COUNTER ANIMATION
        ========================================================================= */
 
-    const animateCounter = (element) => {
-        const target = Number(element.dataset.counter);
+    const animateCasinoCounter = (element) => {
+        const rawTarget = element.dataset.counter;
+        if (rawTarget === undefined || rawTarget === null || rawTarget === "") {
+            return;
+        }
 
+        const target = Number(rawTarget);
         if (Number.isNaN(target)) {
             return;
         }
@@ -444,47 +452,94 @@ document.addEventListener("DOMContentLoaded", () => {
         const prefix = element.dataset.prefix || "";
         const suffix = element.dataset.suffix || "";
         const displayValue = element.dataset.displayValue;
-        const decimalTarget = !Number.isInteger(target) || Boolean(displayValue);
-        const duration = 1350;
+        const isDecimal = !Number.isInteger(target) || Boolean(displayValue);
+
+        // Target string formatted for final lock-in
+        const formatTargetValue = (val) => {
+            if (displayValue && suffix === "L") {
+                return `${prefix}${displayValue}${suffix}`;
+            }
+            if (isDecimal) {
+                return `${prefix}${val.toFixed(1)}${suffix}`;
+            }
+            return `${prefix}${Math.round(val).toLocaleString("en-IN")}${suffix}`;
+        };
+
+        const finalFormatted = formatTargetValue(target);
+
+        // Casino roll duration
+        const duration = target > 500 ? 1600 : 1200;
         const startTime = performance.now();
 
-        const formatValue = (value, isFinalFrame) => {
-            if (displayValue && suffix === "L") {
-                const finalDisplay = Number(displayValue);
-                const currentValue = isFinalFrame
-                    ? finalDisplay
-                    : (finalDisplay * value) / target;
-
-                return `${prefix}${currentValue.toFixed(1)}${suffix}`;
-            }
-
-            if (decimalTarget) {
-                return `${prefix}${value.toFixed(1)}${suffix}`;
-            }
-
-            return `${prefix}${Math.round(value).toLocaleString("en-IN")}${suffix}`;
+        // Helper to generate rolling reel numbers of matching scale
+        const getRandomReelNumber = () => {
+            if (target === 0) return 0;
+            if (target < 10) return Math.floor(Math.random() * 10);
+            if (target < 100) return Math.floor(Math.random() * 90 + 10);
+            const digits = Math.max(2, Math.floor(Math.log10(target)) + 1);
+            const min = Math.pow(10, digits - 1);
+            const max = Math.pow(10, digits) - 1;
+            return Math.floor(Math.random() * (max - min) + min);
         };
 
-        const updateCounter = (currentTime) => {
-            const elapsed = Math.min((currentTime - startTime) / duration, 1);
-            const easedProgress = 1 - Math.pow(1 - elapsed, 4);
-            const currentValue = target * easedProgress;
+        let lastFrameTime = 0;
 
-            element.textContent = formatValue(currentValue, elapsed === 1);
+        const updateReels = (currentTime) => {
+            const elapsed = Math.min((currentTime - startTime) / duration, 1);
+
+            // Phase 1: Rapid casino spinning reels (0% to 58% of duration)
+            if (elapsed < 0.58) {
+                // Update reel characters rapidly at ~30ms intervals
+                if (currentTime - lastFrameTime > 30) {
+                    lastFrameTime = currentTime;
+                    if (target === 0) {
+                        element.textContent = `${prefix}0${suffix}`;
+                    } else if (displayValue && suffix === "L") {
+                        element.textContent = `${prefix}${(Math.random() * 15).toFixed(1)}${suffix}`;
+                    } else if (isDecimal) {
+                        element.textContent = `${prefix}${(Math.random() * target).toFixed(1)}${suffix}`;
+                    } else {
+                        const randomNum = getRandomReelNumber();
+                        element.textContent = `${prefix}${randomNum.toLocaleString("en-IN")}${suffix}`;
+                    }
+                }
+                window.requestAnimationFrame(updateReels);
+                return;
+            }
+
+            // Phase 2: Mechanical deceleration into the target jackpot number (58% to 100%)
+            const decelProgress = (elapsed - 0.58) / 0.42;
+            // Smooth ease-out cubic curve
+            const ease = 1 - Math.pow(1 - decelProgress, 3);
+            const currentVal = target * (0.58 + 0.42 * ease);
 
             if (elapsed < 1) {
-                window.requestAnimationFrame(updateCounter);
+                if (displayValue && suffix === "L") {
+                    const interpolatedDisplay = (Number(displayValue) * (0.58 + 0.42 * ease)).toFixed(1);
+                    element.textContent = `${prefix}${interpolatedDisplay}${suffix}`;
+                } else if (isDecimal) {
+                    element.textContent = `${prefix}${currentVal.toFixed(1)}${suffix}`;
+                } else {
+                    element.textContent = `${prefix}${Math.round(currentVal).toLocaleString("en-IN")}${suffix}`;
+                }
+                window.requestAnimationFrame(updateReels);
+            } else {
+                // Phase 3: Final lock-in and celebratory jackpot bounce
+                element.textContent = finalFormatted;
+                element.classList.remove("casino-spin");
+                element.classList.add("casino-lock");
             }
         };
 
-        element.textContent = `${prefix}0${suffix}`;
-        window.requestAnimationFrame(updateCounter);
+        element.classList.add("casino-spin");
+        window.requestAnimationFrame(updateReels);
     };
 
+    // Stagger all counters across the dashboard
     document.querySelectorAll(selectors.counters).forEach((counter, index) => {
         window.setTimeout(() => {
-            animateCounter(counter);
-        }, 180 + index * 100);
+            animateCasinoCounter(counter);
+        }, 120 + index * 90);
     });
 
     /* =========================================================================
