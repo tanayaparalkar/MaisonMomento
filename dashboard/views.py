@@ -29,17 +29,7 @@ import json
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncMonth
 
-def ensure_data_seeded():
-    """Ensure essential database models are populated. Auto-seeds if empty on live/Render."""
-    from apps.sales.models import Order
-    from apps.catalog.models import Product
-    if Order.objects.count() == 0 or Product.objects.count() == 0:
-        from django.core.management import call_command
-        try:
-            logger.info("Empty database detected. Running seed_dev_data automatically...")
-            call_command("seed_dev_data")
-        except Exception as e:
-            logger.error("Auto-seeding failed: %s", e)
+
 
 
 @staff_member_required
@@ -48,7 +38,6 @@ def dashboard(request):
     Main dashboard — metrics, orders, top products, dynamic notifications,
     and recommendation health. Supports date filtering.
     """
-    ensure_data_seeded()
     now = timezone.now()
     
     # Date Filtering logic
@@ -183,8 +172,6 @@ def dashboard(request):
 
 @staff_member_required
 def insights(request):
-    """Analytics and Charts for Insights page with dynamic metrics from orders and catalogue."""
-    ensure_data_seeded()
     now = timezone.now()
     six_months_ago = (now.replace(day=1) - timedelta(days=165)).replace(day=1)
 

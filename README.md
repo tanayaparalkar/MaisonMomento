@@ -47,8 +47,8 @@ pip install -r requirements.txt
 # 2. Run migrations (Local SQLite only)
 python manage.py migrate
 
-# 3. Seed development data (INR prices & vintage flacon images)
-python manage.py seed_dev_data
+# 3. Create an administrator account
+python manage.py createsuperuser
 
 # 4. Start development server
 python manage.py runserver
