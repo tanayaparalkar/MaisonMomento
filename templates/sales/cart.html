@@ -1,9 +1,10 @@
 {% extends "catalog/base.html" %}
+{% load static %}
 
 {% block title %}Shopping Bag | Maison Momènto Parfumeur{% endblock %}
 
 {% block content %}
-<section class="sf-hero" style="min-height: 20vh; margin-bottom: 20px; padding: 40px 24px;">
+<section class="sf-hero" style="min-height: 20vh; margin-bottom: 20px; padding: 40px 24px; background-image: url('{% static "images/hero_banner.png" %}'); background-size: cover; background-position: center 30%;">
     <div class="sf-hero-content">
         <h1 style="font-size: clamp(32px, 4vw, 48px);">Shopping Bag</h1>
     </div>

@@ -15,9 +15,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Link existing dashboard styles for variables, then storefront for component layout -->
+    <!-- Core styles: variables → storefront layout → luxury animation layer -->
     <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
+    <link rel="stylesheet" href="{% static 'css/luxury-animations.css' %}">
 </head>
 <body>
     <header class="sf-header">
@@ -99,7 +100,7 @@
             <div class="sf-footer-bottom">
                 <div>
                     &copy; 2026 Maison Momènto. All rights reserved.<br>
-                    <span style="font-size: 11px; color: var(--muted); margin-top: 4px; display: inline-block;">Powered by NobleNet Software Technologies</span>
+                    <span class="sf-footer-poweredby">Powered by NobleNet Software Technologies</span>
                 </div>
                 <div style="display: flex; gap: 16px;">
                     <a href="https://instagram.com" aria-label="Instagram" style="color: inherit;" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
@@ -390,6 +391,110 @@
                 }
             });
         });
+    </script>
+
+    <!-- ================================================================
+         LUXURY MOTION SCRIPTS
+         - IntersectionObserver for scroll-triggered reveal animations
+         - Sibling card scale-down on hover (Ajmal card effect)
+         - Subtle hero parallax on scroll
+         All GPU-accelerated (transform + opacity only). No layout thrash.
+         Respects prefers-reduced-motion at runtime.
+         ================================================================ -->
+    <script>
+    (function () {
+        'use strict';
+
+        var prefersReduced = window.matchMedia &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* ------------------------------------------------------------------
+           1. IntersectionObserver — Scroll Reveal
+           ------------------------------------------------------------------ */
+        if (!prefersReduced && 'IntersectionObserver' in window) {
+            var revealObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-revealed');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -48px 0px' });
+
+            /* Observe all reveal-* elements */
+            document.querySelectorAll(
+                '.reveal-up, .reveal-scale, .reveal-heading, .reveal-image, .reveal-fade'
+            ).forEach(function (el, i) {
+                /* Apply stagger delay by grid position within parent */
+                var siblings = el.parentElement
+                    ? el.parentElement.querySelectorAll('.reveal-up, .reveal-scale')
+                    : [];
+                var idx = Array.from(siblings).indexOf(el);
+                if (idx >= 0 && idx < 6) {
+                    el.classList.add('reveal-stagger-' + (idx + 1));
+                }
+                revealObserver.observe(el);
+            });
+        } else {
+            /* Fallback: immediately reveal everything */
+            document.querySelectorAll(
+                '.reveal-up, .reveal-scale, .reveal-heading, .reveal-image, .reveal-fade'
+            ).forEach(function (el) {
+                el.classList.add('is-revealed');
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+            });
+        }
+
+        /* ------------------------------------------------------------------
+           2. Product Card — Sibling Scale Effect (Ajmal-style)
+           When a card is hovered, adjacent cards in the same grid scale down.
+           ------------------------------------------------------------------ */
+        if (!prefersReduced) {
+            document.querySelectorAll('.sf-grid, .sf-scroll-row').forEach(function (grid) {
+                var cards = Array.from(grid.querySelectorAll('.sf-product-card'));
+
+                cards.forEach(function (card) {
+                    card.addEventListener('mouseenter', function () {
+                        cards.forEach(function (other) {
+                            if (other !== card) {
+                                other.classList.add('is-sibling');
+                            }
+                        });
+                    });
+                    card.addEventListener('mouseleave', function () {
+                        cards.forEach(function (other) {
+                            other.classList.remove('is-sibling');
+                        });
+                    });
+                });
+            });
+        }
+
+        /* ------------------------------------------------------------------
+           3. Hero Parallax — subtle depth on scroll (CSS transform only)
+           ------------------------------------------------------------------ */
+        if (!prefersReduced) {
+            var heroVideo = document.querySelector('.sf-hero-video-wrapper');
+            if (heroVideo) {
+                var lastY = 0;
+                var ticking = false;
+
+                window.addEventListener('scroll', function () {
+                    lastY = window.scrollY;
+                    if (!ticking) {
+                        window.requestAnimationFrame(function () {
+                            var shift = Math.min(lastY * 0.25, 80);
+                            heroVideo.style.transform = 'translateY(' + shift + 'px)';
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                }, { passive: true });
+            }
+        }
+
+    })();
     </script>
 
     <!-- Sticky Bottom Checkout Bar -->

@@ -1,5 +1,18 @@
 :root {
-    /* Maison Momento — refined neutral and accent system */
+    /* ============================================================
+       MAISON MOMENTO — Luxury Palette (Ajmal × Subversion inspired)
+       ============================================================ */
+
+    /* Core Luxury Palette */
+    --burgundy-deep: #5B0F18;    /* Deep Burgundy — primary brand accent */
+    --rich-black: #111111;       /* Rich Black — darkest surface */
+    --soft-ivory: #FCFAF6;       /* Soft Ivory — lightest background */
+    --warm-beige-lux: #F4EFE8;   /* Warm Beige — card / section background */
+    --gold: #B68A3A;             /* Antique Gold — luxury accent */
+    --gold-light: #D4A855;       /* Lighter gold for hover states */
+    --charcoal-lux: #2D2D2D;     /* Charcoal — primary text */
+
+    /* Legacy variables preserved (used throughout templates) */
     --leather-brown: #8A552A;
     --leather-brown-deep: #6E411E;
     --burgundy: #701B25;
@@ -35,15 +48,21 @@
     /* Depth */
     --shadow-subtle: 0 8px 24px rgba(13, 37, 56, 0.025);
     --shadow-card: 0 14px 34px rgba(13, 37, 56, 0.045);
-    --shadow-hover: 0 18px 42px rgba(13, 37, 56, 0.075);
+    --shadow-hover: 0 24px 56px rgba(17, 17, 17, 0.12);
     --shadow-menu: 0 20px 48px rgba(13, 37, 56, 0.10);
+    --shadow-bottle: 0 24px 40px rgba(91, 15, 24, 0.18), 0 8px 16px rgba(0,0,0,0.10);
 
-    /* Motion */
+    /* Motion — intentional, never flashy */
     --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-reveal: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --transition-fast: 180ms var(--ease-luxury);
-    --transition: 320ms var(--ease-luxury);
+    --transition: 300ms var(--ease-luxury);
     --transition-slow: 560ms var(--ease-soft);
+
+    /* Animation durations for scroll reveals */
+    --reveal-duration: 700ms;
+    --reveal-stagger: 80ms;
 }
 
 *,

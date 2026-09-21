@@ -1,10 +1,11 @@
 {% extends "catalog/base.html" %}
+{% load static %}
 
 {% block title %}My Collection | Maison Momènto Parfumeur{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="sf-hero" style="min-height: 30vh; margin-bottom: 40px; padding: 60px 24px;">
+<section class="sf-hero" style="min-height: 30vh; margin-bottom: 40px; padding: 60px 24px; background-image: url('{% static "images/hero_banner.png" %}'); background-size: cover; background-position: center 30%;">
     <div class="sf-hero-content">
         <div class="sf-hero-eyebrow">Wishlist</div>
         <h1 style="font-size: clamp(40px, 5vw, 64px);">My Collection</h1>
