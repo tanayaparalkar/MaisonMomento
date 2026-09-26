@@ -1,7 +1,7 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}Products | Maison Momènto Parfumeur{% endblock %}
+{% block title %}Products | Maison Moménto Parfumeur{% endblock %}
 
 {% block content %}
 <!-- Hero Section with Video Banner -->
@@ -18,7 +18,7 @@
     <!-- Hero Content Overlay -->
     <div class="sf-hero-content">
         <div class="sf-hero-eyebrow reveal-heading">The Collection</div>
-        <h1 style="margin-bottom: 8px;" class="reveal-heading">Maison Momènto</h1>
+        <h1 style="margin-bottom: 8px;" class="reveal-heading">Maison Moménto</h1>
         <p style="margin-bottom: 0;" class="reveal-up">Discover our meticulously crafted selection of Eau de Parfums, Extraits, and home olfactory experiences.</p>
     </div>
 
@@ -37,8 +37,9 @@
 </section>
 
 <!-- Active Filters / Top Bar -->
+<!-- Active Filters / Top Bar -->
 <div class="sf-container" style="margin-bottom: 24px;">
-    <div class="sf-catalog-topbar" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div class="sf-catalog-topbar">
         <div class="sf-active-filters" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
             {% if active_filters %}
                 <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--charcoal); margin-right: 8px;">Active Filters:</span>
@@ -47,28 +48,48 @@
                         {{ filter.name }} <span>&times;</span>
                     </a>
                 {% endfor %}
-                <a href="{% url 'catalog:product_list' %}" class="sf-filter-clear" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-left: 8px; text-decoration: none; transition: color 250ms;">Clear All</a>
+                <a href="{% url 'catalog:product_list' %}{% if current_sort %}?sort={{ current_sort }}{% endif %}" class="sf-filter-clear" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-left: 8px; text-decoration: none; transition: color 250ms;">Clear All</a>
             {% endif %}
         </div>
         
-        <div class="sf-sort-container">
-            <form id="sort-form" method="GET" action="{% url 'catalog:product_list' %}">
-                <!-- Preserve existing GET params except sort and page -->
-                {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
-                {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
-                {% if request.GET.family %}<input type="hidden" name="family" value="{{ request.GET.family }}">{% endif %}
-                {% if request.GET.gender %}<input type="hidden" name="gender" value="{{ request.GET.gender }}">{% endif %}
-                
-                <label for="sort" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--charcoal); margin-right: 8px;">Sort By:</label>
-                <select name="sort" id="sort" class="sf-select" onchange="document.getElementById('sort-form').submit();">
-                    <option value="featured" {% if current_sort == 'featured' %}selected{% endif %}>Featured</option>
-                    <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
-                    <option value="alpha" {% if current_sort == 'alpha' %}selected{% endif %}>Alphabetical (A-Z)</option>
-                    <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
-                    <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
-                </select>
-                <noscript><button type="submit" style="display:none;">Sort</button></noscript>
-            </form>
+        <div class="sf-catalog-actions">
+            <!-- Fragrance Consultation Top Bar Button -->
+            <button type="button" class="sf-topbar-consultation-btn" id="topbar-scent-consultation-btn" onclick="openScentModal(this)" aria-label="Open fragrance consultation">
+                <span style="color: #c9952a; font-size: 13px;">✦</span>
+                <span>{% if is_quiz %}Adjust Consultation{% else %}Fragrance Consultation{% endif %}</span>
+            </button>
+
+            <!-- Sort By Dropdown -->
+            <div class="sf-sort-container">
+                <form id="sort-form" method="GET" action="{% url 'catalog:product_list' %}">
+                    <!-- Preserve existing GET params except sort and page -->
+                    {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+                    {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+                    {% if request.GET.family %}<input type="hidden" name="family" value="{{ request.GET.family }}">{% endif %}
+                    {% if request.GET.gender %}<input type="hidden" name="gender" value="{{ request.GET.gender }}">{% endif %}
+                    
+                    <label for="sort" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--charcoal); margin-right: 8px;">Sort By:</label>
+                    <select name="sort" id="sort" class="sf-select" onchange="document.getElementById('sort-form').submit();">
+                        <option value="featured" {% if current_sort == 'featured' %}selected{% endif %}>Featured</option>
+                        <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="alpha" {% if current_sort == 'alpha' %}selected{% endif %}>Alphabetical (A-Z)</option>
+                        <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                    <noscript><button type="submit" style="display:none;">Sort</button></noscript>
+                </form>
+            </div>
+
+            <!-- Luxury Filter Trigger Button immediately beside Sort By -->
+            <button type="button" class="sf-filter-drawer-btn" id="filter-drawer-trigger-btn" onclick="openFilterDrawer(this)" aria-haspopup="dialog" aria-controls="filter-drawer" aria-label="Open filter drawer">
+                <svg class="sf-filter-funnel-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                <span class="sf-filter-btn-text">Filters</span>
+                {% if active_filters %}
+                    <span class="sf-filter-btn-badge" id="filter-active-count">● {{ active_filters|length }}</span>
+                {% endif %}
+            </button>
         </div>
     </div>
 </div>
@@ -77,312 +98,23 @@
 <section id="collection" class="sf-section" style="padding-top: 0;">
     <div class="sf-container sf-catalog-layout">
         
-        <!-- Sidebar Filters & Scent Finder Questionnaire -->
-        <aside class="sf-sidebar">
-
-            <!-- Find Your Scent Questionnaire Widget -->
-            <details class="scent-finder-widget sf-scent-accordion" id="scent-finder-accordion" {% if not is_quiz %}open{% endif %}>
-                <summary class="scent-finder-summary">
-                    <div class="scent-finder-summary-text">
-                        <span class="scent-finder-eyebrow">&#10022; Scent Consultation</span>
-                        <h2 class="scent-finder-title">Find Your Scent</h2>
+        <!-- Permanent Left Sidebar (Hidden from page layout; filter controls moved to slide-out drawer) -->
+        <aside class="sf-sidebar" style="display: none !important;" aria-hidden="true">
+            <!-- Preserved Scent Consultation Trigger Card for backwards-compatibility -->
+            <div class="sf-scent-trigger-card" id="scent-trigger-card" onclick="openScentModal(this)" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="scent-finder-modal" aria-label="Open personal fragrance consultation">
+                {% if is_quiz %}
+                    <div class="sf-scent-trigger-active-badge">
+                        <span>✦ Profile Active</span>
                     </div>
-                    {% if is_quiz %}
-                        <span class="scent-finder-status-badge">Active &bull; Edit</span>
-                    {% else %}
-                        <span class="scent-finder-chevron">&#9662;</span>
-                    {% endif %}
-                </summary>
-
-                <div class="scent-finder-body">
-                    <p class="scent-finder-desc">Select your preferred accords and notes to discover a tailored fragrance suggestion.</p>
-
-                    <!-- Purpose Switcher: Myself vs Gifting -->
-                    <div class="scent-purpose-tabs" role="tablist">
-                        <button type="button" class="scent-purpose-tab {% if quiz_purpose != 'gifting' %}is-active{% endif %}" id="tab-purpose-myself" onclick="setQuizPurpose('myself')">
-                            Personal
-                        </button>
-                        <button type="button" class="scent-purpose-tab {% if quiz_purpose == 'gifting' %}is-active{% endif %}" id="tab-purpose-gifting" onclick="setQuizPurpose('gifting')">
-                            Gift
-                        </button>
-                    </div>
-
-                <form id="scent-finder-form" method="GET" action="{% url 'catalog:product_list' %}">
-                    <input type="hidden" name="scent_quiz" value="1">
-                    <input type="hidden" name="purpose" id="scent-purpose-input" value="{{ quiz_purpose|default:'myself' }}">
-                    {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
-
-                    <!-- Question 1: What kind of scent do you prefer? -->
-                    <div class="scent-quiz-group">
-                        <div class="scent-quiz-qlabel">
-                            <span>1. Scent Preference</span>
-                        </div>
-                        <div class="scent-quiz-options">
-                            {% for option in "Fresh & Clean,Sweet & Fruity,Floral,Woody,Spicy & Warm"|make_list|default:"" %}
-                            {% endfor %}
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="scent_pref" value="Fresh & Clean" {% if quiz_answers.scent_pref == 'Fresh & Clean' %}checked{% endif %}>
-                                <span>Fresh &amp; Clean</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="scent_pref" value="Sweet & Fruity" {% if quiz_answers.scent_pref == 'Sweet & Fruity' %}checked{% endif %}>
-                                <span>Sweet &amp; Fruity</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="scent_pref" value="Floral" {% if quiz_answers.scent_pref == 'Floral' %}checked{% endif %}>
-                                <span>Floral</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="scent_pref" value="Woody" {% if quiz_answers.scent_pref == 'Woody' or not is_quiz %}checked{% endif %}>
-                                <span>Woody</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="scent_pref" value="Spicy & Warm" {% if quiz_answers.scent_pref == 'Spicy & Warm' %}checked{% endif %}>
-                                <span>Spicy &amp; Warm</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Question 2: Which notes do you like? -->
-                    <div class="scent-quiz-group">
-                        <div class="scent-quiz-qlabel">
-                            <span>2. Notes You Like</span>
-                        </div>
-                        <div class="scent-quiz-pill-grid">
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="Citrus" {% if 'Citrus' in quiz_answers.notes %}checked{% endif %}>
-                                <span>Citrus</span>
-                            </label>
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="Vanilla" {% if 'Vanilla' in quiz_answers.notes %}checked{% endif %}>
-                                <span>Vanilla</span>
-                            </label>
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="Rose" {% if 'Rose' in quiz_answers.notes %}checked{% endif %}>
-                                <span>Rose</span>
-                            </label>
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="Jasmine" {% if 'Jasmine' in quiz_answers.notes %}checked{% endif %}>
-                                <span>Jasmine</span>
-                            </label>
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="Sandalwood" {% if 'Sandalwood' in quiz_answers.notes %}checked{% endif %}>
-                                <span>Sandalwood</span>
-                            </label>
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="Musk" {% if 'Musk' in quiz_answers.notes %}checked{% endif %}>
-                                <span>Musk</span>
-                            </label>
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="Amber" {% if 'Amber' in quiz_answers.notes %}checked{% endif %}>
-                                <span>Amber</span>
-                            </label>
-                            <label class="scent-pill-label">
-                                <input type="checkbox" name="notes" value="No Preference" id="note-no-pref" onchange="handleNoPref(this)" {% if 'No Preference' in quiz_answers.notes %}checked{% endif %}>
-                                <span>No Preference</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Question 3: What vibe are you going for? -->
-                    <div class="scent-quiz-group">
-                        <div class="scent-quiz-qlabel">
-                            <span>3. Intended Vibe</span>
-                        </div>
-                        <div class="scent-quiz-options">
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="vibe" value="Everyday" {% if quiz_answers.vibe == 'Everyday' %}checked{% endif %}>
-                                <span>Everyday</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="vibe" value="Elegant" {% if quiz_answers.vibe == 'Elegant' or not is_quiz %}checked{% endif %}>
-                                <span>Elegant</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="vibe" value="Romantic" {% if quiz_answers.vibe == 'Romantic' %}checked{% endif %}>
-                                <span>Romantic</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="vibe" value="Bold" {% if quiz_answers.vibe == 'Bold' %}checked{% endif %}>
-                                <span>Bold</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="vibe" value="Mysterious" {% if quiz_answers.vibe == 'Mysterious' %}checked{% endif %}>
-                                <span>Mysterious</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Question 4: When will you mostly wear it? -->
-                    <div class="scent-quiz-group">
-                        <div class="scent-quiz-qlabel">
-                            <span>4. When To Wear</span>
-                        </div>
-                        <div class="scent-quiz-options">
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="wear_time" value="Day" {% if quiz_answers.wear_time == 'Day' %}checked{% endif %}>
-                                <span>Day</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="wear_time" value="Night" {% if quiz_answers.wear_time == 'Night' %}checked{% endif %}>
-                                <span>Night</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="wear_time" value="Both" {% if quiz_answers.wear_time == 'Both' or not is_quiz %}checked{% endif %}>
-                                <span>Both (Day &amp; Night)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Question 5: How strong do you like your fragrance? -->
-                    <div class="scent-quiz-group">
-                        <div class="scent-quiz-qlabel">
-                            <span>5. Fragrance Strength</span>
-                        </div>
-                        <div class="scent-quiz-options">
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="strength" value="Light" {% if quiz_answers.strength == 'Light' %}checked{% endif %}>
-                                <span>Light (Subtle sillage)</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="strength" value="Moderate" {% if quiz_answers.strength == 'Moderate' or not is_quiz %}checked{% endif %}>
-                                <span>Moderate (Eau de Parfum)</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="strength" value="Strong" {% if quiz_answers.strength == 'Strong' %}checked{% endif %}>
-                                <span>Strong (Parfum Extrait)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Question 6: What's your budget? -->
-                    <div class="scent-quiz-group">
-                        <div class="scent-quiz-qlabel">
-                            <span>6. Desired Budget</span>
-                        </div>
-                        <div class="scent-quiz-options">
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="budget" value="Under ₹1,000" {% if quiz_answers.budget == 'Under ₹1,000' %}checked{% endif %}>
-                                <span>Under &#8377;1,000</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="budget" value="₹1,000–₹2,500" {% if quiz_answers.budget == '₹1,000–₹2,500' %}checked{% endif %}>
-                                <span>&#8377;1,000 &ndash; &#8377;2,500</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="budget" value="₹2,500+" {% if quiz_answers.budget == '₹2,500+' or not is_quiz %}checked{% endif %}>
-                                <span>&#8377;2,500+ (Maison Momènto)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Question 7: Who is it for? -->
-                    <div class="scent-quiz-group">
-                        <div class="scent-quiz-qlabel">
-                            <span>7. Who Is It For?</span>
-                        </div>
-                        <div class="scent-quiz-options">
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="target_audience" value="Men" {% if quiz_answers.target_audience == 'Men' %}checked{% endif %}>
-                                <span>Men</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="target_audience" value="Women" {% if quiz_answers.target_audience == 'Women' %}checked{% endif %}>
-                                <span>Women</span>
-                            </label>
-                            <label class="scent-quiz-radio">
-                                <input type="radio" name="target_audience" value="Unisex" {% if quiz_answers.target_audience == 'Unisex' or not is_quiz %}checked{% endif %}>
-                                <span>Unisex</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="scent-quiz-submit-btn">
-                        Discover My Fragrance
-                    </button>
-                    {% if is_quiz %}
-                        <a href="{% url 'catalog:product_list' %}" class="scent-quiz-reset-link">Reset Preferences</a>
-                    {% endif %}
-                </form>
-                </div>
-            </details>
-
-            <!-- Manual Filters Accordion -->
-            <details class="sf-filter-group" {% if not is_quiz %}open{% endif %} style="border-top: 1px solid var(--border); padding-top: 16px;">
-                <summary class="sf-filter-title" style="cursor: pointer;">Filter by Attribute</summary>
-                
-                <form id="filter-form" method="GET" action="{% url 'catalog:product_list' %}" style="margin-top: 16px;">
-                    <input type="hidden" name="sort" value="{{ current_sort }}">
-                    
-                    <!-- Search Filter -->
-                    <div class="sf-filter-group" style="margin-bottom: 24px;">
-                        <div style="position: relative;">
-                            <input type="search" name="q" value="{{ current_query }}" placeholder="Search fragrances..." 
-                                   style="width: 100%; padding: 12px 16px 12px 40px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); background: var(--warm-beige); font-family: var(--font-body); font-size: 14px; color: var(--charcoal); outline: none; transition: border-color 250ms var(--ease-soft);"
-                                   onfocus="this.style.borderColor='var(--deep-navy)'"
-                                   onblur="this.style.borderColor='var(--border-strong)'">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 16px; top: 14px;">
-                                <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                        </div>
-                    </div>
-                    
-                    <!-- Category Filter -->
-                    <details class="sf-filter-group" open>
-                        <summary class="sf-filter-title">Category</summary>
-                        <div class="sf-filter-content">
-                            <label class="sf-radio">
-                                <input type="radio" name="category" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.category %}checked{% endif %}>
-                                <span>All Categories</span>
-                            </label>
-                            {% for cat in categories %}
-                            <label class="sf-radio">
-                                <input type="radio" name="category" value="{{ cat.slug }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.category == cat.slug %}checked{% endif %}>
-                                <span>{{ cat.name }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                    </details>
-                    
-                    <!-- Fragrance Family Filter -->
-                    <details class="sf-filter-group" open>
-                        <summary class="sf-filter-title">Fragrance Family</summary>
-                        <div class="sf-filter-content">
-                            <label class="sf-radio">
-                                <input type="radio" name="family" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.family %}checked{% endif %}>
-                                <span>All Families</span>
-                            </label>
-                            {% for value, label in families %}
-                            <label class="sf-radio">
-                                <input type="radio" name="family" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.family == value %}checked{% endif %}>
-                                <span>{{ label }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                    </details>
-
-                    <!-- Gender Filter -->
-                    <details class="sf-filter-group" open>
-                        <summary class="sf-filter-title">Gender</summary>
-                        <div class="sf-filter-content">
-                            <label class="sf-radio">
-                                <input type="radio" name="gender" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.gender %}checked{% endif %}>
-                                <span>All</span>
-                            </label>
-                            {% for value, label in genders %}
-                            <label class="sf-radio">
-                                <input type="radio" name="gender" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.gender == value %}checked{% endif %}>
-                                <span>{{ label }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                    </details>
-
-                    <noscript>
-                        <button type="submit" class="primary-btn" style="width: 100%; margin-top: 24px;">Apply Filters</button>
-                    </noscript>
-                </form>
-            </details>
+                {% endif %}
+                <div class="sf-scent-trigger-eyebrow">✦ Personal Fragrance Consultation</div>
+                <h2 class="sf-scent-trigger-title">Find Your Signature Scent</h2>
+                <p class="sf-scent-trigger-desc">Answer a few bespoke questions to discover a fragrance tailored to your personal aesthetic or gifting occasion.</p>
+                <button type="button" class="sf-scent-trigger-btn" id="scent-consultation-trigger-btn" onclick="openScentModal(this); event.stopPropagation();" aria-label="Begin consultation">
+                    <span>{% if is_quiz %}Adjust Consultation{% else %}Begin Consultation{% endif %}</span>
+                    <span aria-hidden="true">&rarr;</span>
+                </button>
+            </div>
         </aside>
 
         <!-- Product Grid / Scent Quiz Recommendations -->
@@ -408,6 +140,9 @@
                     </div>
                     <div class="sf-suggestion-actions">
                         <span class="sf-suggestion-count">{{ quiz_results|length }} Curated Selections</span>
+                        <button type="button" class="secondary-btn" onclick="openScentModal()" style="padding: 7px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; border-color: var(--charcoal); cursor: pointer; background: transparent;">
+                            Adjust Profile
+                        </button>
                         <a href="{% url 'catalog:product_list' %}" class="sf-suggestion-reset-btn">
                             View All Fragrances
                         </a>
@@ -557,23 +292,1423 @@
     </div>
 {% endif %}
 
-<!-- Scent Finder Questionnaire Helper Scripts -->
+<!-- Luxury Slide-Out Filter Drawer & Full Width Grid Layout – Critical CSS Override -->
+<style>
+  /* === CATALOG LAYOUT & FULL-WIDTH PRODUCTS GRID === */
+  .sf-catalog-layout {
+    display: block !important;
+    width: 100% !important;
+  }
+  .sf-sidebar {
+    display: none !important;
+  }
+  .sf-catalog-grid {
+    width: 100% !important;
+  }
+  .sf-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: clamp(32px, 3.2vw, 52px) !important;
+  }
+  @media (max-width: 1023px) {
+    .sf-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: clamp(24px, 2.5vw, 36px) !important;
+    }
+  }
+  @media (max-width: 767px) {
+    .sf-grid {
+      grid-template-columns: 1fr !important;
+      gap: 32px !important;
+      max-width: 440px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+  }
+
+  /* === TOP BAR & CONTROLS === */
+  .sf-catalog-topbar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+    padding-bottom: 20px !important;
+    margin-bottom: 28px !important;
+    border-bottom: 1px solid rgba(220, 212, 198, 0.6) !important;
+  }
+  .sf-catalog-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+  }
+  .sf-topbar-consultation-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    padding: 9px 16px !important;
+    background: rgba(208, 155, 52, 0.08) !important;
+    border: 1px solid rgba(208, 155, 52, 0.3) !important;
+    border-radius: 4px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: #8c6214 !important;
+    cursor: pointer !important;
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .sf-topbar-consultation-btn:hover {
+    background: rgba(208, 155, 52, 0.16) !important;
+    border-color: #c9952a !important;
+    color: #5f420b !important;
+    transform: translateY(-1px) !important;
+  }
+  .sf-filter-drawer-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 9px 18px !important;
+    background: #FAF8F5 !important;
+    border: 1px solid rgba(26, 26, 26, 0.18) !important;
+    border-radius: 4px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: #1a1a1a !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    transition: border-color 200ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .sf-filter-drawer-btn:hover {
+    border-color: #c9952a !important;
+    background: #FFFFFF !important;
+    color: #0d1e18 !important;
+    box-shadow: 0 4px 14px rgba(201, 149, 42, 0.18) !important;
+    transform: translateY(-1px) !important;
+  }
+  .sf-filter-drawer-btn:active {
+    transform: translateY(0) !important;
+  }
+  .sf-filter-funnel-icon {
+    flex-shrink: 0 !important;
+    color: currentColor !important;
+  }
+  .sf-filter-btn-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    background: #0d1e18 !important;
+    color: #d09b34 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    padding: 2px 7px !important;
+    border-radius: 12px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  /* === SLIDE-OUT LUXURY FILTER DRAWER === */
+  #filter-drawer {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 99990 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+  #filter-drawer.is-open {
+    pointer-events: auto !important;
+    visibility: visible !important;
+  }
+
+  /* Backdrop: semi-transparent black overlay + blur(10px) + fade animation */
+  #filter-drawer-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(13, 30, 24, 0.55) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    opacity: 0;
+    transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+  }
+  #filter-drawer.is-open #filter-drawer-backdrop {
+    opacity: 1 !important;
+  }
+
+  /* Drawer Panel: Slide from RIGHT on desktop */
+  #filter-drawer-panel {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 440px !important;
+    max-width: 90vw !important;
+    height: 100vh !important;
+    background: #FAF8F5 !important;
+    border-left: 1px solid rgba(208, 155, 52, 0.25) !important;
+    box-shadow: -16px 0 48px rgba(13, 30, 24, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.8) inset !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transform: translateX(100%) !important;
+    opacity: 0;
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    z-index: 99992 !important;
+    box-sizing: border-box !important;
+  }
+  #filter-drawer.is-open #filter-drawer-panel {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+  }
+
+  /* Drawer Header */
+  .sf-filter-drawer-header {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    padding: 24px 28px 18px !important;
+    background: #FAF8F5 !important;
+    border-bottom: 1px solid rgba(220, 212, 198, 0.55) !important;
+    flex-shrink: 0 !important;
+  }
+  .sf-drawer-eyebrow {
+    display: block !important;
+    font-size: 10px !important;
+    letter-spacing: 0.15em !important;
+    text-transform: uppercase !important;
+    color: #c9952a !important;
+    font-family: 'Inter', sans-serif !important;
+    margin-bottom: 3px !important;
+  }
+  .sf-drawer-title {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 26px !important;
+    font-weight: 400 !important;
+    color: #1a1a1a !important;
+    margin: 0 0 4px 0 !important;
+    line-height: 1.1 !important;
+  }
+  .sf-drawer-subtitle {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    color: #8a7a6a !important;
+    margin: 0 !important;
+  }
+  .sf-drawer-close-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    border: 1px solid rgba(26, 26, 26, 0.14) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #1a1a1a !important;
+    cursor: pointer !important;
+    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin-top: -2px !important;
+  }
+  .sf-drawer-close-btn:hover {
+    border-color: #c9952a !important;
+    background: #FFFFFF !important;
+    color: #c9952a !important;
+    transform: rotate(90deg) scale(1.08) !important;
+    box-shadow: 0 3px 10px rgba(201, 149, 42, 0.22) !important;
+  }
+
+  /* Drawer Body */
+  .sf-filter-drawer-body {
+    padding: 24px 28px !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* Consultation link inside drawer */
+  .sf-drawer-consultation-banner {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 14px 18px !important;
+    background: rgba(208, 155, 52, 0.08) !important;
+    border: 1px solid rgba(208, 155, 52, 0.35) !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin-bottom: 8px !important;
+  }
+  .sf-drawer-consultation-banner:hover {
+    background: rgba(208, 155, 52, 0.16) !important;
+    border-color: #c9952a !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 16px rgba(208, 155, 52, 0.16) !important;
+  }
+  .sf-drawer-consultation-icon {
+    font-size: 18px !important;
+    color: #c9952a !important;
+  }
+  .sf-drawer-consultation-content {
+    flex: 1 !important;
+  }
+  .sf-drawer-consultation-eyebrow {
+    display: block !important;
+    font-size: 9px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.14em !important;
+    color: #8c6214 !important;
+    font-weight: 600 !important;
+  }
+  .sf-drawer-consultation-headline {
+    display: block !important;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 17px !important;
+    color: #1a1a1a !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+  }
+  .sf-drawer-consultation-sub {
+    display: block !important;
+    font-size: 11px !important;
+    color: #7a6a5a !important;
+  }
+  .sf-drawer-consultation-arrow {
+    font-size: 16px !important;
+    color: #c9952a !important;
+    transition: transform 200ms ease !important;
+  }
+  .sf-drawer-consultation-banner:hover .sf-drawer-consultation-arrow {
+    transform: translateX(3px) !important;
+  }
+
+  /* Staggered reveal for drawer sections (40ms stagger) */
+  .sf-drawer-section {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1), transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #filter-drawer.is-open .sf-drawer-section:nth-child(1) {
+    opacity: 1; transform: translateY(0); transition-delay: 40ms;
+  }
+  #filter-drawer.is-open .sf-drawer-section:nth-child(2) {
+    opacity: 1; transform: translateY(0); transition-delay: 80ms;
+  }
+  #filter-drawer.is-open .sf-drawer-section:nth-child(3) {
+    opacity: 1; transform: translateY(0); transition-delay: 120ms;
+  }
+  #filter-drawer.is-open .sf-drawer-section:nth-child(4) {
+    opacity: 1; transform: translateY(0); transition-delay: 160ms;
+  }
+  #filter-drawer.is-open .sf-drawer-section:nth-child(5) {
+    opacity: 1; transform: translateY(0); transition-delay: 200ms;
+  }
+
+  /* Drawer Filter Groups */
+  .sf-drawer-filter-group {
+    border-bottom: 1px solid rgba(220, 212, 198, 0.5) !important;
+    padding: 14px 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .sf-drawer-filter-group .sf-filter-title {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    font-weight: 600 !important;
+    color: #1a1a1a !important;
+    cursor: pointer !important;
+    padding: 0 0 10px 0 !important;
+  }
+  .sf-drawer-filter-group .sf-filter-chevron {
+    transition: transform 250ms ease !important;
+    color: #8a7a6a !important;
+  }
+  .sf-drawer-filter-group[open] .sf-filter-chevron {
+    transform: rotate(180deg) !important;
+  }
+  .sf-drawer-filter-group .sf-filter-content {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding-top: 6px !important;
+  }
+
+  /* Search input inside drawer */
+  .sf-drawer-search-input {
+    width: 100% !important;
+    padding: 12px 16px 12px 42px !important;
+    border: 1px solid rgba(26, 26, 26, 0.2) !important;
+    border-radius: 6px !important;
+    background: #FFFFFF !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13px !important;
+    color: #1a1a1a !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: border-color 200ms ease, box-shadow 200ms ease !important;
+  }
+  .sf-drawer-search-input:focus {
+    border-color: #c9952a !important;
+    box-shadow: 0 0 0 3px rgba(201, 149, 42, 0.15) !important;
+  }
+  .sf-drawer-search-icon {
+    position: absolute !important;
+    left: 15px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #8a7a6a !important;
+    pointer-events: none !important;
+  }
+
+  /* Sticky Drawer Footer */
+  .sf-filter-drawer-footer {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 18px 28px 22px !important;
+    background: #FAF8F5 !important;
+    border-top: 1px solid rgba(220, 212, 198, 0.6) !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.02) !important;
+  }
+  .sf-drawer-clear-btn {
+    flex: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px 16px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: #4a4a4a !important;
+    background: transparent !important;
+    border: 1px solid rgba(26, 26, 26, 0.2) !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    text-align: center !important;
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+  }
+  .sf-drawer-clear-btn:hover {
+    border-color: #1a1a1a !important;
+    color: #1a1a1a !important;
+    background: rgba(26, 26, 26, 0.04) !important;
+    transform: translateY(-1px) !important;
+  }
+  .sf-drawer-apply-btn {
+    flex: 1.3 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 12px 20px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: #FAF8F5 !important;
+    background: #0d1e18 !important;
+    border: 1px solid #0d1e18 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 12px rgba(13, 30, 24, 0.15) !important;
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+  }
+  .sf-drawer-apply-btn:hover {
+    background: #162f26 !important;
+    border-color: #c9952a !important;
+    box-shadow: 0 6px 18px rgba(201, 149, 42, 0.25) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  /* Responsiveness: Tablet (80vw) and Mobile (100vw bottom sheet) */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    #filter-drawer-panel {
+      width: 80vw !important;
+      max-width: 460px !important;
+    }
+  }
+  @media (max-width: 768px) {
+    #filter-drawer-panel {
+      top: auto !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100vw !important;
+      max-width: 100vw !important;
+      height: 85vh !important;
+      max-height: 85vh !important;
+      border-left: none !important;
+      border-top: 1px solid rgba(208, 155, 52, 0.3) !important;
+      border-radius: 20px 20px 0 0 !important;
+      box-shadow: 0 -12px 40px rgba(13, 30, 24, 0.3) !important;
+      transform: translateY(100%) !important;
+    }
+    #filter-drawer.is-open #filter-drawer-panel {
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* Accessibility: prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    #filter-drawer-backdrop,
+    #filter-drawer-panel,
+    .sf-drawer-section,
+    .sf-filter-drawer-btn,
+    .sf-drawer-close-btn,
+    .sf-drawer-apply-btn,
+    .sf-drawer-clear-btn {
+      transition: none !important;
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+
+  /* === MODAL OVERLAY & WINDOW === */
+  #scent-finder-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px 16px !important;
+    background: rgba(13, 30, 24, 0.65) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 300ms ease, visibility 300ms ease;
+    margin: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+  }
+  #scent-finder-modal.is-open {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  #scent-finder-modal .sf-scent-modal-window {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 660px !important;
+    max-height: 90vh !important;
+    background: #FAF8F5 !important;
+    border: 1px solid rgba(208, 155, 52, 0.3) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 32px 80px rgba(13, 67, 77, 0.35), 0 0 0 1px rgba(255,255,255,0.9) inset !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    margin: auto !important;
+    z-index: 1 !important;
+    transform: none !important;
+  }
+
+  /* === MODAL HEADER === */
+  #scent-finder-modal .sf-scent-modal-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 22px 28px 16px !important;
+    background: #FAF8F5 !important;
+    border-bottom: 1px solid rgba(220, 212, 198, 0.5) !important;
+    flex-shrink: 0 !important;
+  }
+  #scent-finder-modal .sf-scent-modal-eyebrow {
+    display: block !important;
+    font-size: 10px !important;
+    letter-spacing: 0.15em !important;
+    text-transform: uppercase !important;
+    color: #c9952a !important;
+    font-family: 'Inter', sans-serif !important;
+    margin-bottom: 4px !important;
+  }
+  #scent-finder-modal .sf-scent-modal-title {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 22px !important;
+    font-weight: 400 !important;
+    color: #1a1a1a !important;
+    margin: 0 !important;
+    letter-spacing: 0.01em !important;
+  }
+  #scent-finder-modal .sf-scent-modal-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
+  }
+  #scent-finder-modal .scent-wizard-step-badge {
+    font-size: 10px !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: #8a7a6a !important;
+    font-family: 'Inter', sans-serif !important;
+    background: rgba(208, 155, 52, 0.1) !important;
+    padding: 4px 10px !important;
+    border-radius: 20px !important;
+  }
+  #scent-finder-modal .sf-scent-modal-close {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    border: 1px solid rgba(208, 155, 52, 0.25) !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    color: #5a4a3a !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+  }
+  #scent-finder-modal .sf-scent-modal-close:hover {
+    background: rgba(208, 155, 52, 0.12) !important;
+  }
+
+  /* === PROGRESS BAR === */
+  #scent-finder-modal .scent-wizard-progress-track {
+    height: 3px !important;
+    background: rgba(208, 155, 52, 0.15) !important;
+    flex-shrink: 0 !important;
+  }
+  #scent-finder-modal .scent-wizard-progress-fill {
+    height: 100% !important;
+    background: linear-gradient(90deg, #c9952a, #e8b84b) !important;
+    transition: width 400ms ease !important;
+  }
+
+  /* === MODAL BODY & STEPS === */
+  #scent-finder-modal .sf-scent-modal-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 28px 28px 16px !important;
+    min-height: 0 !important;
+  }
+  #scent-finder-modal .scent-wizard-step {
+    display: none !important;
+    opacity: 0;
+    transition: opacity 280ms ease !important;
+  }
+  #scent-finder-modal .scent-wizard-step.is-active {
+    display: block !important;
+    opacity: 1 !important;
+  }
+  #scent-finder-modal .scent-wizard-step-header {
+    margin-bottom: 20px !important;
+  }
+  #scent-finder-modal .scent-wizard-step-qnum {
+    font-size: 11px !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: #a08060 !important;
+    font-family: 'Inter', sans-serif !important;
+    margin-bottom: 8px !important;
+  }
+  #scent-finder-modal .scent-wizard-step-title {
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 22px !important;
+    font-weight: 400 !important;
+    color: #1a1a1a !important;
+    margin: 0 0 6px !important;
+  }
+  #scent-finder-modal .scent-wizard-step-desc {
+    font-size: 13px !important;
+    color: #7a6a5a !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+  }
+
+  /* === OPTION CARDS (radio/checkbox) === */
+  #scent-finder-modal .scent-option-cards {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  #scent-finder-modal .scent-option-card {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    padding: 14px 16px !important;
+    border: 1px solid rgba(220, 212, 198, 0.7) !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    transition: border-color 200ms ease, background 200ms ease !important;
+  }
+  #scent-finder-modal .scent-option-card:hover {
+    border-color: rgba(208, 155, 52, 0.4) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+  }
+  #scent-finder-modal .scent-option-card input[type="radio"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  #scent-finder-modal .scent-option-card-indicator {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+    border: 1.5px solid rgba(150, 120, 80, 0.5) !important;
+    flex-shrink: 0 !important;
+    margin-top: 2px !important;
+    transition: border-color 200ms ease, background 200ms ease !important;
+    display: block !important;
+  }
+  #scent-finder-modal .scent-option-card input[type="radio"]:checked + .scent-option-card-indicator {
+    border-color: #c9952a !important;
+    background: radial-gradient(circle, #c9952a 40%, transparent 40%) !important;
+  }
+  #scent-finder-modal .scent-option-card-content {
+    flex: 1 !important;
+  }
+  #scent-finder-modal .scent-option-card-label {
+    display: block !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #2a2a2a !important;
+    margin-bottom: 3px !important;
+  }
+  #scent-finder-modal .scent-option-card-subtext {
+    display: block !important;
+    font-size: 12px !important;
+    color: #8a7a6a !important;
+    line-height: 1.45 !important;
+  }
+
+  /* === NOTE TILES (multi-select checkboxes) === */
+  #scent-finder-modal .scent-notes-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+  #scent-finder-modal .scent-note-tile {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px 8px !important;
+    border: 1px solid rgba(220, 212, 198, 0.7) !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    background: rgba(255,255,255,0.6) !important;
+    text-align: center !important;
+    transition: border-color 200ms, background 200ms !important;
+  }
+  #scent-finder-modal .scent-note-tile input[type="checkbox"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  #scent-finder-modal .scent-note-tile-text {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: #3a2a1a !important;
+  }
+  #scent-finder-modal .scent-note-tile:has(input:checked) {
+    border-color: #c9952a !important;
+    background: rgba(208, 155, 52, 0.1) !important;
+  }
+
+  /* === MODAL FOOTER === */
+  #scent-finder-modal .sf-scent-modal-footer {
+    display: flex !important;
+    align-items: center !important;
+    padding: 16px 28px 22px !important;
+    border-top: 1px solid rgba(220, 212, 198, 0.5) !important;
+    background: #FAF8F5 !important;
+    gap: 10px !important;
+    flex-shrink: 0 !important;
+  }
+  #scent-finder-modal .scent-wizard-btn-next,
+  #scent-finder-modal .scent-wizard-btn-submit {
+    background: linear-gradient(135deg, #2a3d30, #1a2820) !important;
+    color: #e8d5a3 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 11px 24px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  #scent-finder-modal .scent-wizard-btn-prev {
+    background: transparent !important;
+    border: 1px solid rgba(150, 120, 80, 0.3) !important;
+    color: #5a4a3a !important;
+    border-radius: 6px !important;
+    padding: 11px 20px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+  }
+</style>
+
+<!-- Scent Consultation Modal Pop-up (Centered, Deep Blur, 8-Step Wizard) -->
+<div id="scent-finder-modal" class="sf-scent-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="scent-modal-title" onclick="handleModalBackdropClick(event)">
+    <div class="sf-scent-modal-window" role="document">
+        <!-- Modal Header with Atelier Eyebrow and Step Counter -->
+        <div class="sf-scent-modal-header">
+            <div class="sf-scent-modal-header-text">
+                <span class="sf-scent-modal-eyebrow">✦ Maison Momènto Atelier</span>
+                <h2 class="sf-scent-modal-title" id="scent-modal-title">Fragrance Consultation</h2>
+            </div>
+            <div class="sf-scent-modal-header-actions">
+                <span class="scent-wizard-step-badge" id="scent-wizard-step-indicator">Step <span id="wizard-current-step">1</span> of 8</span>
+                <button type="button" class="sf-scent-modal-close" onclick="closeScentModal()" aria-label="Close fragrance consultation window">
+                    &times;
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar Indicator -->
+        <div class="scent-wizard-progress-track" aria-hidden="true">
+            <div class="scent-wizard-progress-fill" id="wizard-progress-bar" style="width: 12.5%;"></div>
+        </div>
+
+        <form id="scent-finder-form" method="GET" action="{% url 'catalog:product_list' %}" style="display: flex; flex-direction: column; flex: 1; min-height: 0; margin: 0;">
+            <input type="hidden" name="scent_quiz" value="1">
+            {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}">{% endif %}
+
+            <!-- Modal Body (Multi-step Viewport) -->
+            <div class="sf-scent-modal-body">
+
+                <!-- Step 1: Purpose (Personal vs Gift) -->
+                <div class="scent-wizard-step is-active" data-step="1">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 1 of 8 &bull; Consultation Purpose</div>
+                        <h3 class="scent-wizard-step-title">Who is this fragrance consultation for?</h3>
+                        <p class="scent-wizard-step-desc">Select whether you are discovering your personal signature scent or curating a bespoke gift.</p>
+                    </div>
+                    <div class="scent-option-cards">
+                        <label class="scent-option-card" for="purpose-myself">
+                            <input type="radio" name="purpose" id="purpose-myself" value="myself" {% if quiz_purpose != 'gifting' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Personal Fragrance</span>
+                                <span class="scent-option-card-subtext">Discover an intimate signature fragrance crafted to mirror your essence and personal aura.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card" for="purpose-gifting">
+                            <input type="radio" name="purpose" id="purpose-gifting" value="gifting" {% if quiz_purpose == 'gifting' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Gift For Someone</span>
+                                <span class="scent-option-card-subtext">Curate a memorable, exquisite olfactory gift silhouette tailored for someone extraordinary.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 2: Scent Preference (Olfactory Family) -->
+                <div class="scent-wizard-step" data-step="2">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 2 of 8 &bull; Olfactory Family</div>
+                        <h3 class="scent-wizard-step-title">Which scent preference speaks to you?</h3>
+                        <p class="scent-wizard-step-desc">Choose the primary fragrance character that best defines your aesthetic.</p>
+                    </div>
+                    <div class="scent-option-cards">
+                        <label class="scent-option-card">
+                            <input type="radio" name="scent_pref" value="Fresh & Clean" {% if quiz_answers.scent_pref == 'Fresh & Clean' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Fresh &amp; Clean</span>
+                                <span class="scent-option-card-subtext">Crisp citrus, sea breeze accords, and dewy morning greenery.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="scent_pref" value="Sweet & Fruity" {% if quiz_answers.scent_pref == 'Sweet & Fruity' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Sweet &amp; Fruity</span>
+                                <span class="scent-option-card-subtext">Ripe summer fruits, wild berries, and radiant vanilla undertones.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="scent_pref" value="Floral" {% if quiz_answers.scent_pref == 'Floral' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Floral</span>
+                                <span class="scent-option-card-subtext">Lush Damask roses, night-blooming jasmine, and delicate white petals.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="scent_pref" value="Woody" {% if quiz_answers.scent_pref == 'Woody' or not is_quiz %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Woody</span>
+                                <span class="scent-option-card-subtext">Warm Mysore sandalwood, smoky vetiver, and cedarwood depths.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="scent_pref" value="Spicy & Warm" {% if quiz_answers.scent_pref == 'Spicy & Warm' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Spicy &amp; Warm</span>
+                                <span class="scent-option-card-subtext">Exotic cardamom, saffron threads, rich golden amber, and resins.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 3: Notes You Like (Multi-select Checkboxes) -->
+                <div class="scent-wizard-step" data-step="3">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 3 of 8 &bull; Desired Notes</div>
+                        <h3 class="scent-wizard-step-title">Which fragrance notes allure you most?</h3>
+                        <p class="scent-wizard-step-desc">Select all the notes you adore, or choose No Preference for an open discovery.</p>
+                    </div>
+                    <div class="scent-notes-grid">
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="Citrus" {% if 'Citrus' in quiz_answers.notes %}checked{% endif %} onchange="handleNoteChange(this)">
+                            <span class="scent-note-tile-text">Citrus</span>
+                        </label>
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="Vanilla" {% if 'Vanilla' in quiz_answers.notes %}checked{% endif %} onchange="handleNoteChange(this)">
+                            <span class="scent-note-tile-text">Vanilla</span>
+                        </label>
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="Rose" {% if 'Rose' in quiz_answers.notes %}checked{% endif %} onchange="handleNoteChange(this)">
+                            <span class="scent-note-tile-text">Rose</span>
+                        </label>
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="Jasmine" {% if 'Jasmine' in quiz_answers.notes %}checked{% endif %} onchange="handleNoteChange(this)">
+                            <span class="scent-note-tile-text">Jasmine</span>
+                        </label>
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="Sandalwood" {% if 'Sandalwood' in quiz_answers.notes %}checked{% endif %} onchange="handleNoteChange(this)">
+                            <span class="scent-note-tile-text">Sandalwood</span>
+                        </label>
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="Musk" {% if 'Musk' in quiz_answers.notes %}checked{% endif %} onchange="handleNoteChange(this)">
+                            <span class="scent-note-tile-text">Musk</span>
+                        </label>
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="Amber" {% if 'Amber' in quiz_answers.notes %}checked{% endif %} onchange="handleNoteChange(this)">
+                            <span class="scent-note-tile-text">Amber</span>
+                        </label>
+                        <label class="scent-note-tile">
+                            <input type="checkbox" name="notes" value="No Preference" id="note-no-pref" {% if 'No Preference' in quiz_answers.notes %}checked{% endif %} onchange="handleNoPref(this)">
+                            <span class="scent-note-tile-text">No Preference</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 4: Intended Vibe -->
+                <div class="scent-wizard-step" data-step="4">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 4 of 8 &bull; Intended Vibe</div>
+                        <h3 class="scent-wizard-step-title">What aura or mood do you want to evoke?</h3>
+                        <p class="scent-wizard-step-desc">Your scent leaves an indelible impression—choose the aura you wish to radiate.</p>
+                    </div>
+                    <div class="scent-option-cards">
+                        <label class="scent-option-card">
+                            <input type="radio" name="vibe" value="Everyday" {% if quiz_answers.vibe == 'Everyday' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Everyday</span>
+                                <span class="scent-option-card-subtext">Effortless, approachable, fresh, and harmoniously balanced.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="vibe" value="Elegant" {% if quiz_answers.vibe == 'Elegant' or not is_quiz %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Elegant</span>
+                                <span class="scent-option-card-subtext">Refined, regal poise, and immaculate Haute Parisian chic.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="vibe" value="Romantic" {% if quiz_answers.vibe == 'Romantic' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Romantic</span>
+                                <span class="scent-option-card-subtext">Intimate, magnetic, soft sensuality that draws admirers closer.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="vibe" value="Bold" {% if quiz_answers.vibe == 'Bold' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Bold</span>
+                                <span class="scent-option-card-subtext">Commanding, daring, and distinguished—unapologetically memorable.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="vibe" value="Mysterious" {% if quiz_answers.vibe == 'Mysterious' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Mysterious</span>
+                                <span class="scent-option-card-subtext">Nocturnal, enigmatic depths with a captivating, lingering trail.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 5: When to Wear -->
+                <div class="scent-wizard-step" data-step="5">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 5 of 8 &bull; When To Wear</div>
+                        <h3 class="scent-wizard-step-title">When will this fragrance mostly be worn?</h3>
+                        <p class="scent-wizard-step-desc">From sunlit morning routines to starlit evening dinners.</p>
+                    </div>
+                    <div class="scent-option-cards">
+                        <label class="scent-option-card">
+                            <input type="radio" name="wear_time" value="Day" {% if quiz_answers.wear_time == 'Day' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Daytime Wear</span>
+                                <span class="scent-option-card-subtext">Crisp, luminous, and radiant under the sun.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="wear_time" value="Night" {% if quiz_answers.wear_time == 'Night' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Nighttime / Evening</span>
+                                <span class="scent-option-card-subtext">Intense, opulent, and seductive for celebrations and galas.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="wear_time" value="Both" {% if quiz_answers.wear_time == 'Both' or not is_quiz %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Both (Day &amp; Night)</span>
+                                <span class="scent-option-card-subtext">Versatile and multifaceted, transitioning effortlessly from dawn till dusk.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 6: Fragrance Strength -->
+                <div class="scent-wizard-step" data-step="6">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 6 of 8 &bull; Concentration &amp; Strength</div>
+                        <h3 class="scent-wizard-step-title">What sillage and strength do you prefer?</h3>
+                        <p class="scent-wizard-step-desc">Select how delicately or powerfully your fragrance radiates.</p>
+                    </div>
+                    <div class="scent-option-cards">
+                        <label class="scent-option-card">
+                            <input type="radio" name="strength" value="Light" {% if quiz_answers.strength == 'Light' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Light &amp; Subtle</span>
+                                <span class="scent-option-card-subtext">An intimate skin scent, airy and discreet (Eau de Toilette lightness).</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="strength" value="Moderate" {% if quiz_answers.strength == 'Moderate' or not is_quiz %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Moderate (Eau de Parfum)</span>
+                                <span class="scent-option-card-subtext">The quintessential Eau de Parfum: beautifully balanced presence lasting 6–8 hours.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="strength" value="Strong" {% if quiz_answers.strength == 'Strong' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Strong (Parfum Extrait)</span>
+                                <span class="scent-option-card-subtext">Extrait de Parfum concentration with rich, lingering sillage.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 7: Desired Budget -->
+                <div class="scent-wizard-step" data-step="7">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 7 of 8 &bull; Desired Budget</div>
+                        <h3 class="scent-wizard-step-title">What is your desired investment range?</h3>
+                        <p class="scent-wizard-step-desc">Choose the collection tier that aligns with your preference.</p>
+                    </div>
+                    <div class="scent-option-cards">
+                        <label class="scent-option-card">
+                            <input type="radio" name="budget" value="Under ₹1,000" {% if quiz_answers.budget == 'Under ₹1,000' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Under &#8377;1,000</span>
+                                <span class="scent-option-card-subtext">Curated travel flacons and discovery editions.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="budget" value="₹1,000–₹2,500" {% if quiz_answers.budget == '₹1,000–₹2,500' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">&#8377;1,000 &ndash; &#8377;2,500</span>
+                                <span class="scent-option-card-subtext">Artisanal Eau de Parfum flacons and coffret sets.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="budget" value="₹2,500+" {% if quiz_answers.budget == '₹2,500+' or not is_quiz %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">&#8377;2,500+ (Maison Moménto)</span>
+                                <span class="scent-option-card-subtext">Masterpiece Extraits, prestige flacons, and limited harvests.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 8: Target Audience (Who Is It For) -->
+                <div class="scent-wizard-step" data-step="8">
+                    <div class="scent-wizard-step-header">
+                        <div class="scent-wizard-step-qnum">Step 8 of 8 &bull; Target Silhouette</div>
+                        <h3 class="scent-wizard-step-title">Who is the intended wearer?</h3>
+                        <p class="scent-wizard-step-desc">All our creations transcend boundaries; select the silhouette you favor.</p>
+                    </div>
+                    <div class="scent-option-cards">
+                        <label class="scent-option-card">
+                            <input type="radio" name="target_audience" value="Men" {% if quiz_answers.target_audience == 'Men' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Men</span>
+                                <span class="scent-option-card-subtext">Masculine profile of dry cedar, crisp citrus, and aromatics.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="target_audience" value="Women" {% if quiz_answers.target_audience == 'Women' %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Women</span>
+                                <span class="scent-option-card-subtext">Feminine profile of radiant blossoms, warm nectar, and soft woods.</span>
+                            </div>
+                        </label>
+                        <label class="scent-option-card">
+                            <input type="radio" name="target_audience" value="Unisex" {% if quiz_answers.target_audience == 'Unisex' or not is_quiz %}checked{% endif %}>
+                            <span class="scent-option-card-indicator"></span>
+                            <div class="scent-option-card-content">
+                                <span class="scent-option-card-label">Unisex / Universal</span>
+                                <span class="scent-option-card-subtext">Harmonious and inclusive balance suited for all preferences.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer Navigation -->
+            <div class="sf-scent-modal-footer">
+                <button type="button" class="scent-wizard-btn-prev" id="wizard-btn-prev" onclick="goToPreviousStep()" style="display: none;" aria-label="Go to previous step">
+                    &larr; Previous
+                </button>
+                <div style="flex: 1;"></div>
+                {% if is_quiz %}
+                    <a href="{% url 'catalog:product_list' %}" class="scent-wizard-btn-prev" style="text-decoration: none; margin-right: 8px;">Reset Preferences</a>
+                {% endif %}
+                <button type="button" class="scent-wizard-btn-next" id="wizard-btn-next" onclick="goToNextStep()" aria-label="Go to next question">
+                    <span>Next</span>
+                    <span aria-hidden="true">&rarr;</span>
+                </button>
+                <button type="submit" class="scent-wizard-btn-submit" id="wizard-btn-submit" style="display: none;" aria-label="Show my fragrance recommendations">
+                    <span>Show My Recommendation</span>
+                    <span aria-hidden="true">&rarr;</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Slide-Out Luxury Filter Drawer -->
+<div id="filter-drawer" class="sf-filter-drawer-wrapper" role="dialog" aria-modal="true" aria-labelledby="filter-drawer-title">
+    <!-- Backdrop Overlay with blur(10px) -->
+    <div class="sf-filter-drawer-backdrop" id="filter-drawer-backdrop" onclick="closeFilterDrawer()" aria-hidden="true"></div>
+
+    <!-- Slide-Out Panel -->
+    <div class="sf-filter-drawer-panel" id="filter-drawer-panel" role="document">
+        <!-- Drawer Header -->
+        <div class="sf-filter-drawer-header">
+            <div class="sf-drawer-header-info">
+                <span class="sf-drawer-eyebrow">✦ Maison Moménto</span>
+                <h2 class="sf-drawer-title" id="filter-drawer-title">Filters</h2>
+                <p class="sf-drawer-subtitle">Refine your fragrance journey.</p>
+            </div>
+            <button type="button" class="sf-drawer-close-btn" id="filter-drawer-close-btn" onclick="closeFilterDrawer()" aria-label="Close filters drawer">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Drawer Body (Filter Controls) -->
+        <div class="sf-filter-drawer-body">
+            <!-- Bespoke Consultation Card inside drawer -->
+            <div class="sf-drawer-consultation-banner sf-drawer-section" onclick="openScentModal(this); closeFilterDrawer();" role="button" tabindex="0" aria-label="Open fragrance consultation">
+                <div class="sf-drawer-consultation-icon">✦</div>
+                <div class="sf-drawer-consultation-content">
+                    <span class="sf-drawer-consultation-eyebrow">Personal Fragrance Consultation</span>
+                    <strong class="sf-drawer-consultation-headline">Find Your Signature Scent</strong>
+                    <span class="sf-drawer-consultation-sub">8 bespoke questions to uncover your ideal notes</span>
+                </div>
+                <div class="sf-drawer-consultation-arrow">&rarr;</div>
+            </div>
+
+            <!-- Existing Filter Form Reused Exactly -->
+            <form id="filter-form" method="GET" action="{% url 'catalog:product_list' %}" style="display: flex; flex-direction: column; gap: 4px; margin: 0;">
+                <input type="hidden" name="sort" value="{{ current_sort }}">
+                
+                <!-- Search Filter -->
+                <div class="sf-filter-group sf-drawer-filter-group sf-drawer-section">
+                    <label for="filter-search-input" class="sf-filter-label" style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: #1a1a1a; margin-bottom: 10px;">Search Fragrances</label>
+                    <div style="position: relative;">
+                        <input type="search" id="filter-search-input" name="q" value="{{ current_query }}" placeholder="Search fragrances, notes..." 
+                               class="sf-drawer-search-input">
+                        <svg class="sf-drawer-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Category Filter -->
+                <details class="sf-filter-group sf-drawer-filter-group sf-drawer-section" open>
+                    <summary class="sf-filter-title">
+                        <span>Category</span>
+                        <svg class="sf-filter-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="sf-filter-content">
+                        <label class="sf-radio">
+                            <input type="radio" name="category" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.category %}checked{% endif %}>
+                            <span>All Categories</span>
+                        </label>
+                        {% for cat in categories %}
+                        <label class="sf-radio">
+                            <input type="radio" name="category" value="{{ cat.slug }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.category == cat.slug %}checked{% endif %}>
+                            <span>{{ cat.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </details>
+                
+                <!-- Fragrance Family Filter -->
+                <details class="sf-filter-group sf-drawer-filter-group sf-drawer-section" open>
+                    <summary class="sf-filter-title">
+                        <span>Fragrance Family</span>
+                        <svg class="sf-filter-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="sf-filter-content">
+                        <label class="sf-radio">
+                            <input type="radio" name="family" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.family %}checked{% endif %}>
+                            <span>All Families</span>
+                        </label>
+                        {% for value, label in families %}
+                        <label class="sf-radio">
+                            <input type="radio" name="family" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.family == value %}checked{% endif %}>
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </details>
+
+                <!-- Gender Filter -->
+                <details class="sf-filter-group sf-drawer-filter-group sf-drawer-section" open>
+                    <summary class="sf-filter-title">
+                        <span>Gender</span>
+                        <svg class="sf-filter-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </summary>
+                    <div class="sf-filter-content">
+                        <label class="sf-radio">
+                            <input type="radio" name="gender" value="" onchange="document.getElementById('filter-form').submit();" {% if not request.GET.gender %}checked{% endif %}>
+                            <span>All</span>
+                        </label>
+                        {% for value, label in genders %}
+                        <label class="sf-radio">
+                            <input type="radio" name="gender" value="{{ value }}" onchange="document.getElementById('filter-form').submit();" {% if request.GET.gender == value %}checked{% endif %}>
+                            <span>{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </details>
+            </form>
+        </div>
+
+        <!-- Sticky Drawer Footer -->
+        <div class="sf-filter-drawer-footer">
+            <a href="{% url 'catalog:product_list' %}{% if current_sort %}?sort={{ current_sort }}{% endif %}" class="sf-drawer-clear-btn" id="filter-drawer-clear-btn">
+                Clear Filters
+            </a>
+            <button type="submit" form="filter-form" class="sf-drawer-apply-btn" id="filter-drawer-apply-btn">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Scent Consultation Multi-Step Wizard Controller -->
 <script>
-    // Purpose Tab Switcher: Myself vs Gifting
-    function setQuizPurpose(purpose) {
-        const input = document.getElementById('scent-purpose-input');
-        if (input) input.value = purpose;
+    let currentStepIndex = 1;
+    const totalSteps = 8;
+    let lastTriggerElement = null;
 
-        const myselfTab = document.getElementById('tab-purpose-myself');
-        const giftingTab = document.getElementById('tab-purpose-gifting');
+    function updateWizardUI(direction) {
+        const steps = document.querySelectorAll('.scent-wizard-step');
+        steps.forEach((step) => {
+            const stepNum = parseInt(step.getAttribute('data-step'), 10);
+            if (stepNum === currentStepIndex) {
+                step.classList.remove('is-entering-left');
+                if (direction === 'prev') {
+                    step.classList.add('is-entering-left');
+                }
+                step.classList.add('is-active');
+                requestAnimationFrame(() => {
+                    step.classList.remove('is-entering-left');
+                });
+            } else {
+                step.classList.remove('is-active');
+            }
+        });
 
-        if (purpose === 'gifting') {
-            if (giftingTab) giftingTab.classList.add('is-active');
-            if (myselfTab) myselfTab.classList.remove('is-active');
-        } else {
-            if (myselfTab) myselfTab.classList.add('is-active');
-            if (giftingTab) giftingTab.classList.remove('is-active');
+        // Update step counter and progress bar
+        const stepNumEl = document.getElementById('wizard-current-step');
+        if (stepNumEl) stepNumEl.textContent = currentStepIndex;
+
+        const progressBar = document.getElementById('wizard-progress-bar');
+        if (progressBar) {
+            const pct = (currentStepIndex / totalSteps) * 100;
+            progressBar.style.width = pct + '%';
         }
+
+        // Update footer buttons
+        const prevBtn = document.getElementById('wizard-btn-prev');
+        const nextBtn = document.getElementById('wizard-btn-next');
+        const submitBtn = document.getElementById('wizard-btn-submit');
+
+        if (prevBtn) {
+            prevBtn.style.display = currentStepIndex > 1 ? 'inline-flex' : 'none';
+        }
+
+        if (currentStepIndex === totalSteps) {
+            if (nextBtn) nextBtn.style.display = 'none';
+            if (submitBtn) submitBtn.style.display = 'inline-flex';
+        } else {
+            if (nextBtn) nextBtn.style.display = 'inline-flex';
+            if (submitBtn) submitBtn.style.display = 'none';
+        }
+
+        // Scroll modal body smoothly to top when switching questions
+        const modalBody = document.querySelector('.sf-scent-modal-body');
+        if (modalBody) modalBody.scrollTop = 0;
+    }
+
+    function goToNextStep() {
+        if (currentStepIndex < totalSteps) {
+            currentStepIndex++;
+            updateWizardUI('next');
+        }
+    }
+
+    function goToPreviousStep() {
+        if (currentStepIndex > 1) {
+            currentStepIndex--;
+            updateWizardUI('prev');
+        }
+    }
+
+    // Modal Visibility & Focus Trapping
+    function trapModalFocus(e) {
+        const modal = document.getElementById('scent-finder-modal');
+        if (!modal || !modal.classList.contains('is-open')) return;
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            closeScentModal();
+            return;
+        }
+
+        if (e.key === 'Tab') {
+            const focusable = modal.querySelectorAll(
+                'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            const visibleFocusable = Array.from(focusable).filter(el => {
+                return el.offsetParent !== null && window.getComputedStyle(el).display !== 'none' && window.getComputedStyle(el).visibility !== 'hidden';
+            });
+            if (visibleFocusable.length === 0) return;
+
+            const firstEl = visibleFocusable[0];
+            const lastEl = visibleFocusable[visibleFocusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === firstEl) {
+                e.preventDefault();
+                lastEl.focus();
+            } else if (!e.shiftKey && document.activeElement === lastEl) {
+                e.preventDefault();
+                firstEl.focus();
+            }
+        }
+    }
+
+    function openScentModal(triggerEl) {
+        lastTriggerElement = triggerEl || document.activeElement;
+        const modal = document.getElementById('scent-finder-modal');
+        if (modal) {
+            modal.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            currentStepIndex = 1;
+            updateWizardUI('next');
+            document.addEventListener('keydown', trapModalFocus);
+            const closeBtn = modal.querySelector('.sf-scent-modal-close');
+            if (closeBtn) closeBtn.focus();
+        }
+    }
+
+    function closeScentModal() {
+        const modal = document.getElementById('scent-finder-modal');
+        if (modal) {
+            modal.classList.remove('is-open');
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', trapModalFocus);
+            if (lastTriggerElement && typeof lastTriggerElement.focus === 'function') {
+                lastTriggerElement.focus();
+            }
+        }
+    }
+
+    function handleModalBackdropClick(e) {
+        if (e.target.id === 'scent-finder-modal') {
+            closeScentModal();
+        }
+    }
+
+    // Keyboard support for trigger card
+    const triggerCard = document.getElementById('scent-trigger-card');
+    if (triggerCard) {
+        triggerCard.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openScentModal(triggerCard);
+            }
+        });
     }
 
     // "No Preference" mutual exclusion for note checkboxes
@@ -582,12 +1717,15 @@
         const noteCheckboxes = form.querySelectorAll('input[name="notes"]');
 
         if (el.value === 'No Preference' && el.checked) {
-            // Uncheck all specific notes
             noteCheckboxes.forEach(cb => {
                 if (cb.value !== 'No Preference') cb.checked = false;
             });
-        } else if (el.value !== 'No Preference' && el.checked) {
-            // Uncheck "No Preference" when a specific note is selected
+        }
+    }
+
+    function handleNoteChange(el) {
+        if (el.checked) {
+            const form = el.closest('form') || document;
             const noPrefCb = form.querySelector('#note-no-pref');
             if (noPrefCb) noPrefCb.checked = false;
         }
@@ -618,6 +1756,69 @@
             });
         }
     })();
+
+    // ========================================================
+    // LUXURY SLIDE-OUT FILTER DRAWER CONTROLLER
+    // ========================================================
+    let lastFilterTriggerElement = null;
+
+    function trapFilterDrawerFocus(e) {
+        const drawer = document.getElementById('filter-drawer');
+        if (!drawer || !drawer.classList.contains('is-open')) return;
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            closeFilterDrawer();
+            return;
+        }
+
+        if (e.key === 'Tab') {
+            const focusable = drawer.querySelectorAll(
+                'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), details, [tabindex]:not([tabindex="-1"])'
+            );
+            const visibleFocusable = Array.from(focusable).filter(el => {
+                return el.offsetParent !== null && window.getComputedStyle(el).display !== 'none' && window.getComputedStyle(el).visibility !== 'hidden';
+            });
+            if (visibleFocusable.length === 0) return;
+
+            const firstEl = visibleFocusable[0];
+            const lastEl = visibleFocusable[visibleFocusable.length - 1];
+
+            if (e.shiftKey && document.activeElement === firstEl) {
+                e.preventDefault();
+                lastEl.focus();
+            } else if (!e.shiftKey && document.activeElement === lastEl) {
+                e.preventDefault();
+                firstEl.focus();
+            }
+        }
+    }
+
+    function openFilterDrawer(triggerEl) {
+        lastFilterTriggerElement = triggerEl || document.getElementById('filter-drawer-trigger-btn') || document.activeElement;
+        const drawer = document.getElementById('filter-drawer');
+        if (drawer) {
+            drawer.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('keydown', trapFilterDrawerFocus);
+            const closeBtn = document.getElementById('filter-drawer-close-btn');
+            if (closeBtn) {
+                closeBtn.focus();
+            }
+        }
+    }
+
+    function closeFilterDrawer() {
+        const drawer = document.getElementById('filter-drawer');
+        if (drawer) {
+            drawer.classList.remove('is-open');
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', trapFilterDrawerFocus);
+            if (lastFilterTriggerElement && typeof lastFilterTriggerElement.focus === 'function') {
+                lastFilterTriggerElement.focus();
+            }
+        }
+    }
 </script>
 
 {% endblock %}

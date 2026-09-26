@@ -1,7 +1,7 @@
 {% extends "catalog/base.html" %}
 {% load static %}
 
-{% block title %}Shopping Bag | Maison Momènto Parfumeur{% endblock %}
+{% block title %}Shopping Bag | Maison Moménto Parfumeur{% endblock %}
 
 {% block content %}
 <section class="sf-hero" style="min-height: 20vh; margin-bottom: 20px; padding: 40px 24px; background-image: url('{% static "images/hero_banner.png" %}'); background-size: cover; background-position: center 30%;">
@@ -37,10 +37,14 @@
                                     <div style="color: var(--charcoal-soft); font-size: 14px;">₹{{ item.product.effective_price }}</div>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
-                                    <div style="display: flex; align-items: center; border: 1px solid var(--border); border-radius: 4px; overflow: hidden;">
-                                        <button class="sf-qty-btn" data-action="decrease" style="background: none; border: none; padding: 8px 12px; cursor: pointer; color: var(--charcoal);">&minus;</button>
-                                        <input type="number" class="sf-qty-input" value="{{ item.quantity }}" min="1" readonly style="width: 40px; text-align: center; border: none; font-family: var(--font-sans); font-size: 14px; background: transparent; padding: 0;">
-                                        <button class="sf-qty-btn" data-action="increase" style="background: none; border: none; padding: 8px 12px; cursor: pointer; color: var(--charcoal);">&plus;</button>
+                                    <div class="sf-cart-qty-control" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 3px 6px; background: rgba(245, 237, 225, 0.55); border: 1px solid rgba(208, 155, 52, 0.32); border-radius: 10px; min-height: 42px;">
+                                        <button type="button" class="sf-cart-qty-btn sf-qty-btn" data-action="decrease" aria-label="Decrease quantity" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: #FAF8F5; border: 1px solid rgba(208, 155, 52, 0.35); cursor: pointer; color: #005441; padding: 0;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        </button>
+                                        <input type="number" class="sf-qty-input sf-cart-qty-value" value="{{ item.quantity }}" min="1" readonly style="width: 32px; height: 36px; padding: 0; margin: 0; border: none; outline: none; background: transparent; text-align: center; font-size: 14px; font-weight: 600; color: #2D3A30; font-family: var(--font-sans); line-height: 36px; vertical-align: middle; -moz-appearance: textfield;">
+                                        <button type="button" class="sf-cart-qty-btn sf-qty-btn" data-action="increase" aria-label="Increase quantity" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: #FAF8F5; border: 1px solid rgba(208, 155, 52, 0.35); cursor: pointer; color: #005441; padding: 0;">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        </button>
                                     </div>
                                     <button class="sf-remove-btn" style="background: none; border: none; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; text-decoration: underline;">Remove</button>
                                 </div>

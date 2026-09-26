@@ -82,12 +82,6 @@ class CheckoutForm(forms.Form):
     )
     phone = forms.CharField(
         max_length=32,
-        validators=[
-            RegexValidator(
-                regex=r'^\+?1?\d{9,15}$',
-                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
-            )
-        ],
         widget=forms.TextInput(attrs={'class': 'sf-input', 'placeholder': '+91 98765 43210'})
     )
     address_line_1 = forms.CharField(
@@ -137,3 +131,11 @@ class CheckoutForm(forms.Form):
 
     def clean_last_name(self):
         return self.cleaned_data.get('last_name', '').strip()
+
+    def clean_phone(self):
+        import re
+        raw_phone = self.cleaned_data.get('phone', '').strip()
+        cleaned = re.sub(r'[\s\-\(\)\.]', '', raw_phone)
+        if not re.match(r'^\+?\d{7,16}$', cleaned):
+            raise forms.ValidationError("Please enter a valid phone number (e.g. +91 98765 43210).")
+        return cleaned

@@ -1,12 +1,12 @@
 {% extends "catalog/base.html" %}
 
-{% block title %}Checkout - Maison Momènto{% endblock %}
+{% block title %}Checkout - Maison Moménto{% endblock %}
 
 {% block content %}
-<main class="sf-container" style="padding-top: 120px; padding-bottom: 120px;">
-    <h1 class="sf-page-title" style="margin-bottom: 48px;">Checkout</h1>
+<div class="sf-container" style="padding-top: 36px; padding-bottom: 60px;">
+    <h1 class="sf-page-title" style="margin-bottom: 24px; font-size: 32px;">Checkout</h1>
     
-    <div class="sf-cart-layout" style="display: grid; grid-template-columns: 1fr 380px; gap: 60px; align-items: start;">
+    <div class="sf-cart-layout" style="display: grid; grid-template-columns: 1fr 380px; gap: 48px; align-items: start;">
         
         <!-- Left Column: Shipping Form -->
         <div class="sf-checkout-form-container">
@@ -33,7 +33,7 @@
             <h1 class="sf-checkout-section-title">Shipping &amp; Delivery</h1>
             <p class="sf-checkout-section-subtitle">Please enter your destination details for complimentary signature packaging.</p>
             
-            <form id="sf-checkout-form" method="POST" action="{% url 'sales:checkout' %}" novalidate class="sf-checkout-form" style="display: flex; flex-direction: column; gap: 20px;">
+            <form id="sf-checkout-form" method="POST" action="{% url 'sales:checkout' %}" class="sf-checkout-form" style="display: flex; flex-direction: column; gap: 20px;">
                 {% csrf_token %}
                 
                 <!-- Group 1: Contact Details -->
@@ -145,40 +145,47 @@
                     {% endif %}
                 </div>
                 
+                <!-- Explicit Complete Order Button on Shipping Form -->
+                <div style="margin-top: 16px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.08);">
+                    <button type="button" id="sf-shipping-submit-btn" class="primary-btn sf-btn-large" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #005441; color: #FFFFFF; padding: 15px 24px; border-radius: 999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; cursor: pointer; border: none; box-shadow: 0 4px 16px rgba(0,84,65,0.25); transition: all 200ms ease;">
+                        Proceed to Place Order &rarr;
+                    </button>
+                </div>
+                
                 <!-- Hidden button for enter key submit -->
                 <button type="submit" id="sf-checkout-submit-btn" style="display: none;"></button>
             </form>
         </div>
 
         <!-- Right Column: Order Summary -->
-        <div class="sf-cart-summary" style="background: var(--bg-alt); padding: 32px; position: sticky; top: 100px;">
-            <h2 style="font-family: 'Outfit', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; font-weight: 500;">Order Summary ({{ cart_item_count }})</h2>
+        <div class="sf-cart-summary" style="background: var(--bg-alt); padding: 24px; position: sticky; top: 80px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 8px 24px rgba(0,0,0,0.03);">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; font-weight: 600; color: var(--text-color);">Order Summary ({{ cart_item_count }})</h2>
             
-            <div class="sf-summary-items" style="margin-bottom: 32px; max-height: 400px; overflow-y: auto; padding-right: 8px;">
+            <div class="sf-summary-items" style="margin-bottom: 24px; max-height: 280px; overflow-y: auto; padding-right: 8px;">
                 {% for item in items %}
-                <div class="sf-summary-item" style="display: flex; gap: 16px; margin-bottom: 16px; align-items: center;">
-                    <div style="width: 60px; height: 80px; flex-shrink: 0; background: #fff;">
+                <div class="sf-summary-item" style="display: flex; gap: 14px; margin-bottom: 14px; align-items: center;">
+                    <div style="width: 54px; height: 72px; flex-shrink: 0; background: #fff; border-radius: 4px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06);">
                         {% if item.product.primary_image %}
                             <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
                         {% else %}
                             <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=200&auto=format&fit=crop" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
                         {% endif %}
                     </div>
-                    <div style="flex-grow: 1;">
-                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 14px; margin-bottom: 4px;">{{ item.product.name }}</h4>
-                        <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted);">Qty: {{ item.quantity }}</p>
+                    <div style="flex-grow: 1; min-width: 0;">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-size: 13.5px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.product.name }}</h4>
+                        <p style="font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted); margin: 0;">Qty: {{ item.quantity }}</p>
                     </div>
-                    <div style="font-family: 'Courier Prime', monospace; font-size: 14px;">
+                    <div style="font-family: 'Courier Prime', monospace; font-size: 14.5px; font-weight: 700; white-space: nowrap; flex-shrink: 0; text-align: right; color: var(--text-color);">
                         ₹{{ item.subtotal }}
                     </div>
                 </div>
                 {% endfor %}
             </div>
             
-            <div class="sf-summary-rows" style="font-family: 'Inter', sans-serif; font-size: 14px; color: var(--muted); margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="sf-summary-rows" style="font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--muted); margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; justify-content: space-between;">
                     <span>Subtotal</span>
-                    <span>₹{{ subtotal }}</span>
+                    <span style="color: var(--text-color); font-weight: 500;">₹{{ subtotal }}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span>Shipping</span>
@@ -190,18 +197,39 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; font-family: 'Courier Prime', monospace; font-size: 18px; font-weight: 700; color: var(--text-color); margin-bottom: 32px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 24px;">
+            <div style="display: flex; justify-content: space-between; font-family: 'Courier Prime', monospace; font-size: 18px; font-weight: 700; color: var(--text-color); margin-bottom: 22px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 18px;">
                 <span>Estimated Total</span>
                 <span>₹{{ estimated_total }}</span>
             </div>
 
-            <button id="sf-place-order-btn" type="button" class="primary-btn sf-btn-large" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                {% if razorpay_configured %}
-                    Proceed to Payment
-                {% else %}
-                    Place Order
-                {% endif %}
+            <!-- Payment Method Selection -->
+            <div style="margin-bottom: 20px;">
+                <label style="font-family: 'Outfit', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; display: block; margin-bottom: 8px; color: var(--muted);">
+                    Payment Method
+                </label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label id="label-choice-razorpay" style="display: flex; align-items: center; gap: 10px; padding: 11px 13px; border: 1.5px solid var(--antique-gold, #D09B34); border-radius: 8px; background: rgba(208, 155, 52, 0.07); cursor: pointer; font-size: 12.5px;">
+                        <input type="radio" id="choice-razorpay" name="checkout_payment_choice" value="razorpay" checked style="accent-color: #D09B34;">
+                        <span style="font-weight: 600; color: var(--text-color);">Razorpay Online</span>
+                        <span style="color: var(--muted); font-size: 11px; margin-left: auto;">UPI, Cards, NetBanking</span>
+                    </label>
+                    <label id="label-choice-direct" style="display: flex; align-items: center; gap: 10px; padding: 11px 13px; border: 1px solid #DFD1B9; border-radius: 8px; background: #FFFFFF; cursor: pointer; font-size: 12.5px;">
+                        <input type="radio" id="choice-direct" name="checkout_payment_choice" value="direct" style="accent-color: #005441;">
+                        <span style="font-weight: 600; color: var(--text-color);">Direct Atelier Order</span>
+                        <span style="color: var(--muted); font-size: 11px; margin-left: auto;">Instant Order Placement</span>
+                    </label>
+                </div>
+            </div>
+
+            <button id="sf-place-order-btn" type="button" class="primary-btn sf-btn-large" style="width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;">
+                Proceed to Checkout &rarr;
             </button>
+            <div id="sf-direct-fallback-box" style="margin-top: 12px; padding: 10px 12px; background: rgba(208, 155, 52, 0.08); border: 1px dashed #D09B34; border-radius: 8px; font-size: 12px; text-align: center; color: var(--text-color);">
+                Prefer not to pay online right now? 
+                <button type="button" id="sf-instant-direct-btn" style="background: none; border: none; color: #005441; font-weight: 700; cursor: pointer; text-decoration: underline; margin-top: 2px; display: inline-block;">
+                    Confirm &amp; Place Order Directly &rarr;
+                </button>
+            </div>
             <div style="text-align: center; margin-top: 14px;">
                 <a href="{% url 'sales:cart' %}" style="font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted); text-decoration: none;">
                     &larr; Back to Shopping Bag
@@ -209,15 +237,58 @@
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const placeOrderBtn = document.getElementById('sf-place-order-btn');
+        const shippingSubmitBtn = document.getElementById('sf-shipping-submit-btn');
         const form = document.getElementById('sf-checkout-form');
         const errorAlert = document.getElementById('sf-checkout-error-alert');
-        const originalBtnText = placeOrderBtn.innerHTML;
+        const fallbackBox = document.getElementById('sf-direct-fallback-box');
+        const instantDirectBtn = document.getElementById('sf-instant-direct-btn');
+        const originalBtnText = placeOrderBtn ? placeOrderBtn.innerHTML : 'Proceed to Checkout &rarr;';
+
+        // Payment Method Radio Interactivity
+        const paymentRadios = document.querySelectorAll('input[name="checkout_payment_choice"]');
+        const updatePaymentUI = () => {
+            const chosen = document.querySelector('input[name="checkout_payment_choice"]:checked')?.value || 'razorpay';
+            const labelRazorpay = document.getElementById('label-choice-razorpay');
+            const labelDirect = document.getElementById('label-choice-direct');
+            if (chosen === 'direct') {
+                if (placeOrderBtn) placeOrderBtn.innerHTML = 'Place Direct Atelier Order &rarr;';
+                if (shippingSubmitBtn) shippingSubmitBtn.innerHTML = 'Place Direct Atelier Order &rarr;';
+                if (labelDirect) {
+                    labelDirect.style.borderColor = '#005441';
+                    labelDirect.style.background = 'rgba(0, 84, 65, 0.08)';
+                }
+                if (labelRazorpay) {
+                    labelRazorpay.style.borderColor = '#DFD1B9';
+                    labelRazorpay.style.background = '#FFFFFF';
+                }
+            } else {
+                if (placeOrderBtn) placeOrderBtn.innerHTML = 'Proceed to Checkout &rarr;';
+                if (shippingSubmitBtn) shippingSubmitBtn.innerHTML = 'Proceed to Place Order &rarr;';
+                if (labelRazorpay) {
+                    labelRazorpay.style.borderColor = '#D09B34';
+                    labelRazorpay.style.background = 'rgba(208, 155, 52, 0.07)';
+                }
+                if (labelDirect) {
+                    labelDirect.style.borderColor = '#DFD1B9';
+                    labelDirect.style.background = '#FFFFFF';
+                }
+            }
+        };
+        paymentRadios.forEach(r => r.addEventListener('change', updatePaymentUI));
+        updatePaymentUI();
+
+        const getCsrfToken = () => {
+            const formToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (formToken) return formToken;
+            const match = document.cookie.match(new RegExp('(?:^|; )csrftoken=([^;]*)'));
+            return match ? decodeURIComponent(match[1]) : '';
+        };
 
         const showError = (msg) => {
             errorAlert.textContent = msg;
@@ -231,38 +302,50 @@
         };
 
         const setLoading = (loading, text) => {
-            if (loading) {
-                placeOrderBtn.disabled = true;
-                placeOrderBtn.style.opacity = '0.7';
-                placeOrderBtn.innerHTML = text || 'Processing...';
-            } else {
-                placeOrderBtn.disabled = false;
-                placeOrderBtn.style.opacity = '1';
-                placeOrderBtn.innerHTML = originalBtnText;
-            }
+            const btns = [placeOrderBtn, shippingSubmitBtn].filter(Boolean);
+            btns.forEach(btn => {
+                if (loading) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.7';
+                    btn.innerHTML = text || 'Processing...';
+                } else {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            });
+            if (!loading) updatePaymentUI();
         };
 
-        placeOrderBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
+        const executeCheckout = async (forcePaymentMethod) => {
             hideError();
 
             // Client HTML5 validation check
             if (!form.checkValidity()) {
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                    const label = form.querySelector(`label[for="${firstInvalid.id}"]`)?.innerText || firstInvalid.name;
+                    showError(`Please fill in a valid ${label}.`);
+                } else {
+                    showError('Please complete all required shipping fields.');
+                }
                 form.reportValidity();
                 return;
             }
 
-            setLoading(true, 'Securing Order...');
+            const chosenMethod = forcePaymentMethod || document.querySelector('input[name="checkout_payment_choice"]:checked')?.value || 'razorpay';
+            setLoading(true, chosenMethod === 'direct' ? 'Confirming Order...' : 'Securing Order...');
 
             const formData = new FormData(form);
             formData.append('format', 'json');
+            formData.append('payment_method', chosenMethod);
 
             try {
                 const response = await fetch("{% url 'sales:checkout' %}", {
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': getCookie('csrftoken') || ''
+                        'X-CSRFToken': getCsrfToken()
                     },
                     body: formData
                 });
@@ -280,7 +363,15 @@
                     return;
                 }
 
-                // If Razorpay is active, launch checkout modal
+                // If Direct order or redirect_url is given directly
+                if (chosenMethod === 'direct' || !data.razorpay_configured || !window.Razorpay) {
+                    if (data.redirect_url || data.direct_url) {
+                        window.location.href = data.redirect_url || data.direct_url;
+                        return;
+                    }
+                }
+
+                // If Razorpay is active and selected, launch checkout modal
                 if (data.razorpay_configured && window.Razorpay) {
                     setLoading(true, 'Opening Payment Gateway...');
 
@@ -297,11 +388,14 @@
                             contact: data.customer_phone || ''
                         },
                         theme: {
-                            color: '#0F1E28'
+                            color: '#0D434D'
                         },
                         modal: {
                             ondismiss: function() {
                                 setLoading(false);
+                                if (fallbackBox) {
+                                    fallbackBox.style.display = 'block';
+                                }
                             }
                         },
                         handler: async function(paymentResponse) {
@@ -311,7 +405,7 @@
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        'X-CSRFToken': getCookie('csrftoken') || '',
+                                        'X-CSRFToken': getCsrfToken(),
                                         'X-Requested-With': 'XMLHttpRequest'
                                     },
                                     body: JSON.stringify({
@@ -337,14 +431,14 @@
                     const rzp = new Razorpay(options);
                     rzp.on('payment.failed', function(resp) {
                         setLoading(false);
-                        const errDesc = resp.error && resp.error.description ? resp.error.description : 'Payment failed.';
-                        showError('Payment unsuccessful: ' + errDesc + '. You can retry payment.');
+                        const errDesc = resp.error && resp.error.description ? resp.error.description : 'Payment unsuccessful.';
+                        showError(errDesc + ' You may retry or complete directly below.');
+                        if (fallbackBox) fallbackBox.style.display = 'block';
                     });
                     rzp.open();
 
-                } else if (data.redirect_url) {
-                    // Direct confirmation (e.g. test mode or unconfigured keys)
-                    window.location.href = data.redirect_url;
+                } else if (data.redirect_url || data.direct_url) {
+                    window.location.href = data.redirect_url || data.direct_url;
                 } else {
                     window.location.href = "{% url 'sales:my_orders' %}";
                 }
@@ -353,7 +447,23 @@
                 console.error('Checkout error:', err);
                 showError('A network error occurred. Please check your connection and try again.');
                 setLoading(false);
+                if (fallbackBox) fallbackBox.style.display = 'block';
             }
+        };
+
+        placeOrderBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            executeCheckout();
+        });
+
+        shippingSubmitBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            executeCheckout();
+        });
+
+        instantDirectBtn?.addEventListener('click', (e) => {
+            e.preventDefault();
+            executeCheckout('direct');
         });
     });
 </script>

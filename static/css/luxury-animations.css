@@ -70,7 +70,7 @@
 
 .sf-hero-eyebrow {
     animation: lux-reveal-up 600ms var(--ease-luxury) 100ms both;
-    color: var(--gold-light, #D4A855) !important;
+    color: var(--gold-light, #E0B455) !important;
     letter-spacing: 0.30em !important;
 }
 
@@ -94,18 +94,18 @@
 .sf-hero::before {
     background: linear-gradient(
         to bottom,
-        rgba(17, 17, 17, 0.22) 0%,
-        rgba(17, 17, 17, 0.52) 60%,
-        rgba(17, 17, 17, 0.76) 100%
+        rgba(13, 67, 77, 0.22) 0%,
+        rgba(13, 67, 77, 0.52) 60%,
+        rgba(13, 67, 77, 0.76) 100%
     ) !important;
 }
 
 .sf-hero.has-video::before {
     background: linear-gradient(
         180deg,
-        rgba(17, 17, 17, 0.28) 0%,
-        rgba(17, 17, 17, 0.52) 55%,
-        rgba(17, 17, 17, 0.80) 100%
+        rgba(13, 67, 77, 0.28) 0%,
+        rgba(13, 67, 77, 0.52) 55%,
+        rgba(13, 67, 77, 0.80) 100%
     ) !important;
 }
 
@@ -115,48 +115,44 @@
 }
 
 .sf-hero-sound-btn:hover {
-    border-color: rgba(182, 138, 58, 0.70) !important;
-    color: var(--gold-light, #D4A855) !important;
+    border-color: rgba(208, 155, 52, 0.70) !important;
+    color: var(--gold-light, #E0B455) !important;
 }
 
 /* --------------------------------------------------------------------------
-   LUXURY PRODUCT CARD — AJMAL BOTTLE RISE
+   LUXURY PRODUCT CARD — Stable, Professional Luxury Presentation
    
-   .sf-card-image-wrap  → overflow:visible so image can escape the box
-   .sf-card-image-riser → inner div with overflow:hidden to clip bg/radius
-   .sf-card-image       → rises translateY(-18px) + drop-shadow on hover
+   .sf-card-image-wrap  → overflow:hidden for crisp, elegant rounded frame
+   .sf-card-image-riser → inner container matching card aspect ratio
+   .sf-card-image       → stable, strictly NO zoom / NO scale on hover
    -------------------------------------------------------------------------- */
 
 .sf-product-card {
     transition:
-        transform 300ms var(--ease-luxury),
-        box-shadow 300ms var(--ease-luxury);
-    will-change: transform;
+        box-shadow 300ms var(--ease-luxury),
+        border-color 300ms var(--ease-luxury);
     position: relative;
     z-index: 1;
 }
 
 .sf-product-card:hover,
 .sf-product-card:focus-within {
-    transform: translateY(-8px) scale(1.045);
+    transform: none !important;
     box-shadow:
-        0 28px 60px rgba(17, 17, 17, 0.13),
-        0 8px 24px rgba(91, 15, 24, 0.08);
-    z-index: 3;
+        0 14px 34px rgba(13, 67, 77, 0.10),
+        0 4px 12px rgba(0, 84, 65, 0.05);
+    z-index: 2;
 }
 
-/* Adjacent cards scale down (class added by JS on mouseenter) */
+/* Stable siblings — no distortion or shrinking */
 .sf-product-card.is-sibling {
-    transform: scale(0.978);
-    opacity: 0.87;
-    transition:
-        transform 280ms var(--ease-luxury),
-        opacity 280ms var(--ease-luxury);
+    transform: none !important;
+    opacity: 1 !important;
 }
 
-/* Allow image to escape the card visually */
+/* Crisp, elegant image frame */
 .sf-card-image-wrap {
-    overflow: visible !important;
+    overflow: hidden !important;
     position: relative;
 }
 
@@ -170,12 +166,10 @@
     aspect-ratio: 4/5;
 }
 
-/* Image: bottle-rise effect on hover */
+/* Image: strictly NO zoom / scale on hover — completely stable */
 .sf-card-image {
-    transition:
-        transform 320ms var(--ease-luxury),
-        filter 320ms var(--ease-luxury);
-    will-change: transform, filter;
+    transition: none !important;
+    transform: none !important;
     display: block;
     width: 100%;
     height: 100%;
@@ -184,10 +178,8 @@
 
 .sf-product-card:hover .sf-card-image,
 .sf-product-card:focus-within .sf-card-image {
-    transform: translateY(-18px) scale(1.03);
-    filter:
-        drop-shadow(0 20px 28px rgba(91, 15, 24, 0.20))
-        drop-shadow(0 6px 12px rgba(0, 0, 0, 0.10));
+    transform: none !important;
+    filter: none !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -195,7 +187,7 @@
    -------------------------------------------------------------------------- */
 
 .sf-nav-link::after {
-    background: var(--gold, #B68A3A) !important;
+    background: var(--gold, #D09B34) !important;
 }
 
 .sf-nav-link:hover,
@@ -206,12 +198,14 @@
 
 .sf-brand:hover,
 .sf-brand:focus-visible {
-    outline-color: var(--gold, #B68A3A) !important;
+    outline: none !important;
+    background: none !important;
+    opacity: 1 !important;
 }
 
 .sf-icon-btn:hover,
 .sf-icon-btn:focus-visible {
-    border-color: rgba(182, 138, 58, 0.45) !important;
+    border-color: rgba(208, 155, 52, 0.45) !important;
     color: var(--charcoal-lux, #2D2D2D) !important;
 }
 
@@ -227,17 +221,18 @@
 }
 
 .primary-btn {
-    background: var(--rich-black, #111111) !important;
-    border-color: var(--rich-black, #111111) !important;
+    background: var(--antique-gold, #D09B34) !important;
+    border-color: var(--antique-gold, #D09B34) !important;
+    color: var(--ivory-silk, #F5EDE1) !important;
 }
 
-/* Sweep gold underlay */
+/* Sweep ivory underlay on hover */
 .primary-btn::before,
 .secondary-btn::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba(182, 138, 58, 0.12);
+    background: rgba(245, 237, 225, 0.10);
     transform: translateX(-101%);
     transition: transform 350ms var(--ease-luxury);
     border-radius: inherit;
@@ -250,13 +245,14 @@
     transform: translateX(0);
 }
 
-/* Primary: burgundy on hover */
+/* Primary: Château Green on hover */
 .primary-btn:hover,
 .primary-btn:focus-visible {
-    border-color: var(--burgundy-deep, #5B0F18) !important;
-    background: var(--burgundy-deep, #5B0F18) !important;
+    border-color: var(--chateau-green, #005441) !important;
+    background: var(--chateau-green, #005441) !important;
+    color: var(--ivory-silk, #F5EDE1) !important;
     box-shadow:
-        0 12px 28px rgba(91, 15, 24, 0.25),
+        0 12px 28px rgba(0, 84, 65, 0.30),
         0 4px 12px rgba(0, 0, 0, 0.12) !important;
     transform: translateY(-2px) !important;
 }
@@ -264,9 +260,9 @@
 /* Secondary: gold border reveal */
 .secondary-btn:hover,
 .secondary-btn:focus-visible {
-    border-color: var(--gold, #B68A3A) !important;
+    border-color: var(--gold, #D09B34) !important;
     color: var(--charcoal-lux, #2D2D2D) !important;
-    box-shadow: inset 0 0 0 1px var(--gold, #B68A3A) !important;
+    box-shadow: inset 0 0 0 1px var(--gold, #D09B34) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -274,22 +270,22 @@
    -------------------------------------------------------------------------- */
 
 .sf-footer {
-    background: var(--rich-black, #111111) !important;
+    background: var(--rich-black, #0D434D) !important;
 }
 
 .sf-footer-brand {
-    color: var(--gold, #B68A3A) !important;
+    color: var(--gold, #D09B34) !important;
 }
 
 .sf-footer-link:hover,
 .sf-footer-link:focus-visible {
-    color: var(--gold-light, #D4A855) !important;
+    color: var(--gold-light, #E0B455) !important;
 }
 
 /* "Powered by NobleNet" — subtle gold italic credit */
 .sf-footer-poweredby {
     font-size: 11px;
-    color: rgba(182, 138, 58, 0.50);
+    color: rgba(208, 155, 52, 0.50);
     font-style: italic;
     letter-spacing: 0.06em;
     margin-top: 5px;
@@ -298,7 +294,7 @@
 }
 
 .sf-footer-poweredby:hover {
-    color: rgba(182, 138, 58, 0.80);
+    color: rgba(208, 155, 52, 0.80);
 }
 
 /* --------------------------------------------------------------------------
@@ -306,73 +302,73 @@
    -------------------------------------------------------------------------- */
 
 .scent-finder-eyebrow {
-    color: var(--gold, #B68A3A) !important;
+    color: var(--gold, #D09B34) !important;
 }
 
 .scent-purpose-tabs {
-    background: rgba(182, 138, 58, 0.08) !important;
-    border-color: rgba(182, 138, 58, 0.15) !important;
+    background: rgba(208, 155, 52, 0.08) !important;
+    border-color: rgba(208, 155, 52, 0.15) !important;
 }
 
 .scent-purpose-tab.is-active {
-    background: var(--burgundy-deep, #5B0F18) !important;
+    background: var(--burgundy-deep, #005441) !important;
     color: var(--white, #fff) !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 0 4px 12px rgba(91, 15, 24, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(0, 84, 65, 0.25) !important;
 }
 
 .scent-quiz-group {
-    border-bottom-color: rgba(182, 138, 58, 0.15) !important;
+    border-bottom-color: rgba(208, 155, 52, 0.15) !important;
 }
 
 .scent-quiz-radio input,
 .scent-quiz-checkbox input {
-    accent-color: var(--gold, #B68A3A) !important;
+    accent-color: var(--gold, #D09B34) !important;
 }
 
 .scent-pill-label {
-    border-color: rgba(182, 138, 58, 0.3) !important;
+    border-color: rgba(208, 155, 52, 0.3) !important;
 }
 
 .scent-pill-label:hover {
-    border-color: var(--gold, #B68A3A) !important;
-    background: rgba(182, 138, 58, 0.05) !important;
+    border-color: var(--gold, #D09B34) !important;
+    background: rgba(208, 155, 52, 0.05) !important;
     color: var(--charcoal-lux, #2D2D2D) !important;
 }
 
 .scent-pill-label:has(input:checked) {
-    background: var(--burgundy-deep, #5B0F18) !important;
+    background: var(--burgundy-deep, #005441) !important;
     color: var(--white, #fff) !important;
-    border-color: var(--burgundy-deep, #5B0F18) !important;
-    box-shadow: 0 2px 5px rgba(91, 15, 24, 0.25) !important;
+    border-color: var(--burgundy-deep, #005441) !important;
+    box-shadow: 0 2px 5px rgba(0, 84, 65, 0.25) !important;
 }
 
 .scent-quiz-submit-btn {
-    background: var(--burgundy-deep, #5B0F18) !important;
-    box-shadow: 0 4px 14px rgba(91, 15, 24, 0.25) !important;
+    background: var(--burgundy-deep, #005441) !important;
+    box-shadow: 0 4px 14px rgba(0, 84, 65, 0.25) !important;
 }
 
 /* "ACTIVE EDIT" badge */
 .scent-finder-status-badge {
-    background: var(--burgundy-deep, #5B0F18) !important;
-    border-color: var(--burgundy-deep, #5B0F18) !important;
+    background: var(--burgundy-deep, #005441) !important;
+    border-color: var(--burgundy-deep, #005441) !important;
 }
 
 /* Filter radio dots */
 .sf-radio input[type="radio"]::before {
-    box-shadow: inset 1em 1em var(--gold, #B68A3A) !important;
+    box-shadow: inset 1em 1em var(--gold, #D09B34) !important;
 }
    DASHBOARD — Subtle polish (non-breaking)
    -------------------------------------------------------------------------- */
 
 .stat-card.revenue::before {
-    background: var(--gold, #B68A3A) !important;
+    background: var(--gold, #D09B34) !important;
 }
 
 .panel:hover {
     box-shadow:
         var(--shadow-card),
-        0 0 0 1px rgba(182, 138, 58, 0.07) !important;
+        0 0 0 1px rgba(208, 155, 52, 0.07) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -380,8 +376,8 @@
    -------------------------------------------------------------------------- */
 
 .sf-page-link:not(.sf-page-disabled):hover {
-    border-color: var(--gold, #B68A3A) !important;
-    color: var(--gold, #B68A3A) !important;
+    border-color: var(--gold, #D09B34) !important;
+    color: var(--gold, #D09B34) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -451,17 +447,18 @@
 
     .sf-product-card:hover,
     .sf-product-card:focus-within {
-        transform: translateY(-4px) scale(1.02) !important;
+        transform: none !important;
     }
 
     .sf-product-card:hover .sf-card-image,
     .sf-product-card:focus-within .sf-card-image {
-        transform: translateY(-8px) scale(1.02) !important;
+        transform: none !important;
+        filter: none !important;
     }
 
     .sf-product-card.is-sibling {
-        transform: scale(0.99) !important;
-        opacity: 0.95 !important;
+        transform: none !important;
+        opacity: 1 !important;
     }
 
     .sf-hero h1 {

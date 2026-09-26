@@ -1,32 +1,41 @@
 :root {
     /* ============================================================
-       MAISON MOMENTO — Luxury Palette (Ajmal × Subversion inspired)
+       MAISON MOMENTO — Official Brand Palette
+       Brand Bible: Château Green × Ivory Silk × Antique Gold
        ============================================================ */
 
-    /* Core Luxury Palette */
-    --burgundy-deep: #5B0F18;    /* Deep Burgundy — primary brand accent */
-    --rich-black: #111111;       /* Rich Black — darkest surface */
-    --soft-ivory: #FCFAF6;       /* Soft Ivory — lightest background */
-    --warm-beige-lux: #F4EFE8;   /* Warm Beige — card / section background */
-    --gold: #B68A3A;             /* Antique Gold — luxury accent */
-    --gold-light: #D4A855;       /* Lighter gold for hover states */
-    --charcoal-lux: #2D2D2D;     /* Charcoal — primary text */
+    /* Core Brand Palette */
+    --chateau-green: #005441;    /* Château Green — primary brand accent */
+    --midnight-teal: #0D434D;    /* Midnight Teal — dark surfaces & headers */
+    --ivory-silk: #F5EDE1;       /* Ivory Silk — lightest background */
+    --french-sand: #DFD1B9;      /* French Sand — card / section background */
+    --antique-gold: #D09B34;     /* Antique Gold — luxury accent */
+    --antique-gold-light: #E0B455; /* Gold — lighter hover variant */
+    --charcoal-lux: #2D2D2D;     /* Charcoal — primary text (unchanged) */
+
+    /* Aliases used across the codebase — mapped to brand palette */
+    --burgundy-deep: #005441;    /* → Château Green */
+    --rich-black: #0D434D;       /* → Midnight Teal */
+    --soft-ivory: #F5EDE1;       /* → Ivory Silk */
+    --warm-beige-lux: #F5EDE1;   /* → Ivory Silk */
+    --gold: #D09B34;             /* → Antique Gold */
+    --gold-light: #E0B455;       /* → Antique Gold light */
 
     /* Legacy variables preserved (used throughout templates) */
     --leather-brown: #8A552A;
     --leather-brown-deep: #6E411E;
-    --burgundy: #701B25;
-    --forest-green: #184C45;
-    --deep-navy: #112a3d;
-    --charcoal: #463833;
-    --charcoal-soft: #625A56;
-    --muted: #817C78;
-    --ivory: #F4F4F2;
+    --burgundy: #005441;         /* → Château Green */
+    --forest-green: #005441;     /* → Château Green */
+    --deep-navy: #0D434D;        /* → Midnight Teal */
+    --charcoal: #2D3A30;         /* Darkened green-tinted charcoal for text */
+    --charcoal-soft: #4A5E52;    /* Softened for secondary text */
+    --muted: #7A8C80;            /* Muted green-grey */
+    --ivory: #F5EDE1;            /* → Ivory Silk */
     --white: #FFFFFF;
-    --warm-beige: #F0EFEC;
-    --warm-stone: #D7D5D1;
-    --border: #E6E6E3;
-    --border-strong: #D9D9D5;
+    --warm-beige: #DFD1B9;       /* → French Sand */
+    --warm-stone: #C8BAA0;       /* Darkened French Sand for borders */
+    --border: #E8DFCF;           /* French Sand derived border */
+    --border-strong: #D6C9B2;    /* Stronger French Sand border */
 
     /* Typography */
     --font-display: "Cormorant Garamond", Georgia, serif;
@@ -45,12 +54,12 @@
     --radius-xl: 30px;
     --radius-pill: 999px;
 
-    /* Depth */
-    --shadow-subtle: 0 8px 24px rgba(13, 37, 56, 0.025);
-    --shadow-card: 0 14px 34px rgba(13, 37, 56, 0.045);
-    --shadow-hover: 0 24px 56px rgba(17, 17, 17, 0.12);
-    --shadow-menu: 0 20px 48px rgba(13, 37, 56, 0.10);
-    --shadow-bottle: 0 24px 40px rgba(91, 15, 24, 0.18), 0 8px 16px rgba(0,0,0,0.10);
+    /* Depth — updated to use teal-based shadows */
+    --shadow-subtle: 0 8px 24px rgba(13, 67, 77, 0.025);
+    --shadow-card: 0 14px 34px rgba(13, 67, 77, 0.045);
+    --shadow-hover: 0 24px 56px rgba(13, 67, 77, 0.12);
+    --shadow-menu: 0 20px 48px rgba(13, 67, 77, 0.10);
+    --shadow-bottle: 0 24px 40px rgba(0, 84, 65, 0.18), 0 8px 16px rgba(0,0,0,0.10);
 
     /* Motion — intentional, never flashy */
     --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
@@ -854,7 +863,7 @@ h1 {
     padding: 0 8px;
     border-radius: var(--radius-pill);
     font-size: 9px;
-    font-weight: 600;
+    font-weight: 400;
     letter-spacing: 0.05em;
     line-height: 1;
 }
@@ -1114,9 +1123,9 @@ h1 {
     color: var(--charcoal-soft);
     cursor: pointer;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 400;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
+    text-transform: none;
     transition:
         color var(--transition-fast),
         border-color var(--transition-fast),

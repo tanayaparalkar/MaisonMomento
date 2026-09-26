@@ -1,6 +1,6 @@
 {% extends "catalog/base.html" %}
 
-{% block title %}{{ product.name }} | Maison Momènto Parfumeur{% endblock %}
+{% block title %}{{ product.name }} | Maison Moménto Parfumeur{% endblock %}
 
 {% block content %}
 <div class="sf-container">
@@ -24,8 +24,8 @@
                 </div>
 
                 <div class="sf-pdp-brand">{{ product.brand|default:"Maison Momento" }}</div>
-                <h1 class="sf-pdp-title">{{ product.name }}</h1>
-                <div class="sf-pdp-price">₹{{ product.effective_price }}</div>
+                <h1 class="sf-pdp-title" style="text-transform: capitalize !important;">{{ product.name|title }}</h1>
+                <div class="sf-pdp-price"><span style="font-family: Arial, Helvetica, sans-serif;">₹</span>{{ product.effective_price }}</div>
                 
                 <div class="sf-pdp-desc">
                     {{ product.description|linebreaks }}
