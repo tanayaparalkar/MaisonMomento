@@ -13,6 +13,34 @@
     </div>
 </section>
 
+<!-- Settings Navigation Sub-Tabs -->
+<div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+    <a href="{% url 'dashboard:settings' %}" class="primary-btn" style="padding: 8px 20px; font-size: 12px; text-decoration: none; border-radius: var(--radius-pill);">
+        General Settings
+    </a>
+    <a href="{% url 'dashboard:contact_settings' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        Contact Information &rarr;
+    </a>
+</div>
+
+<!-- Contact Information Management Panel -->
+<section class="panel" style="margin-bottom: 24px; border-left: 3px solid var(--chateau-green); background: linear-gradient(to right, rgba(0, 84, 65, 0.02), var(--white));">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <p class="eyebrow" style="color: var(--chateau-green);">Business Settings</p>
+            <h3>Contact Information</h3>
+            <p class="subtitle" style="margin-top: 6px; max-width: 600px;">
+                Manage public boutique details, email, phone numbers, flagship address, business hours, and social media channels shown across the storefront and footer.
+            </p>
+        </div>
+        <a href="{% url 'dashboard:contact_settings' %}" class="primary-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; padding: 12px 24px;">
+            <span>Edit Contact Information</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+    </div>
+</section>
+
+
 <section class="panel">
     <p class="eyebrow">Business profile</p>
     <h3>Store information</h3>

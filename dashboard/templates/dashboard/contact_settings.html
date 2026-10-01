@@ -1,0 +1,265 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Contact Information | Maison Moménto{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<section class="hero">
+    <div>
+        <p class="eyebrow">Maison Momènto · Settings → Contact Information</p>
+        <h1>Contact Information</h1>
+        <p class="subtitle">
+            Configure the Maison’s public contact coordinates, boutique hours, flagship location, and social links. Updates take effect immediately across the client-facing website and footer.
+        </p>
+    </div>
+</section>
+
+<!-- Sub-Navigation Tabs -->
+<div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+    <a href="{% url 'dashboard:settings' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        &larr; General Settings
+    </a>
+    <a href="{% url 'dashboard:contact_settings' %}" class="primary-btn" style="padding: 8px 20px; font-size: 12px; text-decoration: none; border-radius: var(--radius-pill);">
+        Contact Information
+    </a>
+</div>
+
+<!-- Feedback Messages -->
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 14px 20px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; {% if message.tags == 'error' %}background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;{% elif message.tags == 'warning' %}background: #fffbeb; color: #d97706; border: 1px solid #fde68a;{% else %}background: #f0fdf4; color: var(--chateau-green); border: 1px solid #bbf7d0;{% endif %}">
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if form.errors %}
+    <div style="padding: 16px 20px; border-radius: var(--radius-sm); background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; margin-bottom: 24px;">
+        <strong style="display: block; font-size: 13.5px; margin-bottom: 6px;">Please review the following input errors:</strong>
+        <ul style="margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6;">
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li><strong>{{ field|title }}:</strong> {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<form method="POST" action="{% url 'dashboard:contact_settings' %}" novalidate id="contact-settings-form">
+    {% csrf_token %}
+
+    <!-- Group 1: Business Identity -->
+    <section class="panel" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+            <div>
+                <p class="eyebrow" style="color: var(--chateau-green);">Identity</p>
+                <h3 style="margin: 0;">Business Identity</h3>
+            </div>
+            <span class="status in-stock" style="font-size: 10px; padding: 4px 10px;">Storefront Header & Footer</span>
+        </div>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 13px;">
+            The primary brand name displayed across client-facing pages, notifications, and legal copyright notices.
+        </p>
+
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="{{ form.business_name.id_for_label }}">Business Name *</label>
+                {{ form.business_name }}
+                {% if form.business_name.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.business_name.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Official business name displayed in navigation, contact page, and footer copyright.</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Group 2: Contact Channels -->
+    <section class="panel" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+            <div>
+                <p class="eyebrow" style="color: var(--chateau-green);">Direct Inquiries</p>
+                <h3 style="margin: 0;">Contact Channels</h3>
+            </div>
+            <span class="status packing" style="font-size: 10px; padding: 4px 10px;">Click-to-Call & Mailto</span>
+        </div>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 13px;">
+            Primary channels for customer service and bespoke fragrance consultations. Phone and email automatically generate interactive links on desktop and mobile.
+        </p>
+
+        <div class="form-grid">
+            <!-- Business Email -->
+            <div class="form-group">
+                <label for="{{ form.business_email.id_for_label }}">Business Email *</label>
+                {{ form.business_email }}
+                {% if form.business_email.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.business_email.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Generates a <code>mailto:</code> link on click.</small>
+            </div>
+
+            <!-- Primary Phone -->
+            <div class="form-group">
+                <label for="{{ form.primary_phone.id_for_label }}">Primary Phone Number *</label>
+                {{ form.primary_phone }}
+                {% if form.primary_phone.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.primary_phone.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Main contact phone. Generates a <code>tel:</code> link on click.</small>
+            </div>
+
+            <!-- Secondary Phone -->
+            <div class="form-group">
+                <label for="{{ form.secondary_phone.id_for_label }}">Secondary Phone Number (Optional)</label>
+                {{ form.secondary_phone }}
+                {% if form.secondary_phone.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.secondary_phone.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Alternative concierge phone. Displayed only if populated.</small>
+            </div>
+
+            <!-- WhatsApp Number -->
+            <div class="form-group">
+                <label for="{{ form.whatsapp_number.id_for_label }}">WhatsApp Number (Optional)</label>
+                {{ form.whatsapp_number }}
+                {% if form.whatsapp_number.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.whatsapp_number.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Include country code (e.g. +33 6 12 34 56 78). Generates direct WhatsApp chat link.</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Group 3: Social Media Channels -->
+    <section class="panel" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+            <div>
+                <p class="eyebrow" style="color: var(--chateau-green);">Presence</p>
+                <h3 style="margin: 0;">Social Media Channels</h3>
+            </div>
+            <span class="status in-stock" style="font-size: 10px; padding: 4px 10px;">Storefront & Footer Icons</span>
+        </div>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 13px;">
+            Icons appear dynamically in the Contact page and Footer only when a valid URL is provided. Twitter/X is never displayed by default.
+        </p>
+
+        <div class="form-grid">
+            <!-- Instagram -->
+            <div class="form-group">
+                <label for="{{ form.instagram_url.id_for_label }}">Instagram URL</label>
+                {{ form.instagram_url }}
+                {% if form.instagram_url.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.instagram_url.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Displayed in social icons on Contact page and Footer.</small>
+            </div>
+
+            <!-- Facebook -->
+            <div class="form-group">
+                <label for="{{ form.facebook_url.id_for_label }}">Facebook URL (Optional)</label>
+                {{ form.facebook_url }}
+                {% if form.facebook_url.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.facebook_url.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Renders Facebook icon when provided.</small>
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="form-group">
+                <label for="{{ form.linkedin_url.id_for_label }}">LinkedIn URL (Optional)</label>
+                {{ form.linkedin_url }}
+                {% if form.linkedin_url.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.linkedin_url.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Renders LinkedIn icon when provided.</small>
+            </div>
+
+            <!-- X / Twitter -->
+            <div class="form-group">
+                <label for="{{ form.twitter_url.id_for_label }}">X / Twitter URL (Optional)</label>
+                {{ form.twitter_url }}
+                {% if form.twitter_url.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.twitter_url.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Hidden by default. Renders only if explicitly configured.</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Group 4: Flagship Boutique & Address -->
+    <section class="panel" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+            <div>
+                <p class="eyebrow" style="color: var(--chateau-green);">Location</p>
+                <h3 style="margin: 0;">Flagship Boutique & Address</h3>
+            </div>
+            <span class="status packing" style="font-size: 10px; padding: 4px 10px;">Physical Presence</span>
+        </div>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 13px;">
+            Physical flagship address shown on the Contact page. Line breaks entered here will be preserved gracefully on the storefront.
+        </p>
+
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="{{ form.business_address.id_for_label }}">Boutique Physical Address *</label>
+                {{ form.business_address }}
+                {% if form.business_address.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.business_address.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Enter each line of the boutique address (e.g. Street, Postal Code & City, Country).</small>
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="{{ form.google_maps_url.id_for_label }}">Google Maps URL (Optional)</label>
+                {{ form.google_maps_url }}
+                {% if form.google_maps_url.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.google_maps_url.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Direct link allowing clients to open Google Maps to navigate to the boutique.</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Group 5: Business Hours -->
+    <section class="panel" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+            <div>
+                <p class="eyebrow" style="color: var(--chateau-green);">Availability</p>
+                <h3 style="margin: 0;">Business Hours</h3>
+            </div>
+            <span class="status in-stock" style="font-size: 10px; padding: 4px 10px;">Concierge Timetable</span>
+        </div>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 13px;">
+            Weekly concierge schedule and boutique opening times displayed on the Contact page. Each line corresponds to a schedule entry.
+        </p>
+
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="{{ form.business_hours.id_for_label }}">Operating Schedule *</label>
+                {{ form.business_hours }}
+                {% if form.business_hours.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ form.business_hours.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">e.g. Monday – Friday: 10:00 AM – 7:00 PM (CET)<br>Saturday: 11:00 AM – 5:00 PM (CET)<br>Sunday: Closed</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Action Bar -->
+    <div class="panel" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; background: var(--white); border-top: 2px solid var(--chateau-green); position: sticky; bottom: 16px; box-shadow: var(--shadow-hover); z-index: 10;">
+        <div style="font-size: 12px; color: var(--muted);">
+            Last updated: <strong style="color: var(--charcoal);">{{ contact_info.updated_at|date:"F j, Y, P"|default:"Never" }}</strong>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <a href="{% url 'contact' %}" target="_blank" style="padding: 11px 20px; font-size: 12.5px; font-weight: 500; color: var(--charcoal); text-decoration: none; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--ivory); transition: background var(--transition-fast);">
+                View Live Contact Page &nearr;
+            </a>
+            <button type="submit" class="primary-btn" style="padding: 12px 30px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                Save Contact Information
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}

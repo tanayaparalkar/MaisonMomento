@@ -132,6 +132,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "dashboard.context_processors.unread_admin_notifications",
+                "dashboard.context_processors.business_contact_info",
                 "apps.customers.context_processors.wishlist_data",
                 "apps.customers.context_processors.customer_notifications_data",
                 "apps.sales.context_processors.cart_data",

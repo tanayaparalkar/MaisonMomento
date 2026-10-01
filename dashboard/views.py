@@ -11,7 +11,10 @@ from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Sum
 from .decorators import staff_member_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import BusinessSettings
+from .forms import BusinessSettingsForm
 
 from apps.catalog.models import Product
 from apps.customers.models import Customer
@@ -270,3 +273,28 @@ def recommendations(request):
 @staff_member_required
 def settings(request):
     return render(request, "dashboard/settings.html")
+
+
+@staff_member_required
+def contact_settings(request):
+    """
+    Dedicated view for managing public contact information,
+    boutique hours, address, and social links.
+    """
+    instance = BusinessSettings.get_settings()
+
+    if request.method == "POST":
+        form = BusinessSettingsForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Contact information updated successfully. Changes are now live across the storefront.")
+            return redirect("dashboard:contact_settings")
+        else:
+            messages.error(request, "Please correct the errors indicated below.")
+    else:
+        form = BusinessSettingsForm(instance=instance)
+
+    return render(request, "dashboard/contact_settings.html", {
+        "form": form,
+        "contact_info": instance,
+    })

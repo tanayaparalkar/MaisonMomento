@@ -172,3 +172,122 @@ class VoucherForm(forms.ModelForm):
 
         return cleaned_data
 
+
+class BusinessSettingsForm(forms.ModelForm):
+    """
+    Form for editing centralized business contact and boutique information.
+    """
+    class Meta:
+        from .models import BusinessSettings
+        model = BusinessSettings
+        fields = [
+            "business_name",
+            "business_email",
+            "primary_phone",
+            "secondary_phone",
+            "whatsapp_number",
+            "instagram_url",
+            "business_address",
+            "business_hours",
+            "google_maps_url",
+            "facebook_url",
+            "linkedin_url",
+            "twitter_url",
+        ]
+        widgets = {
+            "business_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. Maison Moménto",
+            }),
+            "business_email": forms.EmailInput(attrs={
+                "class": "form-control",
+                "placeholder": "concierge@maisonmomento.com",
+            }),
+            "primary_phone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "+33 1 40 20 50 50",
+            }),
+            "secondary_phone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "+33 1 40 20 50 51 (optional)",
+            }),
+            "whatsapp_number": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "+33 6 12 34 56 78 (optional)",
+            }),
+            "instagram_url": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://instagram.com/maisonmomento",
+            }),
+            "facebook_url": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://facebook.com/maisonmomento (optional)",
+            }),
+            "linkedin_url": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://linkedin.com/company/maisonmomento (optional)",
+            }),
+            "twitter_url": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://x.com/maisonmomento (optional)",
+            }),
+            "business_address": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "15 Rue de la Paix\n75002 Paris\nFrance",
+            }),
+            "business_hours": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 4,
+                "placeholder": "Monday – Friday: 10:00 AM – 7:00 PM (CET)\nSaturday: 11:00 AM – 5:00 PM (CET)\nSunday: Closed",
+            }),
+            "google_maps_url": forms.URLInput(attrs={
+                "class": "form-control",
+                "placeholder": "https://maps.google.com/?q=... (optional)",
+            }),
+        }
+
+    def _normalize_url(self, field_name):
+        val = self.cleaned_data.get(field_name)
+        if val:
+            val = val.strip()
+            if val.startswith("http://") and not val.startswith("http://localhost") and not val.startswith("http://127.0.0.1"):
+                val = "https://" + val[7:]
+            elif not val.startswith(("http://", "https://")):
+                val = f"https://{val}"
+        return val
+
+    def clean_instagram_url(self):
+        return self._normalize_url("instagram_url")
+
+    def clean_google_maps_url(self):
+        return self._normalize_url("google_maps_url")
+
+    def clean_facebook_url(self):
+        return self._normalize_url("facebook_url")
+
+    def clean_linkedin_url(self):
+        return self._normalize_url("linkedin_url")
+
+    def clean_twitter_url(self):
+        return self._normalize_url("twitter_url")
+
+    def clean_business_name(self):
+        name = self.cleaned_data.get("business_name", "").strip()
+        if not name:
+            raise forms.ValidationError("Business Name is required.")
+        return name
+
+    def clean_business_email(self):
+        email = self.cleaned_data.get("business_email", "").strip()
+        if not email:
+            raise forms.ValidationError("Business Email is required.")
+        return email
+
+    def clean_primary_phone(self):
+        phone = self.cleaned_data.get("primary_phone", "").strip()
+        if not phone:
+            raise forms.ValidationError("Primary Phone Number is required.")
+        return phone
+
+

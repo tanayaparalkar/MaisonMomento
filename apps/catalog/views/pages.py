@@ -12,4 +12,8 @@ def about(request):
 
 
 def contact(request):
-    return render(request, "catalog/contact.html")
+    from dashboard.models import BusinessSettings
+    return render(request, "catalog/contact.html", {
+        "contact_info": BusinessSettings.get_settings(),
+    })
+
