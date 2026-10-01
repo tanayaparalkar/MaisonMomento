@@ -36,6 +36,11 @@
     </button>
 </section>
 
+<!-- Maison Discovery Collection Section (Appears immediately below Collections section and above Featured Fragrances / Products) -->
+{% if not is_quiz %}
+    {% include "catalog/includes/discovery_collection.html" %}
+{% endif %}
+
 <!-- Active Filters / Top Bar -->
 <!-- Active Filters / Top Bar -->
 <div class="sf-container" style="margin-bottom: 24px;">
@@ -147,6 +152,27 @@
                             View All Fragrances
                         </a>
                     </div>
+                </div>
+
+                <!-- Phase 3: Recommended Discovery Collection Banner for Quiz -->
+                <div class="sf-quiz-discovery-callout" style="background: #FAF5EE; border: 1.5px solid rgba(208, 155, 52, 0.35); border-radius: 18px; padding: 22px 26px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: 0 8px 24px rgba(13, 67, 77, 0.04);">
+                    <div style="flex: 1; min-width: 260px;">
+                        <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #D09B34; display: block; margin-bottom: 4px;">
+                            ✦ Bespoke Discovery Coffret &bull; Recommended For You
+                        </span>
+                        <h3 style="font-family: var(--font-display); font-size: 22px; color: #005441; margin: 0 0 4px 0; font-weight: 600;">
+                            Your Customised Discovery Collection is Ready
+                        </h3>
+                        <p style="font-size: 13.5px; color: #384A42; margin: 0; line-height: 1.5;">
+                            Experience your top recommendations in a handcrafted 4 &times; 2 ml Extrait coffret with an embossed tasting guide and ₹3,500 voucher credit.
+                        </p>
+                    </div>
+                    <a href="{% url 'catalog:discovery_collection' %}?scent_pref={{ quiz_answers.scent_pref|urlencode }}&vibe={{ quiz_answers.vibe|urlencode }}&wear_time={{ quiz_answers.wear_time|urlencode }}&notes={{ quiz_answers.notes|join:','|urlencode }}" 
+                       class="primary-btn" 
+                       style="background: #005441; color: #FFFFFF; padding: 13px 26px; border-radius: 999px; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;">
+                        <span>View Customised Coffret</span>
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
                 </div>
 
                 <div class="sf-grid">

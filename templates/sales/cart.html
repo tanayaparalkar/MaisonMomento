@@ -58,13 +58,47 @@
                 </div>
 
                 <!-- Order Summary -->
-                <div style="flex: 0 1 380px; background: var(--warm-beige); padding: 32px; position: sticky; top: 120px;">
+                <div style="flex: 0 1 380px; background: var(--warm-beige); padding: 32px; position: sticky; top: 120px; border-radius: 4px;">
                     <h3 style="font-family: var(--font-display); font-size: 24px; font-weight: 400; margin-bottom: 24px;">Order Summary</h3>
                     
+                    <!-- Voucher / Privilege Section -->
+                    <div class="sf-voucher-section" style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+                        <label for="sf-voucher-input" style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; color: var(--muted); margin-bottom: 8px;">
+                            Privilege / Voucher Code
+                        </label>
+                        
+                        <div id="sf-voucher-applied-box" style="display: {% if applied_voucher %}flex{% else %}none{% endif %}; margin-bottom: 8px; padding: 10px 14px; background: rgba(0, 84, 65, 0.08); border: 1px solid rgba(0, 84, 65, 0.25); border-radius: 6px; align-items: center; justify-content: space-between;">
+                            <div>
+                                <span style="font-size: 10px; color: #D09B34; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: block;">✦ Privilege Applied</span>
+                                <strong id="sf-applied-code-text" style="font-size: 13.5px; color: #005441;">{{ applied_voucher.code }}</strong>
+                                <span id="sf-applied-discount-text" style="font-size: 12px; color: var(--muted); margin-left: 6px;">({{ applied_voucher.get_discount_display }})</span>
+                            </div>
+                            <button type="button" id="sf-remove-voucher-btn" style="background: none; border: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #c92a2a; cursor: pointer; text-decoration: underline; font-weight: 600; padding: 4px;">
+                                Remove
+                            </button>
+                        </div>
+
+                        <div id="sf-voucher-input-box" style="display: {% if applied_voucher %}none{% else %}flex{% endif %}; gap: 8px;">
+                            <input type="text" id="sf-voucher-input" placeholder="e.g. MAISON10" style="flex: 1; padding: 9px 12px; font-family: var(--font-body); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid var(--border); border-radius: 4px; background: #FFFFFF; color: var(--charcoal);">
+                            <button type="button" id="sf-apply-voucher-btn" class="secondary-btn" style="padding: 0 16px; min-height: 38px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;">
+                                Apply
+                            </button>
+                        </div>
+
+                        <div id="sf-voucher-feedback" style="display: none; font-size: 12px; margin-top: 8px; line-height: 1.4; border-radius: 4px; padding: 8px 12px;"></div>
+                    </div>
+
                     <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
                         <span style="color: var(--charcoal-soft);">Subtotal (<span class="sf-summary-items">{{ cart.total_items }}</span> items)</span>
                         <span class="sf-summary-subtotal">₹{{ cart.subtotal }}</span>
                     </div>
+
+                    <!-- Discount Row -->
+                    <div id="sf-discount-row" style="display: {% if applied_voucher and discount_amount != '0.00' %}flex{% else %}none{% endif %}; justify-content: space-between; margin-bottom: 16px; font-size: 15px; color: #005441; font-weight: 500;">
+                        <span>Privilege Discount (<span id="sf-discount-code-label">{{ applied_voucher.code }}</span>)</span>
+                        <span id="sf-discount-amount-display">-₹{{ discount_amount }}</span>
+                    </div>
+
                     <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
                         <span style="color: var(--charcoal-soft);">Shipping</span>
                         <span style="color: var(--muted);">Calculated at checkout</span>
@@ -78,7 +112,7 @@
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 32px; font-size: 18px; font-weight: 600;">
                         <span>Estimated Total</span>
-                        <span class="sf-summary-total">₹{{ cart.subtotal }}</span>
+                        <span class="sf-summary-total">₹{{ total_with_discount }}</span>
                     </div>
                     
                     <a href="{% url 'sales:checkout' %}" class="primary-btn sf-btn-large" style="display: flex; align-items: center; justify-content: center; width: 100%; text-decoration: none; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">
@@ -87,6 +121,117 @@
                     <p style="text-align: center; font-size: 11px; color: var(--muted); margin-top: 14px; letter-spacing: 0.05em;">Complimentary secure insured delivery included.</p>
                 </div>
             </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const voucherInput = document.getElementById('sf-voucher-input');
+                const applyBtn = document.getElementById('sf-apply-voucher-btn');
+                const removeBtn = document.getElementById('sf-remove-voucher-btn');
+                const appliedBox = document.getElementById('sf-voucher-applied-box');
+                const inputBox = document.getElementById('sf-voucher-input-box');
+                const feedback = document.getElementById('sf-voucher-feedback');
+                const appliedCodeText = document.getElementById('sf-applied-code-text');
+                const appliedDiscountText = document.getElementById('sf-applied-discount-text');
+                const discountRow = document.getElementById('sf-discount-row');
+                const discountCodeLabel = document.getElementById('sf-discount-code-label');
+                const discountAmountDisplay = document.getElementById('sf-discount-amount-display');
+                const totalDisplay = document.querySelector('.sf-summary-total');
+
+                const showFeedback = (msg, isError) => {
+                    feedback.style.display = 'block';
+                    feedback.textContent = msg;
+                    if (isError) {
+                        feedback.style.background = '#fef2f2';
+                        feedback.style.color = '#b91c1c';
+                        feedback.style.border = '1px solid #fecaca';
+                    } else {
+                        feedback.style.background = 'rgba(0, 84, 65, 0.08)';
+                        feedback.style.color = '#005441';
+                        feedback.style.border = '1px solid rgba(0, 84, 65, 0.2)';
+                    }
+                };
+
+                const applyVoucher = () => {
+                    const code = voucherInput.value.trim();
+                    if (!code) {
+                        showFeedback('Please enter a voucher code.', true);
+                        return;
+                    }
+                    applyBtn.disabled = true;
+                    applyBtn.textContent = 'Applying...';
+
+                    fetch("{% url 'sales:apply_voucher' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ code: code })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        applyBtn.disabled = false;
+                        applyBtn.textContent = 'Apply';
+                        if (data.success) {
+                            showFeedback(data.message, false);
+                            appliedCodeText.textContent = data.code;
+                            appliedDiscountText.textContent = `(${data.discount_display})`;
+                            appliedBox.style.display = 'flex';
+                            inputBox.style.display = 'none';
+
+                            discountRow.style.display = 'flex';
+                            discountCodeLabel.textContent = data.code;
+                            discountAmountDisplay.textContent = `-₹${data.discount_amount}`;
+                            if (totalDisplay) totalDisplay.textContent = `₹${data.total}`;
+                        } else {
+                            showFeedback(data.error || 'Failed to apply voucher.', true);
+                        }
+                    })
+                    .catch(err => {
+                        applyBtn.disabled = false;
+                        applyBtn.textContent = 'Apply';
+                        showFeedback('An unexpected error occurred. Please try again.', true);
+                    });
+                };
+
+                const removeVoucher = () => {
+                    removeBtn.disabled = true;
+                    fetch("{% url 'sales:remove_voucher' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        removeBtn.disabled = false;
+                        appliedBox.style.display = 'none';
+                        inputBox.style.display = 'flex';
+                        voucherInput.value = '';
+                        feedback.style.display = 'none';
+                        discountRow.style.display = 'none';
+                        if (totalDisplay) totalDisplay.textContent = `₹${data.total}`;
+                    })
+                    .catch(err => {
+                        removeBtn.disabled = false;
+                    });
+                };
+
+                if (applyBtn) applyBtn.addEventListener('click', applyVoucher);
+                if (voucherInput) {
+                    voucherInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            applyVoucher();
+                        }
+                    });
+                }
+                if (removeBtn) removeBtn.addEventListener('click', removeVoucher);
+            });
+            </script>
         {% else %}
             <!-- Premium Empty State -->
             <div class="sf-empty-state" style="text-align: center; padding: 80px 24px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm);">

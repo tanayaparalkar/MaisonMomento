@@ -1,0 +1,1360 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Maison Discovery Collection | Bespoke Fragrance Coffret | Maison Moménto Parfumeur{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<div class="sf-container" style="padding-top: 24px; padding-bottom: 12px;">
+    <nav class="sf-breadcrumbs" aria-label="Breadcrumb navigation">
+        <ol style="display: flex; align-items: center; gap: 8px; list-style: none; padding: 0; margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted);">
+            <li><a href="{% url 'home' %}" style="color: var(--muted); text-decoration: none; transition: color 200ms;">Home</a></li>
+            <li aria-hidden="true" style="color: var(--border-strong);">&bull;</li>
+            <li><a href="{% url 'catalog:product_list' %}" style="color: var(--muted); text-decoration: none; transition: color 200ms;">Fragrances</a></li>
+            <li aria-hidden="true" style="color: var(--border-strong);">&bull;</li>
+            <li style="color: var(--charcoal); font-weight: 600;">Maison Discovery Collection</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- ==========================================================================
+     PHASE 2 & PHASE 3: DEDICATED DISCOVERY COLLECTION PRODUCT DETAIL HERO
+     ========================================================================== -->
+<div class="sf-container" style="padding-bottom: 80px;">
+    <div class="mm-discovery-pdp">
+        <div class="mm-pdp-layout">
+
+            <!-- LEFT COLUMN: Sticky Image Gallery & Coffret Presentation -->
+            <div class="mm-pdp-gallery-col">
+                <div class="mm-gallery-sticky">
+                    <!-- Main Hero Image Frame -->
+                    <div class="mm-main-image-frame" id="main-coffret-frame">
+                        <img src="{% static 'images/maison_discovery_set.jpg' %}" 
+                             alt="Maison Moménto Discovery Collection Presentation Coffret" 
+                             class="mm-main-coffret-img" 
+                             id="main-coffret-image"
+                             width="1200" 
+                             height="900">
+                        <div class="mm-image-badge">
+                            <span>✦ Bespoke 4 × 2 ml Extrait Coffret</span>
+                        </div>
+                    </div>
+
+                    <!-- Luxury Assurances Strip -->
+                    <div class="mm-assurances-strip">
+                        <div class="mm-assurance-item">
+                            <span class="mm-assurance-icon">✦</span>
+                            <span>Handcrafted in Grasse &amp; Paris</span>
+                        </div>
+                        <div class="mm-assurance-item">
+                            <span class="mm-assurance-icon">✓</span>
+                            <span>100% Redeemable Voucher</span>
+                        </div>
+                        <div class="mm-assurance-item">
+                            <span class="mm-assurance-icon">✦</span>
+                            <span>Complimentary Signature Delivery</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Luxury Editorial Info & Personalised Curation -->
+            <div class="mm-pdp-info-col">
+                
+                <!-- Category Eyebrow & Rating -->
+                <div class="mm-pdp-meta-top">
+                    <span class="mm-pdp-eyebrow">✦ L'Atelier Découverte &bull; Haute Parfumerie</span>
+                    <div class="mm-pdp-rating-badge">
+                        <span class="mm-stars" aria-hidden="true">★★★★★</span>
+                        <span class="mm-rating-score">4.9</span>
+                        <span class="mm-rating-count">(148 Reviews)</span>
+                    </div>
+                </div>
+
+                <!-- Product Title -->
+                <h1 class="mm-pdp-title">Maison Discovery Collection</h1>
+
+                <!-- Price & Voucher Callout -->
+                <div class="mm-pdp-price-wrap">
+                    <div class="mm-pdp-price">
+                        <span class="mm-currency-symbol">₹</span>3,500.00
+                    </div>
+                    <div class="mm-voucher-highlight-pill">
+                        <span class="mm-voucher-check">✓</span>
+                        <span>Includes ₹3,500 Redeemable Credit Voucher</span>
+                    </div>
+                </div>
+
+                <!-- Poetic Luxury Description -->
+                <p class="mm-pdp-description">
+                    An intimate prelude to Maison Moménto. Experience four handcrafted 2 ml Extrait de Parfum 
+                    flacons at your own tempo, accompanied by an embossed fragrance tasting guide and a ₹3,500 voucher 
+                    credited toward your chosen full-size masterpiece.
+                </p>
+
+                <!-- ==========================================================
+                     PHASE 3: CONSULTATION QUIZ RESULTS & CURATED PRE-SELECTION
+                     ========================================================== -->
+                <div class="mm-consultation-box" id="consultation-box">
+                    <div class="mm-consultation-header">
+                        <div class="mm-consultation-title-wrap">
+                            <span class="mm-consultation-kicker">✦ Personalised Fragrance Consultation</span>
+                            <h3 class="mm-consultation-curation-name">{{ curation_data.title }}</h3>
+                            <p class="mm-consultation-curation-desc">{{ curation_data.description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Profile Filter Chips & Quick Switcher -->
+                    <div class="mm-profile-switcher-wrap">
+                        <span class="mm-profile-switcher-label">Consultation Profile:</span>
+                        <div class="mm-profile-chips">
+                            {% for opt in curation_options %}
+                            <a href="?preset={{ opt.key }}" 
+                               class="mm-profile-chip {% if opt.is_active %}is-active{% endif %}"
+                               title="{{ opt.sub }}">
+                                <span>{{ opt.label }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- The 4 Pre-Selected Miniature Flacons -->
+                    <div class="mm-flacons-header">
+                        <span class="mm-flacons-count">Your 4 Curated Flacons:</span>
+                        <span class="mm-flacons-subtext">Each flacon is 2 ml Extrait de Parfum (30% concentration)</span>
+                    </div>
+
+                    <div class="mm-flacons-grid" id="preselected-flacons-grid">
+                        {% for item in selected_fragrances %}
+                        <div class="mm-flacon-card">
+                            <div class="mm-flacon-img-wrap">
+                                {% if item.primary_image %}
+                                    <img src="{{ item.primary_image.image.url }}" alt="{{ item.name }}" class="mm-flacon-thumbnail" loading="lazy">
+                                {% else %}
+                                    <img src="{% static 'images/maison_discovery_set.jpg' %}" alt="{{ item.name }}" class="mm-flacon-thumbnail" loading="lazy">
+                                {% endif %}
+                                <span class="mm-flacon-slot-num">0{{ forloop.counter }}</span>
+                            </div>
+                            <div class="mm-flacon-info">
+                                <div class="mm-flacon-family">{{ item.get_fragrance_family_display|default:item.category.name|upper }}</div>
+                                <h4 class="mm-flacon-name">{{ item.name }}</h4>
+                                <div class="mm-flacon-accords">
+                                    <span class="mm-accord-pill">2 ml Extrait</span>
+                                    <span class="mm-accord-dot">&bull;</span>
+                                    <span class="mm-accord-fullprice">Full: ₹{{ item.effective_price|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'catalog:product_detail' item.pk %}" class="mm-flacon-link" target="_blank" title="Explore full-size fragrance details">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- ==========================================================
+                     ADD TO BAG & PURCHASE CONTROLS
+                     ========================================================== -->
+                <div class="mm-purchase-actions">
+                    <div class="mm-qty-picker" aria-label="Select Quantity">
+                        <button type="button" class="mm-qty-btn" id="qty-minus" onclick="adjustQty(-1)" aria-label="Decrease quantity">&minus;</button>
+                        <span class="mm-qty-val" id="qty-display">1</span>
+                        <button type="button" class="mm-qty-btn" id="qty-plus" onclick="adjustQty(1)" aria-label="Increase quantity">&plus;</button>
+                    </div>
+
+                    <button type="button" 
+                            class="mm-pdp-add-btn sf-add-to-cart" 
+                            id="discovery-add-to-cart-btn"
+                            data-product="{{ product.id }}"
+                            onclick="handleDiscoveryAddToCart(this)">
+                        <span class="mm-add-btn-icon">✦</span>
+                        <span class="mm-add-btn-text">Add Customised Discovery Collection to Bag &bull; ₹3,500</span>
+                    </button>
+                </div>
+
+                <!-- Toast feedback message -->
+                <div class="mm-add-feedback" id="discovery-add-feedback" style="display: none;">
+                    <div class="mm-feedback-icon">✓</div>
+                    <div class="mm-feedback-content">
+                        <strong>Discovery Collection Added to Bag</strong>
+                        <span>Your 4 curated Extrait flacons and ₹3,500 voucher are waiting in your bag.</span>
+                    </div>
+                    <a href="{% url 'sales:cart' %}" class="mm-feedback-link">View Bag &rarr;</a>
+                </div>
+
+                <!-- ==========================================================
+                     WHAT'S INCLUDED & HOW IT WORKS ACCORDION
+                     ========================================================== -->
+                <div class="mm-details-accordion">
+                    
+                    <!-- What's Included -->
+                    <div class="mm-accordion-item is-open">
+                        <div class="mm-accordion-trigger">
+                            <span class="mm-accordion-title">What's Included</span>
+                        </div>
+                        <div class="mm-accordion-body">
+                            <ul class="mm-included-list">
+                                <li class="mm-included-row">
+                                    <span class="mm-included-badge">✦</span>
+                                    <div class="mm-included-text">
+                                        <strong>4 &times; 2 ml Extrait de Parfum</strong>
+                                        <p>Hand-poured miniature flacons at a rare 30% fragrance oil concentration, each equipped with precision gold vaporisateur atomizers.</p>
+                                    </div>
+                                </li>
+                                <li class="mm-included-row">
+                                    <span class="mm-included-badge">✦</span>
+                                    <div class="mm-included-text">
+                                        <strong>Fragrance Guide</strong>
+                                        <p>An embossed tasting booklet detailing top, heart, and base notes, ideal wear occasions, and bespoke layering accords.</p>
+                                    </div>
+                                </li>
+                                <li class="mm-included-row">
+                                    <span class="mm-included-badge">✦</span>
+                                    <div class="mm-included-text">
+                                        <strong>Redeemable Voucher</strong>
+                                        <p>An official ₹3,500 voucher card enclosed in your coffret. Apply the code at checkout toward your first 100 ml flacon.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- How It Works -->
+                    <div class="mm-accordion-item is-open">
+                        <div class="mm-accordion-trigger">
+                            <span class="mm-accordion-title">How It Works</span>
+                        </div>
+                        <div class="mm-accordion-body">
+                            <div class="mm-steps-grid">
+                                <div class="mm-step-card">
+                                    <span class="mm-step-number">1</span>
+                                    <h4 class="mm-step-title">Experience</h4>
+                                    <p class="mm-step-desc">Experience four curated fragrances over several days and evenings in your natural rituals.</p>
+                                </div>
+                                <div class="mm-step-card">
+                                    <span class="mm-step-number">2</span>
+                                    <h4 class="mm-step-title">Discover</h4>
+                                    <p class="mm-step-desc">Discover your favourite signature scent as each complex accord unfolds on your skin.</p>
+                                </div>
+                                <div class="mm-step-card">
+                                    <span class="mm-step-number">3</span>
+                                    <h4 class="mm-step-title">Redeem</h4>
+                                    <p class="mm-step-desc">Redeem the Discovery Collection value (₹3,500) toward your chosen full-size 100 ml bottle.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     RELATED FULL-SIZE FRAGRANCES SECTION
+     Features the 4 exact full-size bottles that correspond to this coffret!
+     ========================================================================== -->
+<section class="sf-section sf-fade-up" style="background: #FAF5EE; padding: 84px 0; border-top: 1px solid rgba(208, 155, 52, 0.2);">
+    <div class="sf-container">
+        <div class="sf-section-header" style="text-align: left; margin-bottom: 44px;">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 600; color: #D09B34; margin-bottom: 8px;">
+                ✦ Full-Size Flacons In Your Curation
+            </div>
+            <h2 style="font-family: var(--font-display); font-size: clamp(28px, 3.5vw, 42px); color: #005441; margin-bottom: 12px; font-weight: 500;">
+                Related Full-Size Fragrances
+            </h2>
+            <p style="color: #4A5E52; font-size: 15.5px; max-width: 640px; line-height: 1.6;">
+                Fall in love with your 2 ml discovery flacons, then apply your <strong>₹3,500 voucher credit</strong> to acquire the signature 100 ml edition.
+            </p>
+        </div>
+
+        <div class="mm-related-grid">
+            {% for prod in selected_fragrances %}
+            <div class="mm-related-card">
+                <div class="mm-related-img-frame">
+                    {% if prod.primary_image %}
+                        <img src="{{ prod.primary_image.image.url }}" alt="{{ prod.name }}" class="mm-related-img" loading="lazy">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=800&auto=format&fit=crop" alt="{{ prod.name }}" class="mm-related-img" loading="lazy">
+                    {% endif %}
+                    <span class="mm-related-voucher-tag">₹3,500 Voucher Applicable</span>
+                </div>
+                <div class="mm-related-content">
+                    <span class="mm-related-family">{{ prod.get_fragrance_family_display|default:prod.category.name|upper }}</span>
+                    <h3 class="mm-related-title">
+                        <a href="{% url 'catalog:product_detail' prod.pk %}" style="color: inherit; text-decoration: none;">
+                            {{ prod.name }}
+                        </a>
+                    </h3>
+                    <div class="mm-related-pricing">
+                        <span class="mm-related-fullprice">₹{{ prod.effective_price|floatformat:0 }}</span>
+                        <span class="mm-related-aftervoucher">Voucher Price: ₹{{ prod.effective_price|add:"-3500"|floatformat:0 }}</span>
+                    </div>
+                    <div class="mm-related-actions">
+                        <a href="{% url 'catalog:product_detail' prod.pk %}" class="mm-related-view-btn">
+                            Explore Fragrance &rarr;
+                        </a>
+                        <button type="button" class="mm-related-add-btn sf-add-to-cart" data-product="{{ prod.id }}">
+                            Add Full-Size
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     CONNOISSEUR REVIEWS SECTION
+     ========================================================================== -->
+<section class="sf-section" style="background: var(--ivory-silk, #F5EDE1); padding: 84px 0; border-top: 1px solid rgba(208, 155, 52, 0.18);">
+    <div class="sf-container">
+        
+        <!-- Header -->
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-bottom: 52px;">
+            <div>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 600; color: #D09B34; display: block; margin-bottom: 8px;">
+                    ✦ Connoisseur Impressions
+                </span>
+                <h2 style="font-family: var(--font-display); font-size: clamp(28px, 3.2vw, 40px); color: #005441; margin: 0; font-weight: 500;">
+                    Client Reviews &amp; Reflections
+                </h2>
+            </div>
+            <div style="display: flex; align-items: center; gap: 14px; background: rgba(255, 255, 255, 0.6); padding: 12px 24px; border-radius: 999px; border: 1px solid rgba(208, 155, 52, 0.3);">
+                <span style="color: #D09B34; font-size: 18px;">★★★★★</span>
+                <span style="font-weight: 700; color: #005441; font-size: 15px;">{{ average_rating }} out of 5</span>
+                <span style="color: #7A8C80; font-size: 13px;">({{ review_count }} Verified Collectors)</span>
+            </div>
+        </div>
+
+        <!-- Reviews Grid -->
+        <div class="mm-reviews-grid">
+            {% for r in reviews %}
+            <div class="mm-review-card">
+                <div class="mm-review-top">
+                    <span class="mm-review-stars">★★★★★</span>
+                    <span class="mm-review-date">{{ r.date }}</span>
+                </div>
+                <h4 class="mm-review-title">&ldquo;{{ r.title }}&rdquo;</h4>
+                <p class="mm-review-text">{{ r.text }}</p>
+                <div class="mm-review-author-wrap">
+                    <div class="mm-author-avatar">{{ r.author|slice:":1" }}</div>
+                    <div>
+                        <div class="mm-author-name">{{ r.author }}</div>
+                        <div class="mm-author-location">{{ r.location }} &bull; <span style="color: #005441; font-weight: 600;">Verified Collector</span></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<!-- ==========================================================================
+     SCOPED LUXURY STYLES FOR DISCOVERY PDP
+     ========================================================================== -->
+<style>
+    /* Main Layout Grid */
+    .mm-discovery-pdp {
+        width: 100%;
+        margin-top: 12px;
+    }
+
+    .mm-pdp-layout {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: clamp(48px, 5.5vw, 84px);
+    }
+
+    .mm-pdp-gallery-col {
+        flex: 1 1 48%;
+        position: relative;
+    }
+
+    .mm-gallery-sticky {
+        position: sticky;
+        top: 110px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .mm-main-image-frame {
+        position: relative;
+        width: 100%;
+        border-radius: 24px;
+        overflow: hidden;
+        background: #FAF5EE;
+        border: 1px solid rgba(208, 155, 52, 0.28);
+        box-shadow: 0 28px 70px rgba(13, 67, 77, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+    }
+
+    .mm-main-coffret-img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        display: block;
+        transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mm-main-image-frame:hover .mm-main-coffret-img {
+        transform: scale(1.03);
+    }
+
+    .mm-image-badge {
+        position: absolute;
+        bottom: 18px;
+        left: 18px;
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 8px 16px;
+        border-radius: 999px;
+        font-family: var(--font-body);
+        font-size: 11.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: #005441;
+        border: 1px solid rgba(208, 155, 52, 0.35);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .mm-assurances-strip {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid rgba(208, 155, 52, 0.2);
+        border-radius: 14px;
+        padding: 14px 20px;
+        gap: 12px;
+    }
+
+    .mm-assurance-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #2D3A30;
+    }
+
+    .mm-assurance-icon {
+        color: #D09B34;
+        font-size: 12px;
+    }
+
+    /* Right Column: Info */
+    .mm-pdp-info-col {
+        flex: 1 1 52%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mm-pdp-meta-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .mm-pdp-eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: #D09B34;
+    }
+
+    .mm-pdp-rating-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+    }
+
+    .mm-stars {
+        color: #D09B34;
+        letter-spacing: 1px;
+    }
+
+    .mm-rating-score {
+        font-weight: 700;
+        color: #005441;
+    }
+
+    .mm-rating-count {
+        color: #7A8C80;
+    }
+
+    .mm-pdp-title {
+        font-family: var(--font-display, "Cormorant Garamond", Georgia, serif);
+        font-size: clamp(34px, 3.8vw, 48px);
+        font-weight: 500;
+        line-height: 1.15;
+        color: #005441;
+        margin: 0 0 18px 0;
+    }
+
+    .mm-pdp-price-wrap {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .mm-pdp-price {
+        font-family: var(--font-display);
+        font-size: 32px;
+        font-weight: 600;
+        color: #0D434D;
+    }
+
+    .mm-currency-symbol {
+        font-family: Arial, sans-serif;
+        font-weight: 400;
+        margin-right: 2px;
+    }
+
+    .mm-voucher-highlight-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(208, 155, 52, 0.14);
+        border: 1px solid rgba(208, 155, 52, 0.4);
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #8C6215;
+    }
+
+    .mm-voucher-check {
+        font-size: 12px;
+        color: #005441;
+    }
+
+    .mm-pdp-description {
+        font-size: 15.5px;
+        line-height: 1.75;
+        color: #384A42;
+        margin: 0 0 28px 0;
+    }
+
+    /* Consultation Pre-selection Box */
+    .mm-consultation-box {
+        background: #FFFFFF;
+        border: 1.5px solid rgba(208, 155, 52, 0.35);
+        border-radius: 20px;
+        padding: 26px 28px;
+        margin-bottom: 30px;
+        box-shadow: 0 12px 34px rgba(13, 67, 77, 0.05);
+    }
+
+    .mm-consultation-kicker {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #D09B34;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .mm-consultation-curation-name {
+        font-family: var(--font-display);
+        font-size: 24px;
+        color: #005441;
+        margin: 0 0 6px 0;
+        font-weight: 600;
+    }
+
+    .mm-consultation-curation-desc {
+        font-size: 13.5px;
+        color: #4A5E52;
+        margin: 0 0 20px 0;
+        line-height: 1.55;
+    }
+
+    /* Profile Switcher Chips */
+    .mm-profile-switcher-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(208, 155, 52, 0.16);
+        margin-bottom: 22px;
+    }
+
+    .mm-profile-switcher-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+        color: #7A8C80;
+    }
+
+    .mm-profile-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .mm-profile-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 14px;
+        border-radius: 999px;
+        background: #FAF5EE;
+        border: 1px solid rgba(208, 155, 52, 0.3);
+        color: #2D3A30;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 200ms ease;
+    }
+
+    .mm-profile-chip:hover {
+        border-color: #005441;
+        color: #005441;
+        background: #FFFFFF;
+    }
+
+    .mm-profile-chip.is-active {
+        background: #005441;
+        border-color: #005441;
+        color: #FFFFFF !important;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 84, 65, 0.2);
+    }
+
+    /* Flacons Header */
+    .mm-flacons-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 14px;
+    }
+
+    .mm-flacons-count {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #0D434D;
+    }
+
+    .mm-flacons-subtext {
+        font-size: 11.5px;
+        color: #7A8C80;
+    }
+
+    /* Flacons Grid */
+    .mm-flacons-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .mm-flacon-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #FAF5EE;
+        border: 1px solid rgba(208, 155, 52, 0.25);
+        border-radius: 12px;
+        padding: 10px 12px;
+        position: relative;
+        transition: border-color 200ms ease, background-color 200ms ease;
+    }
+
+    .mm-flacon-card:hover {
+        border-color: #D09B34;
+        background: #FFFFFF;
+    }
+
+    .mm-flacon-img-wrap {
+        position: relative;
+        width: 44px;
+        height: 52px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #FFFFFF;
+        flex-shrink: 0;
+        border: 1px solid rgba(208, 155, 52, 0.15);
+    }
+
+    .mm-flacon-thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .mm-flacon-slot-num {
+        position: absolute;
+        bottom: 2px;
+        left: 2px;
+        font-size: 8.5px;
+        font-weight: 700;
+        color: #D09B34;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 1px 3px;
+        border-radius: 4px;
+    }
+
+    .mm-flacon-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .mm-flacon-family {
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        color: #D09B34;
+        margin-bottom: 2px;
+    }
+
+    .mm-flacon-name {
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 600;
+        color: #005441;
+        margin: 0 0 3px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mm-flacon-accords {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        color: #6C7A74;
+    }
+
+    .mm-accord-pill {
+        font-weight: 600;
+        color: #0D434D;
+    }
+
+    .mm-flacon-link {
+        color: #7A8C80;
+        display: inline-flex;
+        padding: 6px;
+        border-radius: 6px;
+        transition: color 200ms ease;
+    }
+
+    .mm-flacon-link:hover {
+        color: #005441;
+    }
+
+    /* Purchase Action Controls */
+    .mm-purchase-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .mm-qty-picker {
+        display: flex;
+        align-items: center;
+        border: 1px solid rgba(208, 155, 52, 0.4);
+        border-radius: 999px;
+        background: #FFFFFF;
+        padding: 4px;
+    }
+
+    .mm-qty-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: #005441;
+        font-size: 16px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 150ms ease;
+    }
+
+    .mm-qty-btn:hover {
+        background: #FAF5EE;
+    }
+
+    .mm-qty-val {
+        min-width: 32px;
+        text-align: center;
+        font-weight: 700;
+        color: #0D434D;
+        font-size: 14px;
+    }
+
+    .mm-pdp-add-btn {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #005441;
+        color: #FFFFFF !important;
+        font-family: var(--font-body);
+        font-size: 12.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        border: 1px solid #005441;
+        padding: 16px 28px;
+        border-radius: 999px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(0, 84, 65, 0.25), 0 0 0 1px rgba(208, 155, 52, 0.25);
+        transition: transform 250ms ease, background 250ms ease, box-shadow 250ms ease;
+    }
+
+    .mm-pdp-add-btn:hover {
+        background: #0D434D;
+        border-color: #D09B34;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(13, 67, 77, 0.32), 0 0 0 1px rgba(208, 155, 52, 0.4);
+    }
+
+    .mm-add-btn-icon {
+        color: #D09B34;
+    }
+
+    /* Feedback Banner */
+    .mm-add-feedback {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: #FAF5EE;
+        border: 1.5px solid #005441;
+        padding: 14px 20px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        animation: mmFadeUp 300ms ease;
+    }
+
+    @keyframes mmFadeUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mm-feedback-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #005441;
+        color: #FFFFFF;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .mm-feedback-content {
+        flex: 1;
+        font-size: 13px;
+        color: #2D3A30;
+    }
+
+    .mm-feedback-content strong {
+        display: block;
+        color: #005441;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .mm-feedback-link {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #005441;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        white-space: nowrap;
+    }
+
+    /* Accordion Details */
+    .mm-details-accordion {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 10px;
+    }
+
+    .mm-accordion-item {
+        border: 1px solid rgba(208, 155, 52, 0.25);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.65);
+        overflow: hidden;
+    }
+
+    .mm-accordion-trigger {
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.85);
+        border-bottom: 1px solid rgba(208, 155, 52, 0.15);
+    }
+
+    .mm-accordion-title {
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 600;
+        color: #005441;
+    }
+
+    .mm-accordion-body {
+        padding: 20px 22px;
+    }
+
+    /* What's Included Rows */
+    .mm-included-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .mm-included-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .mm-included-badge {
+        color: #D09B34;
+        font-size: 14px;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+    .mm-included-text strong {
+        font-size: 14px;
+        color: #0D434D;
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    .mm-included-text p {
+        font-size: 13px;
+        color: #4A5E52;
+        margin: 0;
+        line-height: 1.55;
+    }
+
+    /* How It Works Steps Grid */
+    .mm-steps-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .mm-step-card {
+        background: #FAF5EE;
+        border-radius: 12px;
+        padding: 18px 16px;
+        border: 1px solid rgba(208, 155, 52, 0.2);
+    }
+
+    .mm-step-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #005441;
+        color: #FFFFFF;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .mm-step-title {
+        font-family: var(--font-display);
+        font-size: 16px;
+        color: #005441;
+        margin: 0 0 6px 0;
+        font-weight: 600;
+    }
+
+    .mm-step-desc {
+        font-size: 12px;
+        color: #4A5E52;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* Related Full-Size Fragrances Grid */
+    .mm-related-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
+
+    .mm-related-card {
+        background: #FFFFFF;
+        border: 1px solid rgba(208, 155, 52, 0.22);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform 250ms ease, box-shadow 250ms ease;
+    }
+
+    .mm-related-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 36px rgba(13, 67, 77, 0.08);
+    }
+
+    .mm-related-img-frame {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1;
+        background: #FAF5EE;
+        overflow: hidden;
+    }
+
+    .mm-related-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 500ms ease;
+    }
+
+    .mm-related-card:hover .mm-related-img {
+        transform: scale(1.04);
+    }
+
+    .mm-related-voucher-tag {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(8px);
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #005441;
+        border: 1px solid rgba(208, 155, 52, 0.35);
+    }
+
+    .mm-related-content {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .mm-related-family {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        color: #D09B34;
+        margin-bottom: 4px;
+    }
+
+    .mm-related-title {
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 600;
+        color: #005441;
+        margin: 0 0 10px 0;
+        line-height: 1.3;
+    }
+
+    .mm-related-pricing {
+        margin-bottom: 14px;
+    }
+
+    .mm-related-fullprice {
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 700;
+        color: #0D434D;
+        display: block;
+    }
+
+    .mm-related-aftervoucher {
+        font-size: 11px;
+        font-weight: 600;
+        color: #8C6215;
+    }
+
+    .mm-related-actions {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .mm-related-view-btn {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #005441;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 200ms ease;
+    }
+
+    .mm-related-view-btn:hover {
+        color: #D09B34;
+    }
+
+    .mm-related-add-btn {
+        background: #FAF5EE;
+        border: 1px solid rgba(0, 84, 65, 0.3);
+        color: #005441;
+        padding: 9px 14px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        transition: all 200ms ease;
+    }
+
+    .mm-related-add-btn:hover {
+        background: #005441;
+        color: #FFFFFF;
+        border-color: #005441;
+    }
+
+    /* Reviews Grid */
+    .mm-reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    .mm-review-card {
+        background: #FFFFFF;
+        border: 1px solid rgba(208, 155, 52, 0.22);
+        border-radius: 18px;
+        padding: 28px 24px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mm-review-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+    }
+
+    .mm-review-stars {
+        color: #D09B34;
+        font-size: 14px;
+        letter-spacing: 2px;
+    }
+
+    .mm-review-date {
+        font-size: 11px;
+        color: #7A8C80;
+    }
+
+    .mm-review-title {
+        font-family: var(--font-display);
+        font-size: 19px;
+        font-weight: 600;
+        color: #005441;
+        margin: 0 0 10px 0;
+        line-height: 1.35;
+    }
+
+    .mm-review-text {
+        font-size: 13.5px;
+        line-height: 1.65;
+        color: #384A42;
+        margin: 0 0 20px 0;
+        flex: 1;
+    }
+
+    .mm-review-author-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(208, 155, 52, 0.15);
+    }
+
+    .mm-author-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #FAF5EE;
+        border: 1px solid #D09B34;
+        color: #005441;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .mm-author-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: #0D434D;
+    }
+
+    .mm-author-location {
+        font-size: 11px;
+        color: #7A8C80;
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 1024px) {
+        .mm-pdp-layout {
+            flex-direction: column;
+        }
+        .mm-gallery-sticky {
+            position: static;
+        }
+        .mm-related-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .mm-reviews-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .mm-flacons-grid {
+            grid-template-columns: 1fr;
+        }
+        .mm-steps-grid {
+            grid-template-columns: 1fr;
+        }
+        .mm-related-grid {
+            grid-template-columns: 1fr;
+        }
+        .mm-purchase-actions {
+            flex-direction: column;
+        }
+        .mm-qty-picker {
+            width: 100%;
+            justify-content: space-between;
+        }
+        .mm-pdp-add-btn {
+            width: 100%;
+        }
+        .mm-assurances-strip {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<!-- ==========================================================================
+     CLIENT-SIDE INTERACTIVITY & CART SYNC
+     ========================================================================== -->
+<script>
+    let currentQty = 1;
+
+    function adjustQty(delta) {
+        currentQty = Math.max(1, currentQty + delta);
+        document.getElementById('qty-display').innerText = currentQty;
+        const addBtn = document.getElementById('discovery-add-to-cart-btn');
+        if (addBtn) {
+            const totalVal = (3500 * currentQty).toLocaleString('en-IN');
+            addBtn.querySelector('.mm-add-btn-text').innerText = 
+                `Add Customised Discovery Collection to Bag • ₹${totalVal}`;
+        }
+    }
+
+    function handleDiscoveryAddToCart(button) {
+        const productId = button.dataset.product || 17;
+        const feedback = document.getElementById('discovery-add-feedback');
+
+        // Add loading state
+        const originalText = button.querySelector('.mm-add-btn-text').innerText;
+        button.querySelector('.mm-add-btn-text').innerText = 'Adding to Bag...';
+        button.disabled = true;
+
+        fetch("{% url 'sales:cart_action' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCsrfToken()
+            },
+            body: JSON.stringify({
+                action: "ADD",
+                product_id: parseInt(productId),
+                quantity: currentQty
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            button.disabled = false;
+            button.querySelector('.mm-add-btn-text').innerText = originalText;
+
+            if (data.authenticated === false && data.login_url) {
+                window.location.href = data.login_url;
+                return;
+            }
+
+            if (data.cart_total_items !== undefined) {
+                // Update cart count in navbar
+                const badges = document.querySelectorAll('.sf-badge-cart, #nav-cart-count');
+                badges.forEach(b => {
+                    b.innerText = data.cart_total_items;
+                    b.style.display = 'inline-block';
+                });
+
+                // Show luxury feedback message
+                if (feedback) {
+                    feedback.style.display = 'flex';
+                    feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Cart error:", err);
+            button.disabled = false;
+            button.querySelector('.mm-add-btn-text').innerText = originalText;
+            if (feedback) {
+                feedback.style.display = 'flex';
+            }
+        });
+    }
+
+    function getCsrfToken() {
+        const match = document.cookie.match(/csrftoken=([^;]+)/);
+        return match ? match[1] : '';
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Delete Review #{{ review.id }} | Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow"><a href="{% url 'dashboard:reviews' %}" style="color: var(--muted); text-decoration: none;">&larr; Reviews</a> · Moderation</p>
+        <h1>Confirm Deletion.</h1>
+        <p class="subtitle">
+            Are you sure you want to permanently remove this review? This action cannot be undone.
+        </p>
+    </div>
+</section>
+
+<section class="panel" style="max-width: 600px;">
+    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+        <h4 style="color: #991b1b; margin-top: 0; margin-bottom: 8px; font-size: 15px;">Warning: Irreversible Action</h4>
+        <p style="color: #b91c1c; font-size: 13px; margin: 0; line-height: 1.5;">
+            Deleting this review will remove it permanently and immediately update the average rating and review counts for <strong>{{ review.product.name }}</strong>.
+        </p>
+    </div>
+
+    <div style="padding: 16px 20px; background: #FAF8F5; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 28px;">
+        <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Fragrance:</strong> {{ review.product.name }}</p>
+        <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Reviewer:</strong> {{ review.reviewer_name }}</p>
+        <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Rating:</strong> {{ review.rating }} / 5 stars</p>
+        {% if review.title %}<p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Title:</strong> {{ review.title }}</p>{% endif %}
+        <p style="margin: 0; font-size: 13px; color: var(--charcoal-soft); font-style: italic;">"{{ review.comment|truncatewords:30 }}"</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <a href="{% url 'dashboard:reviews' %}" class="secondary-btn" style="padding: 10px 20px; text-decoration: none;">Cancel</a>
+            <button type="submit" class="primary-btn" style="background: #dc2626; border-color: #dc2626; color: #FFF; padding: 10px 24px;">Confirm Delete</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

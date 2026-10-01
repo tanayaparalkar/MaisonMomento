@@ -185,7 +185,12 @@
             <div class="sf-summary-rows" style="font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--muted); margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; justify-content: space-between;">
                     <span>Subtotal</span>
-                    <span style="color: var(--text-color); font-weight: 500;">₹{{ subtotal }}</span>
+                    <span id="sf-checkout-subtotal-val" style="color: var(--text-color); font-weight: 500;">₹{{ subtotal }}</span>
+                </div>
+                <!-- Voucher Discount Row -->
+                <div id="sf-checkout-discount-row" style="display: {% if applied_voucher and discount_amount != '0.00' %}flex{% else %}none{% endif %}; justify-content: space-between; color: #005441; font-weight: 600;">
+                    <span>Privilege Discount (<span id="sf-checkout-discount-label">{{ applied_voucher.code }}</span>)</span>
+                    <span id="sf-checkout-discount-val">-₹{{ discount_amount }}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span>Shipping</span>
@@ -197,9 +202,36 @@
                 </div>
             </div>
 
+            <!-- Privilege Voucher Box on Checkout -->
+            <div class="sf-checkout-voucher-section" style="margin-bottom: 20px; padding: 14px 16px; background: rgba(245, 237, 225, 0.45); border: 1px solid rgba(208, 155, 52, 0.35); border-radius: 8px;">
+                <label for="sf-checkout-voucher-input" style="display: block; font-family: 'Outfit', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--muted); margin-bottom: 8px;">
+                    Have a Privilege Voucher?
+                </label>
+
+                <div id="sf-checkout-voucher-applied" style="display: {% if applied_voucher %}flex{% else %}none{% endif %}; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(0, 84, 65, 0.08); border: 1px solid rgba(0, 84, 65, 0.2); border-radius: 6px; margin-bottom: 8px;">
+                    <div>
+                        <span style="font-size: 10px; color: #D09B34; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: block;">✦ Privilege Applied</span>
+                        <strong id="sf-checkout-applied-code" style="color: #005441; font-size: 13.5px;">{{ applied_voucher.code }}</strong>
+                        <span id="sf-checkout-applied-discount" style="font-size: 11.5px; color: var(--muted); margin-left: 4px;">({{ applied_voucher.get_discount_display }})</span>
+                    </div>
+                    <button type="button" id="sf-checkout-remove-voucher" style="background: none; border: none; font-size: 11px; color: #c92a2a; text-decoration: underline; cursor: pointer; font-weight: 600; padding: 4px;">
+                        Remove
+                    </button>
+                </div>
+
+                <div id="sf-checkout-voucher-inputs" style="display: {% if applied_voucher %}none{% else %}flex{% endif %}; gap: 8px;">
+                    <input type="text" id="sf-checkout-voucher-input" placeholder="e.g. MAISON10" style="flex: 1; padding: 8px 12px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid var(--border); border-radius: 4px; background: #FFFFFF; color: var(--charcoal);">
+                    <button type="button" id="sf-checkout-apply-voucher" class="secondary-btn" style="padding: 0 16px; min-height: 36px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">
+                        Apply
+                    </button>
+                </div>
+
+                <div id="sf-checkout-voucher-feedback" style="display: none; font-size: 12px; margin-top: 8px; padding: 6px 10px; border-radius: 4px;"></div>
+            </div>
+
             <div style="display: flex; justify-content: space-between; font-family: 'Courier Prime', monospace; font-size: 18px; font-weight: 700; color: var(--text-color); margin-bottom: 22px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 18px;">
                 <span>Estimated Total</span>
-                <span>₹{{ estimated_total }}</span>
+                <span id="sf-checkout-total-val">₹{{ estimated_total }}</span>
             </div>
 
             <!-- Payment Method Selection -->
@@ -249,6 +281,115 @@
         const fallbackBox = document.getElementById('sf-direct-fallback-box');
         const instantDirectBtn = document.getElementById('sf-instant-direct-btn');
         const originalBtnText = placeOrderBtn ? placeOrderBtn.innerHTML : 'Proceed to Checkout &rarr;';
+
+        // Checkout Voucher Handling
+        const checkoutVoucherInput = document.getElementById('sf-checkout-voucher-input');
+        const checkoutApplyBtn = document.getElementById('sf-checkout-apply-voucher');
+        const checkoutRemoveBtn = document.getElementById('sf-checkout-remove-voucher');
+        const checkoutAppliedBox = document.getElementById('sf-checkout-voucher-applied');
+        const checkoutInputBox = document.getElementById('sf-checkout-voucher-inputs');
+        const checkoutFeedback = document.getElementById('sf-checkout-voucher-feedback');
+        const checkoutAppliedCode = document.getElementById('sf-checkout-applied-code');
+        const checkoutAppliedDiscount = document.getElementById('sf-checkout-applied-discount');
+        const checkoutDiscountRow = document.getElementById('sf-checkout-discount-row');
+        const checkoutDiscountLabel = document.getElementById('sf-checkout-discount-label');
+        const checkoutDiscountVal = document.getElementById('sf-checkout-discount-val');
+        const checkoutTotalVal = document.getElementById('sf-checkout-total-val');
+
+        const showCheckoutVoucherFeedback = (msg, isError) => {
+            if (!checkoutFeedback) return;
+            checkoutFeedback.style.display = 'block';
+            checkoutFeedback.textContent = msg;
+            if (isError) {
+                checkoutFeedback.style.background = '#fef2f2';
+                checkoutFeedback.style.color = '#b91c1c';
+                checkoutFeedback.style.border = '1px solid #fecaca';
+            } else {
+                checkoutFeedback.style.background = 'rgba(0, 84, 65, 0.08)';
+                checkoutFeedback.style.color = '#005441';
+                checkoutFeedback.style.border = '1px solid rgba(0, 84, 65, 0.2)';
+            }
+        };
+
+        const handleApplyVoucher = () => {
+            const code = checkoutVoucherInput.value.trim();
+            if (!code) {
+                showCheckoutVoucherFeedback('Please enter a voucher code.', true);
+                return;
+            }
+            checkoutApplyBtn.disabled = true;
+            checkoutApplyBtn.textContent = 'Applying...';
+
+            fetch("{% url 'sales:apply_voucher' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(res => res.json())
+            .then(data => {
+                checkoutApplyBtn.disabled = false;
+                checkoutApplyBtn.textContent = 'Apply';
+                if (data.success) {
+                    showCheckoutVoucherFeedback(data.message, false);
+                    checkoutAppliedCode.textContent = data.code;
+                    checkoutAppliedDiscount.textContent = `(${data.discount_display})`;
+                    checkoutAppliedBox.style.display = 'flex';
+                    checkoutInputBox.style.display = 'none';
+
+                    checkoutDiscountRow.style.display = 'flex';
+                    checkoutDiscountLabel.textContent = data.code;
+                    checkoutDiscountVal.textContent = `-₹${data.discount_amount}`;
+                    if (checkoutTotalVal) checkoutTotalVal.textContent = `₹${data.total}`;
+                } else {
+                    showCheckoutVoucherFeedback(data.error || 'Failed to apply voucher.', true);
+                }
+            })
+            .catch(err => {
+                checkoutApplyBtn.disabled = false;
+                checkoutApplyBtn.textContent = 'Apply';
+                showCheckoutVoucherFeedback('An error occurred. Please try again.', true);
+            });
+        };
+
+        const handleRemoveVoucher = () => {
+            checkoutRemoveBtn.disabled = true;
+            fetch("{% url 'sales:remove_voucher' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                checkoutRemoveBtn.disabled = false;
+                checkoutAppliedBox.style.display = 'none';
+                checkoutInputBox.style.display = 'flex';
+                checkoutVoucherInput.value = '';
+                checkoutFeedback.style.display = 'none';
+                checkoutDiscountRow.style.display = 'none';
+                if (checkoutTotalVal) checkoutTotalVal.textContent = `₹${data.total}`;
+            })
+            .catch(err => {
+                checkoutRemoveBtn.disabled = false;
+            });
+        };
+
+        if (checkoutApplyBtn) checkoutApplyBtn.addEventListener('click', handleApplyVoucher);
+        if (checkoutVoucherInput) {
+            checkoutVoucherInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleApplyVoucher();
+                }
+            });
+        }
+        if (checkoutRemoveBtn) checkoutRemoveBtn.addEventListener('click', handleRemoveVoucher);
 
         // Payment Method Radio Interactivity
         const paymentRadios = document.querySelectorAll('input[name="checkout_payment_choice"]');

@@ -29,6 +29,58 @@ class Category(models.Model):
         return self.products.filter(is_active=True).count()
 
 
+class Occasion(models.Model):
+    name = models.CharField(max_length=100, unique=True, help_text="Occasion name (e.g. Office, Date Night, Wedding)")
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    description = models.TextField(blank=True, help_text="Atmosphere and context for this occasion")
+    is_active = models.BooleanField(default=True)
+    display_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Occasion"
+        verbose_name_plural = "Occasions"
+        ordering = ["display_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class FragranceNote(models.Model):
+    """
+    Individual olfactory note used across Top, Heart, and Base tiers of the pyramid.
+    Normalized to support cross-perfume filtering, search, and future recommendation engines.
+    """
+    name = models.CharField(max_length=100, unique=True, help_text="Olfactory note name (e.g. Bergamot, Rose, Oud)")
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    description = models.TextField(blank=True, help_text="Scent profile and olfactory characteristics")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Fragrance Note"
+        verbose_name_plural = "Fragrance Notes"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+# Alias for developer convenience
+Note = FragranceNote
+
+
 class Product(models.Model):
     GENDER_CHOICES = [
         ("unisex", "Unisex"),
@@ -89,6 +141,30 @@ class Product(models.Model):
         default="edp",
         help_text="Perfume oil concentration"
     )
+    occasions = models.ManyToManyField(
+        "catalog.Occasion",
+        blank=True,
+        related_name="products",
+        help_text="Recommended occasions or settings for this fragrance"
+    )
+    top_notes = models.ManyToManyField(
+        "catalog.FragranceNote",
+        blank=True,
+        related_name="top_note_products",
+        help_text="Top / Opening notes (evaporate within 15–30 minutes)"
+    )
+    heart_notes = models.ManyToManyField(
+        "catalog.FragranceNote",
+        blank=True,
+        related_name="heart_note_products",
+        help_text="Heart / Middle notes forming the core character of the fragrance"
+    )
+    base_notes = models.ManyToManyField(
+        "catalog.FragranceNote",
+        blank=True,
+        related_name="base_note_products",
+        help_text="Base / Foundation notes that linger on the skin for hours"
+    )
     is_featured = models.BooleanField(default=False, help_text="Display prominently on featured showcase")
     is_active = models.BooleanField(default=True, help_text="Product visibility status")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -136,6 +212,40 @@ class Product(models.Model):
     def effective_price(self):
         return self.discount_price if self.discount_price else self.price
 
+    @property
+    def average_rating(self):
+        agg = self.reviews.filter(is_approved=True).aggregate(models.Avg("rating"))["rating__avg"]
+        if agg is not None:
+            return round(float(agg), 1)
+        return 5.0
+
+    @property
+    def review_count(self):
+        return self.reviews.filter(is_approved=True).count()
+
+    def get_rating_distribution(self):
+        total = self.review_count
+        dist = []
+        for star in range(5, 0, -1):
+            count = self.reviews.filter(is_approved=True, rating=star).count()
+            pct = round((count / total * 100), 1) if total > 0 else 0
+            dist.append({
+                "star": star,
+                "count": count,
+                "percentage": pct
+            })
+        return dist
+
+    @property
+    def has_fragrance_notes(self):
+        """Return True if any olfactory tier has assigned notes."""
+        return self.top_notes.exists() or self.heart_notes.exists() or self.base_notes.exists()
+
+    @property
+    def all_fragrance_notes(self):
+        """Return all distinct fragrance notes in this perfume across all tiers."""
+        return (self.top_notes.all() | self.heart_notes.all() | self.base_notes.all()).distinct()
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(
@@ -162,3 +272,53 @@ class ProductImage(models.Model):
             # Deselect any other primary image for this product
             ProductImage.objects.filter(product=self.product, is_primary=True).exclude(pk=self.pk).update(is_primary=False)
         super().save(*args, **kwargs)
+
+
+class Review(models.Model):
+    RATING_CHOICES = [
+        (1, "1 Star"),
+        (2, "2 Stars"),
+        (3, "3 Stars"),
+        (4, "4 Stars"),
+        (5, "5 Stars"),
+    ]
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        help_text="Product being reviewed"
+    )
+    customer = models.ForeignKey(
+        "customers.Customer",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviews",
+        help_text="Associated customer account (optional)"
+    )
+    reviewer_name = models.CharField(max_length=150, help_text="Display name of reviewer")
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES, help_text="Rating between 1 and 5")
+    title = models.CharField(max_length=255, blank=True, help_text="Optional review title")
+    comment = models.TextField(help_text="Review content / olfactory impression")
+    is_verified_purchase = models.BooleanField(default=False, help_text="Verified customer purchase status")
+    is_approved = models.BooleanField(default=True, help_text="Designates whether review is approved and visible")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Review"
+        verbose_name_plural = "Reviews"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.rating}★ Review for {self.product.name} by {self.reviewer_name}"
+
+    @property
+    def stars_display(self):
+        return "★" * self.rating
+
+    @property
+    def empty_stars_display(self):
+        return "☆" * (5 - self.rating)
+

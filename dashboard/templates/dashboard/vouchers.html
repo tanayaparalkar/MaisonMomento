@@ -1,0 +1,271 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Privilege Vouchers | Maison Moménto Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; margin-bottom: 28px;">
+    <div>
+        <p class="eyebrow" style="color: #D09B34; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px;">Privilege & Promotion Management</p>
+        <h1 style="font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif); font-size: 32px; font-weight: 500; color: #111827; margin: 0 0 8px 0;">Privilege Vouchers.</h1>
+        <p class="subtitle" style="color: #64748B; font-size: 13.5px; max-width: 620px; line-height: 1.5; margin: 0;">
+            Curate promotional codes, configure bespoke VIP concessions, schedule seasonal privileges, and monitor real-time patron redemptions.
+        </p>
+    </div>
+
+    <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <!-- Metrics Badge Strip -->
+        <div style="display: flex; gap: 20px; background: #FFFFFF; border: 1px solid var(--border, #E2E8F0); padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <div>
+                <span style="display: block; font-size: 10px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600;">Total</span>
+                <strong style="font-size: 18px; color: #1E293B; font-family: var(--font-display, serif);">{{ total_count }}</strong>
+            </div>
+            <div style="border-left: 1px solid var(--border, #E2E8F0); padding-left: 16px;">
+                <span style="display: block; font-size: 10px; text-transform: uppercase; color: #005441; letter-spacing: 0.08em; font-weight: 600;">Active Now</span>
+                <strong style="font-size: 18px; color: #005441; font-family: var(--font-display, serif);">{{ active_count }}</strong>
+            </div>
+            <div style="border-left: 1px solid var(--border, #E2E8F0); padding-left: 16px;">
+                <span style="display: block; font-size: 10px; text-transform: uppercase; color: #B45309; letter-spacing: 0.08em; font-weight: 600;">Expired</span>
+                <strong style="font-size: 18px; color: #B45309; font-family: var(--font-display, serif);">{{ expired_count }}</strong>
+            </div>
+            <div style="border-left: 1px solid var(--border, #E2E8F0); padding-left: 16px;">
+                <span style="display: block; font-size: 10px; text-transform: uppercase; color: #0D434D; letter-spacing: 0.08em; font-weight: 600;">Redemptions</span>
+                <strong style="font-size: 18px; color: #0D434D; font-family: var(--font-display, serif);">{{ total_redemptions }}</strong>
+            </div>
+        </div>
+
+        <a href="{% url 'dashboard:voucher_create' %}" class="primary-btn" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 11px 22px; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; background: #005441; color: #FFFFFF; border-radius: 6px;">
+            <span>+ Create Privilege Voucher</span>
+        </a>
+    </div>
+</section>
+
+<!-- Feedback Messages -->
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 13px 18px; border-radius: 6px; font-size: 13.5px; font-weight: 500; margin-bottom: 8px; {% if message.tags == 'error' %}background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;{% elif message.tags == 'warning' %}background: #fffbeb; color: #f59e0b; border: 1px solid #fcd34d;{% else %}background: #f0fdf4; color: #005441; border: 1px solid #a7f3d0;{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Filters & Search Toolbar -->
+<form method="GET" action="{% url 'dashboard:vouchers' %}" class="toolbar" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 22px;">
+    <!-- Search Box -->
+    <div style="flex-grow: 1; min-width: 260px;">
+        <input
+            type="text"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Search by code, description, or VIP customer..."
+            class="search-box"
+            style="width: 100%; box-sizing: border-box; padding: 10px 16px; border: 1px solid var(--border, #E2E8F0); border-radius: 6px; font-size: 13px;"
+        >
+    </div>
+
+    <!-- Discount Type Filter -->
+    <div>
+        <select name="type" class="form-control" onchange="this.form.submit()" style="padding: 9px 14px; border: 1px solid var(--border, #E2E8F0); border-radius: 6px; font-size: 13px; background: #FFF;">
+            <option value="">All Concession Types</option>
+            <option value="percentage" {% if selected_type == 'percentage' %}selected{% endif %}>Percentage (%)</option>
+            <option value="flat" {% if selected_type == 'flat' %}selected{% endif %}>Flat Amount (₹)</option>
+        </select>
+    </div>
+
+    <!-- Status Tabs -->
+    <div class="filters" role="group" aria-label="Filter vouchers by lifecycle status" style="display: inline-flex; background: #F1F5F9; padding: 4px; border-radius: 8px;">
+        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_type %}type={{ selected_type }}&{% endif %}status=" class="filter {% if not selected_status %}active{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 12.5px; border-radius: 6px; font-weight: 500; color: {% if not selected_status %}#005441; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.06);{% else %}#64748B;{% endif %}">
+            All
+        </a>
+        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_type %}type={{ selected_type }}&{% endif %}status=active" class="filter {% if selected_status == 'active' %}active{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 12.5px; border-radius: 6px; font-weight: 500; color: {% if selected_status == 'active' %}#005441; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.06);{% else %}#64748B;{% endif %}">
+            Active
+        </a>
+        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_type %}type={{ selected_type }}&{% endif %}status=scheduled" class="filter {% if selected_status == 'scheduled' %}active{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 12.5px; border-radius: 6px; font-weight: 500; color: {% if selected_status == 'scheduled' %}#005441; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.06);{% else %}#64748B;{% endif %}">
+            Scheduled
+        </a>
+        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_type %}type={{ selected_type }}&{% endif %}status=expired" class="filter {% if selected_status == 'expired' %}active{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 12.5px; border-radius: 6px; font-weight: 500; color: {% if selected_status == 'expired' %}#005441; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.06);{% else %}#64748B;{% endif %}">
+            Expired
+        </a>
+        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_type %}type={{ selected_type }}&{% endif %}status=deactivated" class="filter {% if selected_status == 'deactivated' %}active{% endif %}" style="text-decoration: none; padding: 6px 14px; font-size: 12.5px; border-radius: 6px; font-weight: 500; color: {% if selected_status == 'deactivated' %}#005441; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.06);{% else %}#64748B;{% endif %}">
+            Deactivated
+        </a>
+    </div>
+
+    {% if search_query or selected_status or selected_type %}
+        <a href="{% url 'dashboard:vouchers' %}" class="secondary-btn" style="padding: 8px 14px; font-size: 12px; text-decoration: none; color: #64748B;">Clear</a>
+    {% endif %}
+</form>
+
+<!-- Main Table Panel -->
+<section class="panel" style="background: #FFFFFF; border: 1px solid var(--border, #E2E8F0); border-radius: 8px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+    <form method="POST" action="{% url 'dashboard:vouchers' %}">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <h3 style="font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif); font-size: 21px; color: #1E293B; margin: 0;">
+                Vouchers ({{ page_obj.paginator.count }})
+            </h3>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <select name="action" class="form-control" style="padding: 7px 12px; height: auto; min-width: 170px; border: 1px solid var(--border, #E2E8F0); border-radius: 6px; font-size: 12.5px;">
+                    <option value="">Bulk Actions...</option>
+                    <option value="activate">Activate Selected</option>
+                    <option value="deactivate">Deactivate Selected</option>
+                    <option value="delete">Delete Selected</option>
+                </select>
+                <button type="submit" class="secondary-btn" style="padding: 7px 14px; font-size: 12.5px; border-radius: 6px; cursor: pointer;">Apply</button>
+            </div>
+        </div>
+
+        <table class="orders-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border, #E2E8F0); text-align: left;">
+                    <th style="width: 38px; padding: 12px 8px;"><input type="checkbox" id="select-all" onclick="toggleVoucherCheckboxes(this)"></th>
+                    <th style="padding: 12px 14px; font-size: 11px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600;">Privilege Code</th>
+                    <th style="padding: 12px 14px; font-size: 11px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600;">Concession</th>
+                    <th style="padding: 12px 14px; font-size: 11px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600;">Min. Cart</th>
+                    <th style="padding: 12px 14px; font-size: 11px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600;">Redemptions</th>
+                    <th style="padding: 12px 14px; font-size: 11px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600;">Validity Window</th>
+                    <th style="padding: 12px 14px; font-size: 11px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600;">Status</th>
+                    <th style="padding: 12px 14px; font-size: 11px; text-transform: uppercase; color: #64748B; letter-spacing: 0.08em; font-weight: 600; text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for voucher in vouchers %}
+                <tr style="border-bottom: 1px solid #F1F5F9; {% if not voucher.is_active or voucher.is_expired %}background: #FCFDFD; opacity: 0.88;{% endif %}">
+                    <td style="padding: 14px 8px;">
+                        <input type="checkbox" name="selected_vouchers" value="{{ voucher.id }}">
+                    </td>
+                    <td style="padding: 14px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-family: 'SFMono-Regular', Consolas, monospace; font-size: 13.5px; font-weight: 700; letter-spacing: 0.07em; background: #F8FAFC; border: 1px dashed #CBD5E1; padding: 4px 10px; border-radius: 4px; color: #005441;">
+                                {{ voucher.code }}
+                            </span>
+                        </div>
+                        {% if voucher.description %}
+                            <small style="display: block; color: #64748B; font-size: 11.5px; margin-top: 4px; max-width: 220px; line-height: 1.3;">
+                                {{ voucher.description }}
+                            </small>
+                        {% endif %}
+                        {% if voucher.specific_customer %}
+                            <div style="margin-top: 4px;">
+                                <span style="display: inline-block; font-size: 10.5px; background: #FEF3C7; color: #92400E; padding: 2px 6px; border-radius: 3px; font-weight: 500;">
+                                    Exclusive: {{ voucher.specific_customer.full_name }}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 14px;">
+                        <strong style="color: #005441; font-size: 14px; font-weight: 700;">
+                            {{ voucher.get_discount_display }}
+                        </strong>
+                        {% if voucher.max_discount %}
+                            <small style="display: block; color: #64748B; font-size: 11px;">
+                                Up to ₹{{ voucher.max_discount|floatformat:2 }}
+                            </small>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 14px; font-size: 13px; color: #334155;">
+                        {% if voucher.min_cart_value > 0 %}
+                            ₹{{ voucher.min_cart_value|floatformat:2 }}
+                        {% else %}
+                            <span style="color: #94A3B8;">No Minimum</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 14px;">
+                        <div style="font-size: 13px; font-weight: 600; color: #1E293B;">
+                            {{ voucher.used_count }}
+                            <span style="font-weight: 400; color: #94A3B8;">/</span>
+                            <span style="font-weight: 500; color: #64748B;">
+                                {% if voucher.max_uses %}{{ voucher.max_uses }}{% else %}∞{% endif %}
+                            </span>
+                        </div>
+                        {% if voucher.max_uses %}
+                            <div style="width: 70px; height: 4px; background: #E2E8F0; border-radius: 2px; margin-top: 5px; overflow: hidden;">
+                                <div style="height: 100%; background: {% if voucher.used_count >= voucher.max_uses %}#EF4444{% else %}#005441{% endif %}; width: {% widthratio voucher.used_count voucher.max_uses 100 %}%;"></div>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 14px; font-size: 12px; color: #475569; line-height: 1.4;">
+                        <div><strong style="color: #64748B; font-size: 10.5px; text-transform: uppercase;">From:</strong> {{ voucher.valid_from|date:"M d, Y H:i" }}</div>
+                        <div>
+                            <strong style="color: #64748B; font-size: 10.5px; text-transform: uppercase;">Until:</strong> 
+                            {% if voucher.valid_until %}
+                                {{ voucher.valid_until|date:"M d, Y H:i" }}
+                            {% else %}
+                                <span style="color: #005441;">Perpetual</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="padding: 14px;">
+                        {% if not voucher.is_active %}
+                            <span class="status shipped" style="background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1;">Deactivated</span>
+                        {% elif voucher.is_scheduled %}
+                            <span class="status packing" style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;">Scheduled</span>
+                        {% elif voucher.is_expired %}
+                            <span class="status shipped" style="background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA;">Expired</span>
+                        {% elif voucher.max_uses and voucher.used_count >= voucher.max_uses %}
+                            <span class="status shipped" style="background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A;">Exhausted</span>
+                        {% else %}
+                            <span class="status delivered" style="background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0;">Active</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 14px; text-align: right; white-space: nowrap;">
+                        <a href="{% url 'dashboard:voucher_edit' voucher.id %}" style="font-size: 12px; font-weight: 600; color: #005441; text-decoration: none; margin-right: 12px; padding: 4px 8px; border-radius: 4px; background: #F0FDF4;">
+                            Edit
+                        </a>
+                        <a href="{% url 'dashboard:voucher_toggle' voucher.id %}" style="font-size: 12px; font-weight: 500; color: {% if voucher.is_active %}#D97706{% else %}#047857{% endif %}; text-decoration: none; margin-right: 12px;">
+                            {% if voucher.is_active %}Deactivate{% else %}Activate{% endif %}
+                        </a>
+                        <a href="{% url 'dashboard:voucher_delete' voucher.id %}" style="font-size: 12px; font-weight: 500; color: #DC2626; text-decoration: none;">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: #64748B; padding: 48px 0;">
+                        <div style="font-size: 28px; margin-bottom: 8px;">🎟️</div>
+                        <div style="font-family: var(--font-display, serif); font-size: 18px; color: #334155; margin-bottom: 4px;">No privilege vouchers found</div>
+                        <p style="font-size: 13px; color: #94A3B8; margin-bottom: 16px;">Create your first voucher to offer promotional privileges to your esteemed patrons.</p>
+                        <a href="{% url 'dashboard:voucher_create' %}" class="primary-btn" style="text-decoration: none; display: inline-block; padding: 8px 18px; font-size: 12.5px; background: #005441; color: #FFF; border-radius: 4px;">
+                            Create Privilege Voucher
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border, #E2E8F0); font-size: 13px; color: #64748B;">
+        <div>
+            Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} vouchers
+        </div>
+        <div style="display: flex; gap: 6px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}" class="secondary-btn" style="padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 12px;">Previous</a>
+            {% endif %}
+
+            <span style="padding: 6px 12px; font-weight: 600; color: #005441;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_type %}&type={{ selected_type }}{% endif %}" class="secondary-btn" style="padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 12px;">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<script>
+function toggleVoucherCheckboxes(source) {
+    const checkboxes = document.getElementsByName('selected_vouchers');
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+</script>
+{% endblock %}

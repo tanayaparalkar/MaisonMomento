@@ -248,7 +248,11 @@ def product_list(request):
 
 
 def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk, is_active=True)
+    product = get_object_or_404(
+        Product.objects.prefetch_related("top_notes", "heart_notes", "base_notes", "occasions", "images"),
+        pk=pk,
+        is_active=True
+    )
 
     # Log the view interaction — never let logging failures break the page
     if hasattr(request, "visitor") and request.visitor:
@@ -270,12 +274,17 @@ def product_detail(request, pk):
         {"name": product.name,  "url": ""},
     ]
 
+    approved_reviews = product.reviews.filter(is_approved=True).order_by("-created_at")
+    rating_distribution = product.get_rating_distribution()
+
     return render(
         request,
         "catalog/product_detail.html",
         {
-            "product":          product,
-            "similar_products": similar_products,
-            "breadcrumbs":      breadcrumbs,
+            "product":             product,
+            "reviews":             approved_reviews,
+            "rating_distribution": rating_distribution,
+            "similar_products":    similar_products,
+            "breadcrumbs":         breadcrumbs,
         }
     )

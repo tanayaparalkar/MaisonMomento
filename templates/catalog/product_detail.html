@@ -25,6 +25,14 @@
 
                 <div class="sf-pdp-brand">{{ product.brand|default:"Maison Momento" }}</div>
                 <h1 class="sf-pdp-title" style="text-transform: capitalize !important;">{{ product.name|title }}</h1>
+
+                <!-- Always visible luxury rating line -->
+                <a href="#customer-reviews" class="sf-pdp-rating-line" aria-label="Rating: {{ product.average_rating }} out of 5 stars based on {{ product.review_count }} reviews">
+                    <span class="sf-pdp-stars" aria-hidden="true">★★★★★</span>
+                    <span class="sf-pdp-rating-num">{{ product.average_rating }}</span>
+                    <span class="sf-pdp-rating-link">({{ product.review_count }} Customer Review{{ product.review_count|pluralize }})</span>
+                </a>
+
                 <div class="sf-pdp-price"><span style="font-family: Arial, Helvetica, sans-serif;">₹</span>{{ product.effective_price }}</div>
                 
                 <div class="sf-pdp-desc">
@@ -49,13 +57,694 @@
                 <div style="border-top: 1px solid var(--border); padding-top: 24px; font-size: 13px; color: var(--muted);">
                     <p style="margin-bottom: 8px;"><strong>SKU:</strong> {{ product.sku|default:"N/A" }}</p>
                     <p style="margin-bottom: 8px;"><strong>Family:</strong> {{ product.get_fragrance_family_display|default:product.category.name }}</p>
-                    <p><strong>Concentration:</strong> {{ product.get_concentration_display|default:"Eau de Parfum" }}</p>
+                    <p style="{% if product.has_fragrance_notes %}margin-bottom: 8px;{% else %}margin-bottom: 0;{% endif %}"><strong>Concentration:</strong> {{ product.get_concentration_display|default:"Eau de Parfum" }}</p>
+                    {% if product.has_fragrance_notes %}
+                    <p style="margin: 0;"><strong style="color: #005441;">Pyramid:</strong> <a href="#olfactory-pyramid" style="color: #005441; text-decoration: underline; font-weight: 500;">Explore Olfactory Notes &darr;</a></p>
+                    {% endif %}
                 </div>
+
+                {% if product.occasions.all %}
+                <div class="sf-pdp-occasions">
+                    <span class="sf-occasions-eyebrow">Olfactory Setting</span>
+                    <h3 class="sf-occasions-title">Perfect For</h3>
+                    <div class="sf-occasions-grid">
+                        {% for occasion in product.occasions.all %}
+                            <span class="sf-occasion-tag">{{ occasion.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <style>
+                .sf-pdp-occasions {
+                    margin-top: 28px;
+                    padding-top: 24px;
+                    border-top: 1px solid var(--border);
+                }
+                .sf-occasions-eyebrow {
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.16em;
+                    color: var(--muted);
+                    margin-bottom: 6px;
+                    display: block;
+                }
+                .sf-occasions-title {
+                    font-family: var(--font-display);
+                    font-size: 20px;
+                    font-weight: 500;
+                    color: var(--charcoal);
+                    margin: 0 0 14px 0;
+                    letter-spacing: 0.01em;
+                }
+                .sf-occasions-grid {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+                .sf-occasion-tag {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 7px 16px;
+                    background: #FAF7F2;
+                    border: 1px solid rgba(208, 155, 52, 0.38);
+                    border-radius: 6px;
+                    font-family: var(--font-body);
+                    font-size: 12px;
+                    font-weight: 500;
+                    letter-spacing: 0.04em;
+                    color: #005441;
+                    transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+                    user-select: none;
+                }
+                .sf-occasion-tag::before {
+                    content: "[";
+                    color: #D09B34;
+                    font-weight: 400;
+                    font-family: var(--font-display);
+                    font-size: 13px;
+                    margin-right: 4px;
+                    opacity: 0.85;
+                }
+                .sf-occasion-tag::after {
+                    content: "]";
+                    color: #D09B34;
+                    font-weight: 400;
+                    font-family: var(--font-display);
+                    font-size: 13px;
+                    margin-left: 4px;
+                    opacity: 0.85;
+                }
+                .sf-occasion-tag:hover {
+                    background: #F5EDE1;
+                    border-color: #D09B34;
+                    color: #003629;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(208, 155, 52, 0.18);
+                }
+                </style>
+                {% endif %}
             </div>
             
         </div>
     </div>
 </div>
+
+{% if product.has_fragrance_notes %}
+<!-- Olfactory Pyramid (Fragrance Notes) Section -->
+<section id="olfactory-pyramid" class="sf-pyramid-section">
+    <div class="sf-container">
+        <div class="sf-pyramid-card">
+            
+            <!-- Section Header -->
+            <div class="sf-pyramid-header">
+                <span class="sf-pyramid-eyebrow">The Harmonic Composition</span>
+                <h2 class="sf-pyramid-title">Olfactory Pyramid</h2>
+                <div class="sf-pyramid-rule" aria-hidden="true"></div>
+            </div>
+
+            <!-- Three Elegant Columns: Top | Heart | Base -->
+            <div class="sf-pyramid-grid">
+                
+                <!-- Column 1: Top Notes -->
+                <div class="sf-pyramid-col sf-pyramid-top">
+                    <div class="sf-pyramid-col-header">
+                        <span class="sf-tier-phase">Phase I &bull; Opening</span>
+                        <h3 class="sf-tier-title">Top Notes</h3>
+                        <span class="sf-tier-timing">First 15–30 Minutes</span>
+                    </div>
+                    <div class="sf-tier-divider" aria-hidden="true"></div>
+                    <ul class="sf-notes-list">
+                        {% for note in product.top_notes.all %}
+                            <li class="sf-note-item">
+                                <span class="sf-note-bullet">&bull;</span>
+                                <span class="sf-note-name">{{ note.name }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="sf-note-item sf-note-empty">
+                                <span class="sf-note-name">—</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Column 2: Heart Notes -->
+                <div class="sf-pyramid-col sf-pyramid-heart">
+                    <div class="sf-pyramid-col-header">
+                        <span class="sf-tier-phase">Phase II &bull; The Soul</span>
+                        <h3 class="sf-tier-title">Heart Notes</h3>
+                        <span class="sf-tier-timing">Lasting 2–4 Hours</span>
+                    </div>
+                    <div class="sf-tier-divider" aria-hidden="true"></div>
+                    <ul class="sf-notes-list">
+                        {% for note in product.heart_notes.all %}
+                            <li class="sf-note-item">
+                                <span class="sf-note-bullet">&bull;</span>
+                                <span class="sf-note-name">{{ note.name }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="sf-note-item sf-note-empty">
+                                <span class="sf-note-name">—</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Column 3: Base Notes -->
+                <div class="sf-pyramid-col sf-pyramid-base">
+                    <div class="sf-pyramid-col-header">
+                        <span class="sf-tier-phase">Phase III &bull; Foundation</span>
+                        <h3 class="sf-tier-title">Base Notes</h3>
+                        <span class="sf-tier-timing">Lingering 6–12+ Hours</span>
+                    </div>
+                    <div class="sf-tier-divider" aria-hidden="true"></div>
+                    <ul class="sf-notes-list">
+                        {% for note in product.base_notes.all %}
+                            <li class="sf-note-item">
+                                <span class="sf-note-bullet">&bull;</span>
+                                <span class="sf-note-name">{{ note.name }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="sf-note-item sf-note-empty">
+                                <span class="sf-note-name">—</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Subtle Editorial Architecture Accent Line -->
+            <div class="sf-pyramid-footer-rule" aria-hidden="true"></div>
+            
+        </div>
+    </div>
+</section>
+
+<style>
+/* Olfactory Pyramid Styling - Maison Moménto Design System */
+.sf-pyramid-section {
+    padding: 64px 0 32px 0;
+    background: transparent;
+    position: relative;
+}
+
+.sf-pyramid-card {
+    background: #FFFFFF;
+    border: 1px solid #DFD1B9;
+    border-radius: 6px;
+    padding: 52px 48px;
+    box-shadow: 0 4px 28px rgba(13, 67, 77, 0.04);
+    position: relative;
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sf-pyramid-card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Header */
+.sf-pyramid-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.sf-pyramid-eyebrow {
+    display: block;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #D09B34;
+    margin-bottom: 8px;
+}
+
+.sf-pyramid-title {
+    font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+    font-size: 34px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #005441;
+    margin: 0 0 16px 0;
+}
+
+.sf-pyramid-rule {
+    width: 64px;
+    height: 1px;
+    background: #D09B34;
+    margin: 0 auto;
+    opacity: 0.8;
+}
+
+/* Three Columns Grid */
+.sf-pyramid-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    align-items: stretch;
+}
+
+.sf-pyramid-col {
+    padding: 0 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.sf-pyramid-top,
+.sf-pyramid-heart {
+    border-right: 1px solid rgba(223, 209, 185, 0.7);
+}
+
+.sf-pyramid-col-header {
+    margin-bottom: 14px;
+}
+
+.sf-tier-phase {
+    display: block;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: #D09B34;
+    margin-bottom: 4px;
+}
+
+.sf-tier-title {
+    font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #005441;
+    margin: 0 0 4px 0;
+}
+
+.sf-tier-timing {
+    display: block;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 11.5px;
+    color: #64748B;
+    letter-spacing: 0.03em;
+}
+
+.sf-tier-divider {
+    width: 36px;
+    height: 1px;
+    background: #DFD1B9;
+    margin: 0 auto 20px auto;
+}
+
+/* Notes List */
+.sf-notes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+}
+
+.sf-note-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 14px;
+    font-weight: 400;
+    color: #0D434D;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    transition: transform 180ms ease, color 180ms ease;
+}
+
+.sf-note-item:hover {
+    transform: translateX(2px);
+    color: #005441;
+}
+
+.sf-note-bullet {
+    color: #D09B34;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.sf-note-name {
+    font-weight: 450;
+    color: #1E293B;
+}
+
+.sf-note-empty {
+    color: #94A3B8;
+}
+
+.sf-pyramid-footer-rule {
+    margin-top: 44px;
+    border-top: 1px solid rgba(223, 209, 185, 0.5);
+    width: 100%;
+}
+
+/* Responsive Stacking for Mobile */
+@media (max-width: 840px) {
+    .sf-pyramid-card {
+        padding: 36px 24px;
+    }
+    .sf-pyramid-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .sf-pyramid-col {
+        padding: 0 0 28px 0;
+        margin-bottom: 28px;
+        border-right: none;
+        border-bottom: 1px solid rgba(223, 209, 185, 0.7);
+    }
+    .sf-pyramid-base {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+    .sf-pyramid-title {
+        font-size: 28px;
+    }
+    .sf-tier-title {
+        font-size: 21px;
+    }
+    .sf-pyramid-footer-rule {
+        margin-top: 28px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const card = document.querySelector('.sf-pyramid-card');
+    if (!card) return;
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    card.classList.add('is-visible');
+                    observer.unobserve(card);
+                }
+            });
+        }, { threshold: 0.1 });
+        observer.observe(card);
+    } else {
+        card.classList.add('is-visible');
+    }
+});
+</script>
+{% endif %}
+
+<!-- Dedicated Customer Reviews Section -->
+<section id="customer-reviews" class="sf-reviews-section">
+    <div class="sf-container">
+        {% if messages %}
+            <div style="margin-bottom: 32px;">
+                {% for message in messages %}
+                    <div style="padding: 16px 20px; border-radius: 4px; font-size: 14px; font-weight: 500; {% if message.tags == 'error' %}background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;{% else %}background: rgba(0, 84, 65, 0.08); color: #005441; border: 1px solid rgba(0, 84, 65, 0.2);{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="sf-reviews-header">
+            <h2 class="sf-reviews-title">Customer Reviews</h2>
+            <p class="sf-reviews-subtitle">Authentic olfactory impressions from Maison Moménto patrons.</p>
+        </div>
+
+        <!-- Rating Overview Grid -->
+        <div class="sf-reviews-overview">
+            <!-- Left: Score Box -->
+            <div class="sf-reviews-score-box">
+                <div class="sf-reviews-big-score" id="sf-avg-rating-val">{{ product.average_rating }}<span style="font-size: 24px; color: var(--muted); font-weight: 300;"> / 5</span></div>
+                <div class="sf-reviews-big-stars" aria-hidden="true">★★★★★</div>
+                <div class="sf-reviews-total-label" id="sf-total-reviews-val">Based on {{ product.review_count }} Review{{ product.review_count|pluralize }}</div>
+            </div>
+
+            <!-- Middle: Distribution Bars -->
+            <div class="sf-rating-bars" aria-label="Rating breakdown" id="sf-rating-bars-container">
+                {% for item in rating_distribution %}
+                <div class="sf-rating-bar-row">
+                    <span class="sf-rating-bar-label">{{ item.star }} <span style="color: #D09B34;">★</span></span>
+                    <div class="sf-rating-bar-track" role="progressbar" aria-valuenow="{{ item.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                        <div class="sf-rating-bar-fill" style="width: {{ item.percentage }}%;"></div>
+                    </div>
+                    <span class="sf-rating-bar-pct">{{ item.count }} ({{ item.percentage|floatformat:0 }}%)</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Right: Write Review Trigger -->
+            <div class="sf-reviews-cta-box">
+                <h3 class="sf-reviews-cta-title">Share Your Scent Story</h3>
+                <p class="sf-reviews-cta-desc">Guide connoisseurs on their olfactory journey with your impressions.</p>
+                <button type="button" class="primary-btn" id="sf-toggle-review-btn" style="min-height: 44px; padding: 0 24px; font-size: 11px;">
+                    Write a Review
+                </button>
+            </div>
+        </div>
+
+        <!-- Write Review Form Panel -->
+        <div id="write-review-form-panel" class="sf-review-form-panel">
+            <h3 class="sf-review-form-title">Write an Olfactory Review</h3>
+            <p class="sf-review-form-subtitle">Reviewing: <strong>{{ product.name }}</strong></p>
+
+            <form id="sf-review-form" method="POST" action="{% url 'catalog:submit_review' product.pk %}">
+                {% csrf_token %}
+
+                <!-- Star Picker (5 to 1 order for CSS reverse hover) -->
+                <div class="sf-form-group">
+                    <label class="sf-form-label">Your Rating <span style="color: #c92a2a;">*</span></label>
+                    <div class="sf-star-picker" role="radiogroup" aria-label="Select star rating">
+                        <input type="radio" id="star5" name="rating" value="5" required>
+                        <label for="star5" title="5 Stars — Masterpiece">★</label>
+
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4" title="4 Stars — Very Good">★</label>
+
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3" title="3 Stars — Pleasant">★</label>
+
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2" title="2 Stars — Fair">★</label>
+
+                        <input type="radio" id="star1" name="rating" value="1">
+                        <label for="star1" title="1 Star — Disappointing">★</label>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                    <div class="sf-form-group">
+                        <label for="reviewer_name" class="sf-form-label">Your Name or Pseudonym <span style="color: #c92a2a;">*</span></label>
+                        <input type="text" id="reviewer_name" name="reviewer_name" class="sf-form-input" placeholder="e.g. Eleanor de C." required maxlength="150">
+                    </div>
+
+                    <div class="sf-form-group">
+                        <label for="review_title" class="sf-form-label">Review Headline (Optional)</label>
+                        <input type="text" id="review_title" name="title" class="sf-form-input" placeholder="e.g. Seductive smoky vanilla with extraordinary longevity" maxlength="255">
+                    </div>
+
+                    <div class="sf-form-group">
+                        <label for="review_comment" class="sf-form-label">Your Review <span style="color: #c92a2a;">*</span></label>
+                        <textarea id="review_comment" name="comment" class="sf-form-textarea" placeholder="Describe the opening notes, sillage, dry-down, and the emotions this fragrance evokes..." required></textarea>
+                    </div>
+                </div>
+
+                <div id="sf-review-form-feedback" style="display: none; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; border-radius: 4px;"></div>
+
+                <div style="display: flex; gap: 16px; align-items: center; justify-content: flex-start; margin-top: 12px;">
+                    <button type="submit" id="sf-review-submit-btn" class="primary-btn" style="min-height: 48px; padding: 0 32px; font-size: 11px;">
+                        Submit Review
+                    </button>
+                    <button type="button" id="sf-review-cancel-btn" class="secondary-btn" style="min-height: 48px; padding: 0 24px; font-size: 11px;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Individual Reviews List (Newest First) -->
+        <div class="sf-reviews-list" id="sf-reviews-list-container">
+            {% for review in reviews %}
+                <article class="sf-review-card">
+                    <div class="sf-review-header">
+                        <div class="sf-reviewer-meta">
+                            <span class="sf-reviewer-name">{{ review.reviewer_name }}</span>
+                            {% if review.is_verified_purchase %}
+                                <span class="sf-verified-badge">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    Verified Purchaser
+                                </span>
+                            {% endif %}
+                        </div>
+                        <time class="sf-review-date" datetime="{{ review.created_at|date:'c' }}">{{ review.created_at|date:"F d, Y" }}</time>
+                    </div>
+
+                    <div class="sf-review-stars" aria-label="{{ review.rating }} out of 5 stars">
+                        {{ review.stars_display }}
+                    </div>
+
+                    {% if review.title %}
+                        <h4 class="sf-review-title">{{ review.title }}</h4>
+                    {% endif %}
+
+                    <div class="sf-review-comment">
+                        {{ review.comment|linebreaks }}
+                    </div>
+                </article>
+            {% empty %}
+                <div id="sf-empty-reviews-placeholder" style="text-align: center; padding: 60px 20px; background: #FFFFFF; border: 1px dashed var(--border); border-radius: var(--radius-xs);">
+                    <p style="font-family: var(--font-display); font-size: 22px; color: var(--charcoal); margin-bottom: 8px;">No reviews yet.</p>
+                    <p style="color: var(--muted); font-size: 14px;">Be the first patron to share an olfactory impression of {{ product.name }}.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('sf-toggle-review-btn');
+    const cancelBtn = document.getElementById('sf-review-cancel-btn');
+    const panel = document.getElementById('write-review-form-panel');
+    const form = document.getElementById('sf-review-form');
+    const feedback = document.getElementById('sf-review-form-feedback');
+    const submitBtn = document.getElementById('sf-review-submit-btn');
+    const listContainer = document.getElementById('sf-reviews-list-container');
+    const emptyPlaceholder = document.getElementById('sf-empty-reviews-placeholder');
+
+    function openForm() {
+        if (panel) {
+            panel.classList.add('is-open');
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    function closeForm() {
+        if (panel) {
+            panel.classList.remove('is-open');
+            form.reset();
+            feedback.style.display = 'none';
+        }
+    }
+
+    if (toggleBtn) toggleBtn.addEventListener('click', openForm);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeForm);
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            feedback.style.display = 'none';
+            feedback.className = '';
+
+            const formData = new FormData(form);
+            const ratingVal = formData.get('rating');
+            if (!ratingVal) {
+                feedback.style.display = 'block';
+                feedback.style.background = '#fef2f2';
+                feedback.style.color = '#b91c1c';
+                feedback.style.border = '1px solid #fecaca';
+                feedback.textContent = 'Please select a star rating (1 to 5).';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(res => res.json().then(data => ({ status: res.status, body: data })))
+            .then(({ status, body }) => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Review';
+
+                if (body.success) {
+                    // Prepend new review card
+                    if (emptyPlaceholder) emptyPlaceholder.remove();
+
+                    const review = body.review;
+                    const card = document.createElement('article');
+                    card.className = 'sf-review-card';
+                    card.innerHTML = `
+                        <div class="sf-review-header">
+                            <div class="sf-reviewer-meta">
+                                <span class="sf-reviewer-name">${review.reviewer_name}</span>
+                                ${review.is_verified_purchase ? `
+                                    <span class="sf-verified-badge">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        Verified Purchaser
+                                    </span>
+                                ` : ''}
+                            </div>
+                            <time class="sf-review-date">${review.created_at}</time>
+                        </div>
+                        <div class="sf-review-stars" aria-label="${review.rating} out of 5 stars">${review.stars}</div>
+                        ${review.title ? `<h4 class="sf-review-title">${review.title}</h4>` : ''}
+                        <div class="sf-review-comment"><p>${review.comment.replace(/\\n/g, '<br>')}</p></div>
+                    `;
+                    listContainer.prepend(card);
+
+                    // Update header numbers
+                    const avgScoreEl = document.getElementById('sf-avg-rating-val');
+                    if (avgScoreEl && body.average_rating) {
+                        avgScoreEl.innerHTML = `${body.average_rating}<span style="font-size: 24px; color: var(--muted); font-weight: 300;"> / 5</span>`;
+                    }
+                    const totalReviewsEl = document.getElementById('sf-total-reviews-val');
+                    if (totalReviewsEl && body.review_count) {
+                        totalReviewsEl.textContent = `Based on ${body.review_count} Review${body.review_count > 1 ? 's' : ''}`;
+                    }
+
+                    // Success feedback & close form after brief moment
+                    feedback.style.display = 'block';
+                    feedback.style.background = 'rgba(0, 84, 65, 0.08)';
+                    feedback.style.color = '#005441';
+                    feedback.style.border = '1px solid rgba(0, 84, 65, 0.2)';
+                    feedback.textContent = body.message || 'Thank you! Your review has been published.';
+
+                    setTimeout(() => {
+                        closeForm();
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 1200);
+
+                } else {
+                    feedback.style.display = 'block';
+                    feedback.style.background = '#fef2f2';
+                    feedback.style.color = '#b91c1c';
+                    feedback.style.border = '1px solid #fecaca';
+                    feedback.textContent = body.error || 'Failed to submit review. Please check all fields.';
+                }
+            })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Review';
+                feedback.style.display = 'block';
+                feedback.style.background = '#fef2f2';
+                feedback.style.color = '#b91c1c';
+                feedback.style.border = '1px solid #fecaca';
+                feedback.textContent = 'An unexpected error occurred. Please try again.';
+            });
+        });
+    }
+});
+</script>
 
 <!-- Recommendations Section -->
 {% if similar_products %}

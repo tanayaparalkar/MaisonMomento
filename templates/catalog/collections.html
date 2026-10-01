@@ -41,12 +41,14 @@
                 </div>
             </div>
 
-            <!-- Products Grid (Max 6) -->
-            <div class="sf-grid">
-                {% for product in category.products.all|slice:":6" %}
+            <!-- Products Grid (Max 6) — adaptive layout based on product count -->
+            {% with shown_products=category.products.all|slice:":6" %}
+            <div class="sf-grid sf-collection-grid sf-collection-grid--count-{{ shown_products|length }}" data-product-count="{{ shown_products|length }}">
+                {% for product in shown_products %}
                 {% include "catalog/includes/product_card.html" with product=product %}
                 {% endfor %}
             </div>
+            {% endwith %}
 
             {% if category.num_products > 6 %}
             <div style="text-align: center; margin-top: 48px;">

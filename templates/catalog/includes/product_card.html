@@ -7,9 +7,25 @@
                 {% else %}
                     <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?q=80&w=600&auto=format&fit=crop" alt="Fallback image for {{ product.name }}" class="sf-card-image" loading="lazy">
                 {% endif %}
+
+                <!-- On-hover subtle reveal: Read Reviews -->
+                <div class="sf-card-reviews-reveal" aria-hidden="true">
+                    <span class="sf-card-reviews-reveal-btn">
+                        <span>Read Reviews</span>
+                        <span class="sf-card-reviews-reveal-arrow">&rarr;</span>
+                    </span>
+                </div>
             </div>
             <div class="sf-card-content">
                 <h3 class="sf-card-title">{{ product.name }}</h3>
+
+                <!-- Always visible elegant rating line -->
+                <div class="sf-card-rating" aria-label="Rating: {{ product.average_rating }} out of 5 stars ({{ product.review_count }} Reviews)">
+                    <span class="sf-card-stars" aria-hidden="true">★★★★★</span>
+                    <span class="sf-card-rating-num">{{ product.average_rating }}</span>
+                    <span class="sf-card-rating-count">({{ product.review_count }} Review{{ product.review_count|pluralize }})</span>
+                </div>
+
                 <p class="sf-card-desc">{{ product.description|truncatewords:15 }}</p>
                 <div class="sf-card-footer">
                     <span class="sf-card-price">₹{{ product.effective_price }}</span>

@@ -5,6 +5,8 @@ from . import order_views
 from . import export_views
 from . import inventory_views
 from . import notification_views
+from . import review_views
+from . import voucher_views
 
 app_name = "dashboard"
 
@@ -25,6 +27,19 @@ urlpatterns = [
     path("products/new/", product_views.product_create, name="product_create"),
     path("products/<int:pk>/edit/", product_views.product_edit, name="product_edit"),
     path("categories/", product_views.categories, name="categories"),
+    
+    # Reviews Management
+    path("reviews/", review_views.reviews, name="reviews"),
+    path("reviews/<int:pk>/toggle/", review_views.review_toggle_approval, name="review_toggle"),
+    path("reviews/<int:pk>/edit/", review_views.review_edit, name="review_edit"),
+    path("reviews/<int:pk>/delete/", review_views.review_delete, name="review_delete"),
+    
+    # Privilege Vouchers
+    path("vouchers/", voucher_views.vouchers, name="vouchers"),
+    path("vouchers/new/", voucher_views.voucher_create, name="voucher_create"),
+    path("vouchers/<int:pk>/edit/", voucher_views.voucher_edit, name="voucher_edit"),
+    path("vouchers/<int:pk>/toggle/", voucher_views.voucher_toggle, name="voucher_toggle"),
+    path("vouchers/<int:pk>/delete/", voucher_views.voucher_delete, name="voucher_delete"),
     
     # Orders (Phase 10B)
     path("orders/", order_views.orders, name="orders"),

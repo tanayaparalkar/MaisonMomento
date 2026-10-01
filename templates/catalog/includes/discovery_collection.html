@@ -1,0 +1,513 @@
+{% load static %}
+<!-- ==========================================================================
+     MAISON MOMÉNTO — Maison Discovery Collection Section
+     A bespoke haute parfumerie introduction coffret section
+     ========================================================================== -->
+<section id="maison-discovery" class="mm-discovery-section" aria-labelledby="mm-discovery-heading">
+    <!-- Subtle Ambient Glow -->
+    <div class="mm-discovery-ambient" aria-hidden="true"></div>
+
+    <div class="sf-container mm-discovery-container">
+        <div class="mm-discovery-layout">
+            
+            <!-- LEFT COLUMN: Editorial Text, Benefits & CTA -->
+            <div class="mm-discovery-content mm-discovery-reveal" data-reveal="content">
+                <div class="mm-discovery-eyebrow">
+                    <span class="mm-discovery-eyebrow-accent" aria-hidden="true">✦</span>
+                    <span>L'Atelier Découverte</span>
+                </div>
+
+                <h2 id="mm-discovery-heading" class="mm-discovery-heading">
+                    Maison Discovery Collection
+                </h2>
+
+                <p class="mm-discovery-subtitle">
+                    Discover the essence of Maison Moménto through a curated collection of handcrafted fragrances before selecting your signature scent.
+                </p>
+
+                <!-- Elegant Benefit Rows -->
+                <ul class="mm-discovery-benefits" aria-label="Discovery Collection Highlights">
+                    <li class="mm-discovery-benefit-row">
+                        <span class="mm-discovery-check" aria-hidden="true">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </span>
+                        <span class="mm-discovery-benefit-text">Four carefully curated fragrances</span>
+                    </li>
+                    <li class="mm-discovery-benefit-row">
+                        <span class="mm-discovery-check" aria-hidden="true">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </span>
+                        <span class="mm-discovery-benefit-text">Complimentary fragrance guide</span>
+                    </li>
+                    <li class="mm-discovery-benefit-row">
+                        <span class="mm-discovery-check" aria-hidden="true">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </span>
+                        <span class="mm-discovery-benefit-text">Redeemable towards your first full-size bottle</span>
+                    </li>
+                </ul>
+
+                <!-- Luxury CTA Button -->
+                <div class="mm-discovery-action">
+                    <a href="{% url 'catalog:discovery_collection' %}" class="mm-discovery-cta-btn" role="button" aria-label="Discover Collection">
+                        <span class="mm-discovery-cta-text">Discover Collection</span>
+                        <span class="mm-discovery-cta-arrow" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Premium Discovery Coffret Image -->
+            <div class="mm-discovery-media mm-discovery-reveal" data-reveal="media">
+                <div class="mm-discovery-image-wrapper">
+                    <div class="mm-discovery-image-frame">
+                        <img src="{% static 'images/maison_discovery_set.jpg' %}" 
+                             alt="Maison Moménto Discovery Collection - Four Curated Miniature Fragrances in Presentation Coffret" 
+                             class="mm-discovery-img"
+                             loading="lazy"
+                             width="1200"
+                             height="900">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     SCOPED LUXURY STYLING — Maison Discovery Collection
+     Uses strict brand tokens:
+     Château Green (#005441) | Midnight Teal (#0D434D) | Antique Gold (#D09B34)
+     Ivory Silk (#F5EDE1) | French Sand (#DFD1B9)
+     Cormorant Garamond & Inter
+     ========================================================================== -->
+<style>
+    /* Section Container with Ivory Silk Background & Subtle Gradient */
+    .mm-discovery-section {
+        position: relative;
+        background-color: #F5EDE1;
+        background-image: 
+            radial-gradient(ellipse 70% 50% at 85% 35%, rgba(208, 155, 52, 0.07) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 60% at 10% 75%, rgba(13, 67, 77, 0.04) 0%, transparent 65%),
+            linear-gradient(180deg, #F5EDE1 0%, #FAF5EE 50%, #F5EDE1 100%);
+        border-top: 1px solid rgba(208, 155, 52, 0.22);
+        border-bottom: 1px solid rgba(208, 155, 52, 0.18);
+        padding: clamp(68px, 7.5vw, 116px) 0;
+        overflow: hidden;
+    }
+
+    .mm-discovery-ambient {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.6) 0%, transparent 60%);
+        opacity: 0.65;
+    }
+
+    .mm-discovery-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* 50 / 50 Split Layout */
+    .mm-discovery-layout {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: clamp(48px, 6vw, 96px);
+    }
+
+    /* Left Column: Text & Content */
+    .mm-discovery-content {
+        flex: 1 1 50%;
+        max-width: 580px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    /* Eyebrow Label */
+    .mm-discovery-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-body, "Inter", sans-serif);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: #D09B34; /* Antique Gold */
+        margin-bottom: 16px;
+    }
+
+    .mm-discovery-eyebrow-accent {
+        font-size: 12px;
+        line-height: 1;
+        color: #D09B34;
+    }
+
+    /* Luxury Display Heading */
+    .mm-discovery-heading {
+        font-family: var(--font-display, "Cormorant Garamond", Georgia, serif);
+        font-size: clamp(34px, 3.8vw, 52px);
+        font-weight: 500;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        color: #005441; /* Château Green */
+        margin: 0 0 20px 0;
+    }
+
+    /* Description / Subtitle */
+    .mm-discovery-subtitle {
+        font-family: var(--font-body, "Inter", sans-serif);
+        font-size: clamp(15px, 1.15vw, 17px);
+        font-weight: 400;
+        line-height: 1.75;
+        color: #2D3A30; /* Soft refined charcoal */
+        margin: 0 0 34px 0;
+        max-width: 520px;
+    }
+
+    /* Benefit List */
+    .mm-discovery-benefits {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 40px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 520px;
+    }
+
+    .mm-discovery-benefit-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    /* Elegant Custom Checkmark */
+    .mm-discovery-check {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: rgba(208, 155, 52, 0.12);
+        border: 1px solid rgba(208, 155, 52, 0.32);
+        color: #D09B34; /* Antique Gold */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: transform 250ms ease, background-color 250ms ease, border-color 250ms ease;
+    }
+
+    .mm-discovery-benefit-row:hover .mm-discovery-check {
+        transform: scale(1.08);
+        background-color: rgba(208, 155, 52, 0.2);
+        border-color: #D09B34;
+    }
+
+    .mm-discovery-benefit-text {
+        font-family: var(--font-body, "Inter", sans-serif);
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 1.5;
+        color: #2D3A30;
+        letter-spacing: 0.01em;
+    }
+
+    /* Luxury CTA Action */
+    .mm-discovery-action {
+        display: flex;
+        align-items: center;
+        margin-top: 4px;
+    }
+
+    .mm-discovery-cta-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background-color: #005441; /* Château Green */
+        color: #FFFFFF !important;
+        font-family: var(--font-body, "Inter", sans-serif);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        text-decoration: none !important;
+        padding: 16px 36px;
+        border-radius: 999px;
+        border: 1px solid #005441;
+        box-shadow: 0 6px 20px rgba(0, 84, 65, 0.22), 0 0 0 1px rgba(208, 155, 52, 0.22);
+        cursor: pointer;
+        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 300ms ease,
+                    border-color 300ms ease,
+                    box-shadow 300ms ease;
+    }
+
+    .mm-discovery-cta-btn:hover {
+        background-color: #0D434D; /* Midnight Teal */
+        border-color: #D09B34;     /* Antique Gold */
+        color: #FFFFFF !important;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(13, 67, 77, 0.3), 0 0 0 1px rgba(208, 155, 52, 0.45);
+    }
+
+    .mm-discovery-cta-arrow {
+        display: inline-flex;
+        align-items: center;
+        transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mm-discovery-cta-btn:hover .mm-discovery-cta-arrow {
+        transform: translateX(4px);
+    }
+
+    /* Right Column: Media & Image Frame */
+    .mm-discovery-media {
+        flex: 1 1 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .mm-discovery-image-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 620px;
+    }
+
+    /* Subtle Gold Accent Aura behind Image */
+    .mm-discovery-image-wrapper::before {
+        content: "";
+        position: absolute;
+        inset: -14px;
+        border-radius: clamp(18px, 2.2vw, 26px);
+        background: radial-gradient(circle at 50% 50%, rgba(208, 155, 52, 0.12) 0%, transparent 75%);
+        z-index: 0;
+        pointer-events: none;
+        transition: opacity 400ms ease;
+    }
+
+    .mm-discovery-image-frame {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        border-radius: clamp(14px, 1.8vw, 22px);
+        overflow: hidden;
+        border: 1px solid rgba(208, 155, 52, 0.28);
+        box-shadow: 
+            0 24px 60px rgba(13, 67, 77, 0.12),
+            0 6px 18px rgba(0, 84, 65, 0.05),
+            0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        background-color: #FAF5EE;
+    }
+
+    .mm-discovery-img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        display: block;
+        transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+        transform: scale(1);
+    }
+
+    .mm-discovery-image-frame:hover .mm-discovery-img {
+        transform: scale(1.035);
+    }
+
+    /* ==========================================================================
+       SCROLL-TRIGGERED LUXURY ANIMATIONS
+       Fade upward, image scales 0.98 -> 1, text fades in with slight delay
+       ========================================================================== */
+    .mm-discovery-reveal {
+        opacity: 0;
+        will-change: opacity, transform;
+        transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Initial state for Content: fade upward */
+    .mm-discovery-reveal[data-reveal="content"] {
+        transform: translateY(28px);
+    }
+
+    /* Initial state for Media: fade upward & scale 0.98 -> 1 */
+    .mm-discovery-reveal[data-reveal="media"] {
+        transform: translateY(24px) scale(0.98);
+        transition-delay: 120ms;
+    }
+
+    /* Revealed Active State */
+    .mm-discovery-reveal.is-in-view {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* Content text slight delay */
+    .mm-discovery-reveal[data-reveal="content"].is-in-view {
+        transition-delay: 60ms;
+    }
+
+    /* Fallback for reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+        .mm-discovery-reveal {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        .mm-discovery-img {
+            transition: none !important;
+            transform: none !important;
+        }
+        .mm-discovery-image-frame:hover .mm-discovery-img {
+            transform: none !important;
+        }
+        .mm-discovery-cta-btn {
+            transition: none !important;
+        }
+        .mm-discovery-cta-btn:hover {
+            transform: none !important;
+        }
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BEHAVIOUR
+       Desktop: 50 / 50 split
+       Tablet: Columns stack with image first
+       Mobile: Single column: Image -> Heading -> Description -> Benefits -> Button
+       ========================================================================== */
+    @media (max-width: 991px) {
+        .mm-discovery-section {
+            padding: 72px 0;
+        }
+
+        .mm-discovery-layout {
+            flex-direction: column;
+            gap: 44px;
+        }
+
+        /* Order: Image First */
+        .mm-discovery-media {
+            order: 1;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Order: Content Second */
+        .mm-discovery-content {
+            order: 2;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .mm-discovery-subtitle,
+        .mm-discovery-benefits {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .mm-discovery-section {
+            padding: 56px 0;
+        }
+
+        .mm-discovery-layout {
+            gap: 36px;
+        }
+
+        .mm-discovery-heading {
+            font-size: 30px;
+            margin-bottom: 14px;
+        }
+
+        .mm-discovery-subtitle {
+            font-size: 14.5px;
+            line-height: 1.65;
+            margin-bottom: 26px;
+        }
+
+        .mm-discovery-benefits {
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+
+        .mm-discovery-benefit-text {
+            font-size: 14px;
+        }
+
+        .mm-discovery-check {
+            width: 22px;
+            height: 22px;
+        }
+
+        .mm-discovery-action {
+            width: 100%;
+        }
+
+        .mm-discovery-cta-btn {
+            width: 100%;
+            padding: 15px 24px;
+            letter-spacing: 0.14em;
+        }
+    }
+</style>
+
+<!-- Lightweight Observer for the Discovery Section Animations -->
+<script>
+    (function() {
+        function initDiscoveryReveal() {
+            var section = document.getElementById('maison-discovery');
+            if (!section) return;
+
+            var items = section.querySelectorAll('.mm-discovery-reveal');
+            if (!items.length) return;
+
+            if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            items.forEach(function(el) {
+                                el.classList.add('is-in-view');
+                            });
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+                observer.observe(section);
+            } else {
+                items.forEach(function(el) {
+                    el.classList.add('is-in-view');
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDiscoveryReveal);
+        } else {
+            initDiscoveryReveal();
+        }
+    })();
+</script>

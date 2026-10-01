@@ -11,8 +11,9 @@ class ProductForm(forms.ModelForm):
         model = Product
         fields = [
             "name", "brand", "sku", "category", "gender", 
-            "fragrance_family", "concentration", "price", 
-            "discount_price", "description", "is_featured", "is_active"
+            "fragrance_family", "concentration", "occasions",
+            "top_notes", "heart_notes", "base_notes",
+            "price", "discount_price", "description", "is_featured", "is_active"
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
@@ -22,6 +23,10 @@ class ProductForm(forms.ModelForm):
             "gender": forms.Select(attrs={"class": "form-control"}),
             "fragrance_family": forms.Select(attrs={"class": "form-control"}),
             "concentration": forms.Select(attrs={"class": "form-control"}),
+            "occasions": forms.CheckboxSelectMultiple(),
+            "top_notes": forms.CheckboxSelectMultiple(),
+            "heart_notes": forms.CheckboxSelectMultiple(),
+            "base_notes": forms.CheckboxSelectMultiple(),
             "price": forms.NumberInput(attrs={"class": "form-control", "step": "0.01", "min": "0"}),
             "discount_price": forms.NumberInput(attrs={"class": "form-control", "step": "0.01", "min": "0"}),
             "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
@@ -60,3 +65,110 @@ ProductImageFormSet = inlineformset_factory(
     extra=1, 
     can_delete=True
 )
+
+
+class VoucherForm(forms.ModelForm):
+    """
+    Administrative form for creating, editing, and scheduling promotional privilege vouchers.
+    """
+    class Meta:
+        from apps.sales.models import Voucher
+        model = Voucher
+        fields = [
+            "code",
+            "description",
+            "discount_type",
+            "discount_value",
+            "min_cart_value",
+            "max_discount",
+            "valid_from",
+            "valid_until",
+            "max_uses",
+            "is_active",
+            "specific_customer",
+        ]
+        widgets = {
+            "code": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. MAISON20, PRIVILEGE500",
+                "style": "text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;",
+            }),
+            "description": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. 20% privilege on orders above ₹10,000",
+            }),
+            "discount_type": forms.Select(attrs={"class": "form-control"}),
+            "discount_value": forms.NumberInput(attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0.01",
+                "placeholder": "e.g. 15 for 15% or 500 for ₹500",
+            }),
+            "min_cart_value": forms.NumberInput(attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "placeholder": "0.00",
+            }),
+            "max_discount": forms.NumberInput(attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "placeholder": "Optional cap in ₹",
+            }),
+            "valid_from": forms.DateTimeInput(
+                format="%Y-%m-%dT%H:%M",
+                attrs={"class": "form-control", "type": "datetime-local"}
+            ),
+            "valid_until": forms.DateTimeInput(
+                format="%Y-%m-%dT%H:%M",
+                attrs={"class": "form-control", "type": "datetime-local"}
+            ),
+            "max_uses": forms.NumberInput(attrs={
+                "class": "form-control",
+                "min": "1",
+                "placeholder": "Leave empty for unlimited",
+            }),
+            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "specific_customer": forms.Select(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            if self.instance.valid_from:
+                self.initial["valid_from"] = self.instance.valid_from.strftime("%Y-%m-%dT%H:%M")
+            if self.instance.valid_until:
+                self.initial["valid_until"] = self.instance.valid_until.strftime("%Y-%m-%dT%H:%M")
+        elif "valid_from" not in self.initial:
+            from django.utils import timezone
+            self.initial["valid_from"] = timezone.now().strftime("%Y-%m-%dT%H:%M")
+
+    def clean_code(self):
+        code = self.cleaned_data.get("code")
+        if code:
+            code = code.strip().upper()
+        return code
+
+    def clean(self):
+        cleaned_data = super().clean()
+        discount_type = cleaned_data.get("discount_type")
+        discount_value = cleaned_data.get("discount_value")
+        min_cart_value = cleaned_data.get("min_cart_value")
+        valid_from = cleaned_data.get("valid_from")
+        valid_until = cleaned_data.get("valid_until")
+
+        if discount_value is not None:
+            if discount_value <= 0:
+                self.add_error("discount_value", "Discount value must be greater than zero.")
+            elif discount_type == "percentage" and discount_value > 100:
+                self.add_error("discount_value", "Percentage discount cannot exceed 100%.")
+
+        if min_cart_value is not None and min_cart_value < 0:
+            self.add_error("min_cart_value", "Minimum cart value cannot be negative.")
+
+        if valid_from and valid_until and valid_until <= valid_from:
+            self.add_error("valid_until", "Expiration date must be chronologically after the start date.")
+
+        return cleaned_data
+

@@ -78,6 +78,131 @@
                 {{ form.description }}
                 {{ form.description.errors }}
             </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Occasions (Perfect For)</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; padding: 16px; background: #FAF8F5; border: 1px solid var(--border); border-radius: 6px;">
+                    {% for checkbox in form.occasions %}
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--charcoal); cursor: pointer; margin: 0;">
+                            {{ checkbox.tag }}
+                            <span>{{ checkbox.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                {{ form.occasions.errors }}
+                <small style="color: var(--muted); font-size: 12px; margin-top: 4px; display: block;">Select all occasions and settings suitable for this fragrance.</small>
+            </div>
+
+            <!-- Fragrance Notes (Olfactory Pyramid) Editor -->
+            <div class="form-group" style="grid-column: span 2; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+                    <div>
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #D09B34; font-weight: 600; display: block;">Olfactory Pyramid</span>
+                        <h3 style="font-family: var(--font-display, serif); font-size: 20px; color: var(--charcoal); margin: 2px 0 4px 0;">Fragrance Notes</h3>
+                        <p style="color: var(--muted); font-size: 12.5px; margin: 0;">Curate ingredients across the tripartite opening, heart, and enduring base tiers.</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    
+                    <!-- Top Notes Tier -->
+                    <div style="background: #FAF8F5; border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <strong style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #005441; display: block;">Top Notes</strong>
+                                <span style="font-size: 11px; color: var(--muted);">Opening • 15–30 mins</span>
+                            </div>
+                            <span class="note-count-badge" id="top-notes-count" style="font-size: 11px; background: rgba(0,84,65,0.08); color: #005441; font-weight: 600; padding: 2px 8px; border-radius: 12px;">0 selected</span>
+                        </div>
+                        <input type="text" placeholder="Filter top notes..." oninput="filterNotesList(this, 'top-notes-container')" style="width: 100%; box-sizing: border-box; padding: 6px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 10px; background: #FFF;">
+                        <div id="top-notes-container" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;">
+                            {% for checkbox in form.top_notes %}
+                                <label class="note-tag-label" style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--charcoal); cursor: pointer; padding: 6px 10px; border-radius: 4px; background: #FFF; border: 1px solid rgba(0,0,0,0.06); transition: all 150ms ease;">
+                                    {{ checkbox.tag }}
+                                    <span class="note-text">{{ checkbox.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        {{ form.top_notes.errors }}
+                    </div>
+
+                    <!-- Heart Notes Tier -->
+                    <div style="background: #FAF8F5; border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <strong style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #0D434D; display: block;">Heart Notes</strong>
+                                <span style="font-size: 11px; color: var(--muted);">Core • 2–4 hours</span>
+                            </div>
+                            <span class="note-count-badge" id="heart-notes-count" style="font-size: 11px; background: rgba(13,67,77,0.08); color: #0D434D; font-weight: 600; padding: 2px 8px; border-radius: 12px;">0 selected</span>
+                        </div>
+                        <input type="text" placeholder="Filter heart notes..." oninput="filterNotesList(this, 'heart-notes-container')" style="width: 100%; box-sizing: border-box; padding: 6px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 10px; background: #FFF;">
+                        <div id="heart-notes-container" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;">
+                            {% for checkbox in form.heart_notes %}
+                                <label class="note-tag-label" style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--charcoal); cursor: pointer; padding: 6px 10px; border-radius: 4px; background: #FFF; border: 1px solid rgba(0,0,0,0.06); transition: all 150ms ease;">
+                                    {{ checkbox.tag }}
+                                    <span class="note-text">{{ checkbox.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        {{ form.heart_notes.errors }}
+                    </div>
+
+                    <!-- Base Notes Tier -->
+                    <div style="background: #FAF8F5; border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <strong style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #78350F; display: block;">Base Notes</strong>
+                                <span style="font-size: 11px; color: var(--muted);">Foundation • 6–12+ hours</span>
+                            </div>
+                            <span class="note-count-badge" id="base-notes-count" style="font-size: 11px; background: rgba(120,53,15,0.08); color: #78350F; font-weight: 600; padding: 2px 8px; border-radius: 12px;">0 selected</span>
+                        </div>
+                        <input type="text" placeholder="Filter base notes..." oninput="filterNotesList(this, 'base-notes-container')" style="width: 100%; box-sizing: border-box; padding: 6px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 10px; background: #FFF;">
+                        <div id="base-notes-container" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;">
+                            {% for checkbox in form.base_notes %}
+                                <label class="note-tag-label" style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--charcoal); cursor: pointer; padding: 6px 10px; border-radius: 4px; background: #FFF; border: 1px solid rgba(0,0,0,0.06); transition: all 150ms ease;">
+                                    {{ checkbox.tag }}
+                                    <span class="note-text">{{ checkbox.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        {{ form.base_notes.errors }}
+                    </div>
+
+                </div>
+            </div>
+
+            <script>
+            function filterNotesList(input, containerId) {
+                const query = input.value.toLowerCase().trim();
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const labels = container.querySelectorAll('.note-tag-label');
+                labels.forEach(label => {
+                    const text = label.querySelector('.note-text')?.textContent.toLowerCase() || '';
+                    label.style.display = text.includes(query) ? 'flex' : 'none';
+                });
+            }
+
+            function updateNoteCounts() {
+                const countTier = (containerId, badgeId) => {
+                    const container = document.getElementById(containerId);
+                    const badge = document.getElementById(badgeId);
+                    if (!container || !badge) return;
+                    const checked = container.querySelectorAll('input[type="checkbox"]:checked').length;
+                    badge.textContent = `${checked} selected`;
+                };
+                countTier('top-notes-container', 'top-notes-count');
+                countTier('heart-notes-container', 'heart-notes-count');
+                countTier('base-notes-container', 'base-notes-count');
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                updateNoteCounts();
+                document.querySelectorAll('#top-notes-container, #heart-notes-container, #base-notes-container').forEach(c => {
+                    c.addEventListener('change', updateNoteCounts);
+                });
+            });
+            </script>
             
             <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
                 {{ form.is_featured }}

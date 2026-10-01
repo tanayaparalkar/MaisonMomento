@@ -12,6 +12,7 @@ urlpatterns = [
     path("about/", catalog_views.about, name="about"),
     path("contact/", catalog_views.contact, name="contact"),
     path("collections/", catalog_views.collections, name="collections"),
+    path("discovery/", catalog_views.discovery_collection_view, name="discovery"),
     path("dashboard/", include("dashboard.urls")),
     path(
     "login/",

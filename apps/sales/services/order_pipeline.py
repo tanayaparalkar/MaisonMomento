@@ -16,15 +16,17 @@ Extension points
   of the hard check_stock() call below; release on payment failure.
 """
 
+from decimal import Decimal
 from django.db import transaction
 
 from apps.sales.models import Cart, Order, OrderItem
 from apps.sales.services.inventory import check_stock, deduct_inventory, InsufficientStockError
 
 
-def place_order(customer, cart, form_data):
+def place_order(customer, cart, form_data, discount=Decimal("0.00"), voucher=None):
     """
     Create a single Order from a validated checkout form and a Cart.
+
 
     Parameters
     ----------
@@ -79,13 +81,18 @@ def place_order(customer, cart, form_data):
         # ------------------------------------------------------------------ #
         # 3. Create the Order header                                           #
         # ------------------------------------------------------------------ #
+        delivery_note = form_data.get("delivery_notes", "")
+        if voucher:
+            delivery_note = f"{delivery_note} [Privilege: {voucher.code}]".strip()
+
         order = Order.objects.create(
             customer=customer,
             customer_name=f"{form_data['first_name']} {form_data['last_name']}".strip(),
             email=form_data["email"],
             phone=form_data["phone"],
             shipping_address=shipping_address,
-            notes=form_data.get("delivery_notes", ""),
+            discount=discount,
+            notes=delivery_note,
         )
 
         # ------------------------------------------------------------------ #
@@ -114,6 +121,9 @@ def place_order(customer, cart, form_data):
         #    Extension point: apply coupons / tax BEFORE this call.           #
         # ------------------------------------------------------------------ #
         order.recalculate_totals()
+
+        if voucher:
+            voucher.record_redemption()
 
         # ------------------------------------------------------------------ #
         # 7. Clear cart ONLY after a fully successful commit                  #

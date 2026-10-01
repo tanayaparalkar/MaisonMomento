@@ -11,7 +11,7 @@ from django.urls import reverse
 from apps.customers.models import Customer
 from apps.customers.services import get_customer_from_user
 from apps.catalog.models import Product
-from .models import Cart, CartItem, Order, OrderItem
+from .models import Cart, CartItem, Order, OrderItem, Voucher
 from .forms import CheckoutForm
 from .services.order_pipeline import place_order
 from .services.notifications import send_order_confirmation
@@ -20,6 +20,33 @@ from .services.payment import create_payment, verify_payment
 from .services.providers.razorpay import is_razorpay_configured
 
 logger = logging.getLogger(__name__)
+
+
+def _get_cart_and_voucher_context(request, cart, customer=None):
+    """
+    Helper to calculate current voucher discount and total for cart or checkout.
+    """
+    applied_voucher = None
+    discount_amount = Decimal("0.00")
+    subtotal = cart.subtotal if cart else Decimal("0.00")
+    total = subtotal
+
+    code = request.session.get("applied_voucher_code")
+    if code and subtotal > 0:
+        voucher = Voucher.objects.filter(code__iexact=code).first()
+        if voucher:
+            is_valid, discount, _ = voucher.calculate_discount(subtotal, customer=customer)
+            if is_valid:
+                applied_voucher = voucher
+                discount_amount = discount
+                total = max(Decimal("0.00"), subtotal - discount_amount)
+            else:
+                request.session.pop("applied_voucher_code", None)
+        else:
+            request.session.pop("applied_voucher_code", None)
+
+    return applied_voucher, discount_amount, total
+
 
 @login_required
 def cart_view(request):
@@ -31,9 +58,14 @@ def cart_view(request):
         cart = None
         items = []
 
+    applied_voucher, discount_amount, total_val = _get_cart_and_voucher_context(request, cart, customer=customer)
+
     return render(request, "sales/cart.html", {
         "cart": cart,
-        "items": items
+        "items": items,
+        "applied_voucher": applied_voucher,
+        "discount_amount": f"{discount_amount:.2f}",
+        "total_with_discount": f"{total_val:.2f}",
     })
 
 
@@ -120,6 +152,90 @@ def cart_action(request):
         return JsonResponse({"error": str(e)}, status=400)
 
 
+@require_POST
+def apply_voucher(request):
+    """
+    Validate and apply a promotional voucher to the current shopping session.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"success": False, "error": "Please log in to redeem privilege vouchers."}, status=401)
+
+    customer = get_customer_from_user(request.user)
+    if not customer:
+        return JsonResponse({"success": False, "error": "Customer account not found."}, status=400)
+
+    try:
+        cart = Cart.objects.get(customer=customer)
+    except Cart.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Your shopping bag is empty."}, status=400)
+
+    if not cart.items.exists() or cart.subtotal <= 0:
+        return JsonResponse({"success": False, "error": "Your shopping bag is empty."}, status=400)
+
+    try:
+        if request.content_type == "application/json" and request.body:
+            data = json.loads(request.body)
+            code = data.get("code", "")
+        else:
+            code = request.POST.get("code", "")
+    except Exception:
+        code = request.POST.get("code", "")
+
+    code = str(code).strip().upper()
+    if not code:
+        return JsonResponse({"success": False, "error": "Please enter a voucher code."}, status=400)
+
+    voucher = Voucher.objects.filter(code__iexact=code).first()
+    if not voucher:
+        return JsonResponse({"success": False, "error": f"Privilege code '{code}' is invalid or does not exist."}, status=404)
+
+    is_valid, discount, message = voucher.calculate_discount(cart.subtotal, customer=customer)
+    if not is_valid:
+        return JsonResponse({"success": False, "error": message}, status=400)
+
+    # Store voucher in session
+    request.session["applied_voucher_code"] = voucher.code
+
+    final_total = max(Decimal("0.00"), cart.subtotal - discount)
+
+    return JsonResponse({
+        "success": True,
+        "message": message,
+        "code": voucher.code,
+        "discount_display": voucher.get_discount_display(),
+        "discount_type": voucher.discount_type,
+        "discount_amount": f"{discount:.2f}",
+        "subtotal": f"{cart.subtotal:.2f}",
+        "total": f"{final_total:.2f}",
+    })
+
+
+@require_POST
+def remove_voucher(request):
+    """
+    Remove any applied voucher from the current shopping session.
+    """
+    request.session.pop("applied_voucher_code", None)
+
+    subtotal = Decimal("0.00")
+    if request.user.is_authenticated:
+        customer = get_customer_from_user(request.user)
+        if customer:
+            try:
+                cart = Cart.objects.get(customer=customer)
+                subtotal = cart.subtotal
+            except Cart.DoesNotExist:
+                pass
+
+    return JsonResponse({
+        "success": True,
+        "message": "Voucher removed.",
+        "discount_amount": "0.00",
+        "subtotal": f"{subtotal:.2f}",
+        "total": f"{subtotal:.2f}",
+    })
+
+
 @login_required
 def checkout_view(request):
     customer = get_customer_from_user(request.user)
@@ -169,11 +285,15 @@ def checkout_view(request):
         form = CheckoutForm(request.POST)
         if form.is_valid():
             try:
+                applied_voucher, discount_amount, _ = _get_cart_and_voucher_context(request, cart, customer=customer)
                 order = place_order(
                     customer=customer,
                     cart=cart,
                     form_data=form.cleaned_data,
+                    discount=discount_amount,
+                    voucher=applied_voucher,
                 )
+                request.session.pop("applied_voucher_code", None)
             except ValueError:
                 logger.warning("Checkout attempted with empty cart: customer=%s", customer.pk)
                 if is_ajax:
@@ -238,14 +358,18 @@ def checkout_view(request):
     else:
         form = CheckoutForm(initial=initial_data)
 
+    applied_voucher, discount_amount, total_val = _get_cart_and_voucher_context(request, cart, customer=customer)
+
     context = {
         "form": form,
         "items": items,
         "cart_item_count": cart.total_items,
         "subtotal": f"{cart.subtotal:.2f}",
-        "shipping_placeholder": "Calculated after order placement",
-        "tax_placeholder": "Calculated during payment",
-        "estimated_total": f"{cart.subtotal:.2f}",
+        "applied_voucher": applied_voucher,
+        "discount_amount": f"{discount_amount:.2f}",
+        "shipping_placeholder": "Complimentary",
+        "tax_placeholder": "Included",
+        "estimated_total": f"{total_val:.2f}",
         "razorpay_configured": razorpay_ready,
         "razorpay_key_id": getattr(settings, "RAZORPAY_KEY_ID", ""),
     }

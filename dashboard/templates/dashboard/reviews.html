@@ -1,0 +1,222 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Customer Reviews | Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Customer Reputation & Moderation</p>
+        <h1>Customer Reviews.</h1>
+        <p class="subtitle">
+            Curate authentic olfactory reflections, review patron feedback, and cultivate Maison prestige.
+        </p>
+    </div>
+
+    <div style="display: flex; gap: 16px; align-items: center;">
+        <div style="display: flex; gap: 24px; background: #FFFFFF; border: 1px solid var(--border); padding: 10px 20px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+            <div>
+                <span style="display: block; font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em;">Total</span>
+                <strong style="font-size: 18px; color: var(--charcoal); font-family: var(--font-display);">{{ total_count }}</strong>
+            </div>
+            <div style="border-left: 1px solid var(--border); padding-left: 16px;">
+                <span style="display: block; font-size: 11px; text-transform: uppercase; color: #005441; letter-spacing: 0.08em;">Approved</span>
+                <strong style="font-size: 18px; color: #005441; font-family: var(--font-display);">{{ approved_count }}</strong>
+            </div>
+            <div style="border-left: 1px solid var(--border); padding-left: 16px;">
+                <span style="display: block; font-size: 11px; text-transform: uppercase; color: #b45309; letter-spacing: 0.08em;">Pending</span>
+                <strong style="font-size: 18px; color: #b45309; font-family: var(--font-display);">{{ pending_count }}</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Toolbar with Filters & Search -->
+<form method="GET" action="{% url 'dashboard:reviews' %}" class="toolbar" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 24px;">
+    <!-- Search Box -->
+    <div style="flex-grow: 1; min-width: 240px;">
+        <input
+            type="text"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Search reviews, fragrances, or reviewers..."
+            class="search-box"
+            style="width: 100%; box-sizing: border-box;"
+        >
+    </div>
+
+    <!-- Product Filter Dropdown -->
+    <div>
+        <select name="product" class="form-control" onchange="this.form.submit()" style="padding: 9px 14px; height: auto; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background: #FFF;">
+            <option value="">All Fragrances</option>
+            {% for prod in products %}
+                <option value="{{ prod.id }}" {% if selected_product == prod.id %}selected{% endif %}>{{ prod.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Rating Filter Dropdown -->
+    <div>
+        <select name="rating" class="form-control" onchange="this.form.submit()" style="padding: 9px 14px; height: auto; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background: #FFF;">
+            <option value="">All Ratings</option>
+            <option value="5" {% if selected_rating == 5 %}selected{% endif %}>★★★★★ (5 Stars)</option>
+            <option value="4" {% if selected_rating == 4 %}selected{% endif %}>★★★★☆ (4 Stars)</option>
+            <option value="3" {% if selected_rating == 3 %}selected{% endif %}>★★★☆☆ (3 Stars)</option>
+            <option value="2" {% if selected_rating == 2 %}selected{% endif %}>★★☆☆☆ (2 Stars)</option>
+            <option value="1" {% if selected_rating == 1 %}selected{% endif %}>★☆☆☆☆ (1 Star)</option>
+        </select>
+    </div>
+
+    <!-- Status Tabs -->
+    <div class="filters" role="group" aria-label="Filter by approval status">
+        <a href="?{% if selected_product %}product={{ selected_product }}&{% endif %}{% if selected_rating %}rating={{ selected_rating }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}status=" class="filter {% if not selected_status %}active{% endif %}" style="text-decoration: none;">
+            All
+        </a>
+        <a href="?{% if selected_product %}product={{ selected_product }}&{% endif %}{% if selected_rating %}rating={{ selected_rating }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}status=approved" class="filter {% if selected_status == 'approved' %}active{% endif %}" style="text-decoration: none;">
+            Approved
+        </a>
+        <a href="?{% if selected_product %}product={{ selected_product }}&{% endif %}{% if selected_rating %}rating={{ selected_rating }}&{% endif %}{% if search_query %}q={{ search_query }}&{% endif %}status=pending" class="filter {% if selected_status == 'pending' %}active{% endif %}" style="text-decoration: none;">
+            Pending
+        </a>
+    </div>
+
+    {% if search_query or selected_product or selected_rating or selected_status %}
+        <a href="{% url 'dashboard:reviews' %}" class="secondary-btn" style="padding: 8px 14px; font-size: 12px; text-decoration: none;">Clear Filters</a>
+    {% endif %}
+</form>
+
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 14px 18px; border-radius: 4px; font-size: 13.5px; font-weight: 500; {% if message.tags == 'error' %}background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5;{% elif message.tags == 'warning' %}background: #fffbeb; color: #f59e0b; border: 1px solid #fcd34d;{% else %}background: #f0fdf4; color: #10b981; border: 1px solid #6ee7b7;{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<section class="panel">
+    <form method="POST" action="{% url 'dashboard:reviews' %}">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <h3 style="font-family: var(--font-display); font-size: 20px; color: var(--charcoal); margin: 0;">
+                Reviews ({{ page_obj.paginator.count }})
+            </h3>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <select name="action" class="form-control" style="padding: 6px 12px; height: auto; min-width: 170px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px;">
+                    <option value="">Bulk Actions...</option>
+                    <option value="approve">Approve Selected</option>
+                    <option value="reject">Reject / Hide Selected</option>
+                    <option value="delete">Delete Selected</option>
+                </select>
+                <button type="submit" class="secondary-btn" style="padding: 7px 14px; font-size: 12px;">Apply</button>
+            </div>
+        </div>
+
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th style="width: 36px;"><input type="checkbox" id="select-all" onclick="toggleReviewCheckboxes(this)"></th>
+                    <th style="width: 180px;">Fragrance</th>
+                    <th style="width: 150px;">Reviewer</th>
+                    <th style="width: 110px;">Rating</th>
+                    <th>Impression / Comment</th>
+                    <th style="width: 110px;">Date</th>
+                    <th style="width: 90px;">Status</th>
+                    <th style="text-align: right; width: 170px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr class="product-row stagger-item {% if not review.is_approved %}opacity-60{% endif %}" style="vertical-align: top;">
+                    <td><input type="checkbox" name="selected_reviews" value="{{ review.id }}"></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 36px; height: 44px; border-radius: 4px; background: #FAF7F2; flex-shrink: 0; {% if review.product.primary_image %}background-image: url('{{ review.product.primary_image.image.url }}'); background-size: cover; background-position: center;{% endif %} border: 1px solid var(--border);"></div>
+                            <div>
+                                <a href="{% url 'catalog:product_detail' review.product.pk %}" target="_blank" style="font-weight: 600; color: var(--charcoal); text-decoration: none; font-size: 13px; line-height: 1.3; display: block;">
+                                    {{ review.product.name }}
+                                </a>
+                                <small style="color: var(--muted); font-size: 11px;">{{ review.product.category.name }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong style="display: block; font-size: 13px; color: var(--charcoal);">{{ review.reviewer_name }}</strong>
+                        {% if review.is_verified_purchase %}
+                            <span style="display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: #005441; background: rgba(0, 84, 65, 0.08); padding: 2px 6px; border-radius: 10px; font-weight: 600; margin-top: 3px;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Verified
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="color: #D09B34; font-size: 13px; letter-spacing: 1px; display: block;">{{ review.stars_display }}</span>
+                        <span style="font-size: 11px; color: var(--muted); font-weight: 600;">{{ review.rating }} / 5</span>
+                    </td>
+                    <td>
+                        {% if review.title %}
+                            <div style="font-weight: 600; color: var(--charcoal); font-size: 13px; margin-bottom: 4px;">{{ review.title }}</div>
+                        {% endif %}
+                        <div style="font-size: 12.5px; color: var(--charcoal-soft); line-height: 1.5; max-height: 70px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+                            {{ review.comment }}
+                        </div>
+                    </td>
+                    <td style="font-size: 12px; color: var(--muted); white-space: nowrap;">
+                        {{ review.created_at|date:"M d, Y" }}
+                    </td>
+                    <td>
+                        {% if review.is_approved %}
+                            <span class="status delivered" style="font-size: 11px; padding: 3px 8px;">Approved</span>
+                        {% else %}
+                            <span class="status packing" style="font-size: 11px; padding: 3px 8px; background: #fffbeb; color: #b45309; border: 1px solid #fde68a;">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <!-- Quick Toggle Approve/Reject -->
+                        <a href="{% url 'dashboard:review_toggle' review.id %}" style="font-size: 12px; font-weight: 600; {% if review.is_approved %}color: #d97706;{% else %}color: #005441;{% endif %} text-decoration: none; margin-right: 12px;">
+                            {% if review.is_approved %}Reject{% else %}Approve{% endif %}
+                        </a>
+                        <!-- Edit -->
+                        <a href="{% url 'dashboard:review_edit' review.id %}" class="table-btn" style="text-decoration: none; margin-right: 8px;">Edit</a>
+                        <!-- Delete -->
+                        <a href="{% url 'dashboard:review_delete' review.id %}" onclick="return confirm('Delete this review permanently?');" style="font-size: 12px; color: #dc2626; text-decoration: none;">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: var(--muted); padding: 48px 0; font-size: 14px;">
+                        No reviews found matching the current criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+        <span style="font-size: 12.5px; color: var(--muted);">
+            Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        <div style="display: flex; gap: 8px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if selected_product %}&product={{ selected_product }}{% endif %}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="secondary-btn" style="padding: 6px 12px; font-size: 12px; text-decoration: none;">Previous</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if selected_product %}&product={{ selected_product }}{% endif %}{% if selected_rating %}&rating={{ selected_rating }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" class="secondary-btn" style="padding: 6px 12px; font-size: 12px; text-decoration: none;">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<script>
+function toggleReviewCheckboxes(source) {
+    const checkboxes = document.getElementsByName('selected_reviews');
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+</script>
+{% endblock %}
