@@ -1,150 +1,348 @@
 {% extends "dashboard/base.html" %}
 
-{% block title %}Settings{% endblock %}
+{% block title %}Settings & Administration | Maison Moménto{% endblock %}
 
 {% block content %}
+<!-- Hero Header -->
 <section class="hero">
     <div>
         <p class="eyebrow">Maison Momènto · Workspace Configuration</p>
-        <h1>Settings</h1>
+        <h1>Settings Hub</h1>
         <p class="subtitle">
-            Manage the Maison’s operational preferences, communication settings, and account security.
+            Centralized hub for boutique parameters, public contact coordinates, system preferences, future third-party integrations, and team administration.
         </p>
     </div>
 </section>
 
-<!-- Settings Navigation Sub-Tabs -->
-<div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+<!-- Sub-Navigation Bar -->
+<div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 14px; flex-wrap: wrap;">
     <a href="{% url 'dashboard:settings' %}" class="primary-btn" style="padding: 8px 20px; font-size: 12px; text-decoration: none; border-radius: var(--radius-pill);">
-        General Settings
+        Workspace Settings
     </a>
     <a href="{% url 'dashboard:contact_settings' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
         Contact Information &rarr;
     </a>
+    <a href="{% url 'dashboard:profile' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        My Profile &rarr;
+    </a>
+    <a href="#integrations" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        Future Integrations &darr;
+    </a>
+    <a href="#administration" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        Administration &darr;
+    </a>
 </div>
 
-<!-- Contact Information Management Panel -->
-<section class="panel" style="margin-bottom: 24px; border-left: 3px solid var(--chateau-green); background: linear-gradient(to right, rgba(0, 84, 65, 0.02), var(--white));">
+<!-- Alerts / Messages -->
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 14px 20px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; {% if message.tags == 'error' %}background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;{% elif message.tags == 'warning' %}background: #fffbeb; color: #d97706; border: 1px solid #fde68a;{% else %}background: #f0fdf4; color: var(--chateau-green); border: 1px solid #bbf7d0;{% endif %}">
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- =========================================================================
+     1. BUSINESS SETTINGS & CONTACT INFORMATION CARD
+     ========================================================================= -->
+<section class="panel" style="margin-bottom: 28px; border-left: 3px solid var(--chateau-green); background: linear-gradient(to right, rgba(0, 84, 65, 0.02), var(--white));">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
         <div>
-            <p class="eyebrow" style="color: var(--chateau-green);">Business Settings</p>
-            <h3>Contact Information</h3>
-            <p class="subtitle" style="margin-top: 6px; max-width: 600px;">
-                Manage public boutique details, email, phone numbers, flagship address, business hours, and social media channels shown across the storefront and footer.
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                <p class="eyebrow" style="color: var(--chateau-green); margin: 0;">Business Settings</p>
+                <span class="status in-stock" style="font-size: 10px; padding: 3px 8px;">Live Synchronized</span>
+            </div>
+            <h3 style="margin: 0 0 6px;">Business Contact Information</h3>
+            <p class="subtitle" style="margin: 0; max-width: 640px; font-size: 13px;">
+                Manage public concierge details, boutique telephone, WhatsApp, Paris flagship address, operating hours, and dynamic social media links displayed across the client-facing website and footer.
             </p>
         </div>
         <a href="{% url 'dashboard:contact_settings' %}" class="primary-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; padding: 12px 24px;">
-            <span>Edit Contact Information</span>
+            <span>Edit Contact Coordinates</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
         </a>
     </div>
 </section>
 
+<!-- Store Profile & Preferences -->
+<section class="panel" style="margin-bottom: 28px;">
+    <p class="eyebrow">Business Profile</p>
+    <h3>Store Information</h3>
+    <p class="subtitle" style="font-size: 13px; margin-bottom: 20px;">
+        General brand parameters used in administrative notifications and internal reports.
+    </p>
 
-<section class="panel">
-    <p class="eyebrow">Business profile</p>
-    <h3>Store information</h3>
+    <form method="POST" action="{% url 'dashboard:settings' %}">
+        {% csrf_token %}
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="store-name">Store Name</label>
+                <input
+                    id="store-name"
+                    name="store_name"
+                    type="text"
+                    value="{{ contact_info.business_name|default:'Maison Moménto' }}"
+                    class="form-control"
+                >
+            </div>
 
-    <div class="form-grid">
-        <div class="form-group">
-            <label for="store-name">Store name</label>
-            <input
-                id="store-name"
-                type="text"
-                value="Maison Momènto"
-            >
+            <div class="form-group">
+                <label for="store-email">Administrative Email</label>
+                <input
+                    id="store-email"
+                    type="email"
+                    value="{{ contact_info.business_email|default:'concierge@maisonmomento.com' }}"
+                    class="form-control"
+                    readonly
+                >
+                <small style="color: var(--muted); font-size: 11px; margin-top: 4px;">Configured in Contact Information.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="store-phone">Primary Telephone</label>
+                <input
+                    id="store-phone"
+                    type="tel"
+                    value="{{ contact_info.primary_phone|default:'+33 1 40 20 50 50' }}"
+                    class="form-control"
+                    readonly
+                >
+                <small style="color: var(--muted); font-size: 11px; margin-top: 4px;">Configured in Contact Information.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="store-currency">Default Currency</label>
+                <select id="store-currency" class="form-control">
+                    <option selected>INR (₹) — Indian Rupee</option>
+                    <option>EUR (€) — Euro</option>
+                    <option>USD ($) — US Dollar</option>
+                    <option>GBP (£) — British Pound</option>
+                </select>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="store-email">Email</label>
-            <input
-                id="store-email"
-                type="email"
-                value="admin@maisonmomento.com"
-            >
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+            <button class="primary-btn" type="submit" style="padding: 10px 24px; font-size: 12.5px;">
+                Save Store Settings
+            </button>
         </div>
-
-        <div class="form-group">
-            <label for="store-phone">Phone</label>
-            <input
-                id="store-phone"
-                type="tel"
-                value="+91 9876543210"
-            >
-        </div>
-
-        <div class="form-group">
-            <label for="store-currency">Currency</label>
-            <select id="store-currency">
-                <option selected>INR (₹)</option>
-                <option>USD ($)</option>
-                <option>EUR (€)</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="settings-actions">
-        <button class="primary-btn" type="button">
-            Save changes
-        </button>
-    </div>
+    </form>
 </section>
 
-<section class="panel">
-    <p class="eyebrow">Communications</p>
-    <h3>Notifications</h3>
+<!-- =========================================================================
+     2. SYSTEM PREFERENCES & NOTIFICATIONS
+     ========================================================================= -->
+<section class="panel" style="margin-bottom: 28px;">
+    <p class="eyebrow">System Preferences</p>
+    <h3>Communications & Automated Alerts</h3>
+    <p class="subtitle" style="font-size: 13px; margin-bottom: 20px;">
+        Control operational notification dispatches for inventory, weekly executive summaries, and system webhooks.
+    </p>
 
     <div class="settings-options">
         <label class="setting-option">
             <span class="setting-option-copy">
-                <span class="setting-option-title">Inventory alerts</span>
+                <span class="setting-option-title">Inventory Low-Stock Alerts</span>
                 <span class="setting-option-description">
-                    Receive a notification when fragrance stock requires attention.
+                    Receive immediate dashboard and dispatch notifications when bespoke fragrance quantities drop below 10 units.
                 </span>
             </span>
-
             <input type="checkbox" checked>
             <span class="toggle-switch" aria-hidden="true"></span>
         </label>
 
         <label class="setting-option">
             <span class="setting-option-copy">
-                <span class="setting-option-title">Weekly reports</span>
+                <span class="setting-option-title">Weekly Atelier Executive Reports</span>
                 <span class="setting-option-description">
-                    Receive a weekly overview of sales, inventory, and client activity.
+                    Receive weekly analytical summaries of boutique revenue, high-intent client interactions, and top olfactory accord demand.
                 </span>
             </span>
-
             <input type="checkbox" checked>
             <span class="toggle-switch" aria-hidden="true"></span>
         </label>
 
         <label class="setting-option">
             <span class="setting-option-copy">
-                <span class="setting-option-title">Promotional emails</span>
+                <span class="setting-option-title">Order Status Webhooks & Dispatch Notifications</span>
                 <span class="setting-option-description">
-                    Receive Maison announcements, feature releases, and product updates.
+                    Trigger automated order confirmation dispatches upon verified checkout payments.
                 </span>
             </span>
-
-            <input type="checkbox">
+            <input type="checkbox" checked>
             <span class="toggle-switch" aria-hidden="true"></span>
         </label>
     </div>
 </section>
 
-<section class="panel">
-    <p class="eyebrow">Account protection</p>
-    <h3>Security</h3>
-
-    <p class="subtitle settings-description">
-        Maintain the security of your workspace by reviewing your credentials regularly.
+<!-- =========================================================================
+     3. FUTURE INTEGRATIONS
+     ========================================================================= -->
+<section id="integrations" class="panel" style="margin-bottom: 28px; scroll-margin-top: 100px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+        <div>
+            <p class="eyebrow" style="color: var(--antique-gold);">Ecosystem Architecture</p>
+            <h3 style="margin: 0;">Future Integrations</h3>
+        </div>
+        <span class="status packing" style="font-size: 10px; padding: 4px 10px;">Modular Services</span>
+    </div>
+    <p class="subtitle" style="font-size: 13px; margin-bottom: 24px;">
+        Overview of external APIs, payment processing gateways, olfactory recommendation engines, and third-party fulfillment services connected to Maison Moménto.
     </p>
 
-    <div class="settings-actions">
-        <button class="primary-btn" type="button">
-            Change password
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
+        <!-- Integration 1: Razorpay -->
+        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; background: var(--white); box-shadow: var(--shadow-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div style="font-weight: 600; font-size: 14px; color: var(--charcoal);">Razorpay Gateway</div>
+                <span class="status in-stock" style="font-size: 10px; padding: 2px 8px;">Active</span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--charcoal-soft); margin-bottom: 16px; line-height: 1.5;">
+                Handles encrypted checkout sessions, UPI, Cards, and NetBanking with automated webhook verification.
+            </p>
+            <div style="font-size: 11px; color: var(--muted);">Protocol: Webhook Signature Verified</div>
+        </div>
+
+        <!-- Integration 2: Scent Recommendation Engine -->
+        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; background: var(--white); box-shadow: var(--shadow-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div style="font-weight: 600; font-size: 14px; color: var(--charcoal);">Scent AI Recommendation Engine</div>
+                <span class="status in-stock" style="font-size: 10px; padding: 2px 8px;">Active</span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--charcoal-soft); margin-bottom: 16px; line-height: 1.5;">
+                Interactive olfactory quiz, base/heart/head note vector weighting, and bespoke curations.
+            </p>
+            <div style="font-size: 11px; color: var(--muted);">Internal Python Recommendation Engine</div>
+        </div>
+
+        <!-- Integration 3: Klaviyo / Email Automation -->
+        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; background: var(--white); box-shadow: var(--shadow-subtle); opacity: 0.9;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div style="font-weight: 600; font-size: 14px; color: var(--charcoal);">Klaviyo & CRM Automation</div>
+                <span class="status packing" style="font-size: 10px; padding: 2px 8px;">Planned</span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--charcoal-soft); margin-bottom: 16px; line-height: 1.5;">
+                Targeted private olfactory previews, fragrance discovery follow-ups, and privilege voucher automation.
+            </p>
+            <div style="font-size: 11px; color: var(--muted);">Reserved for Phase 4</div>
+        </div>
+
+        <!-- Integration 4: Global Courier API -->
+        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; background: var(--white); box-shadow: var(--shadow-subtle); opacity: 0.9;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div style="font-weight: 600; font-size: 14px; color: var(--charcoal);">Global Courier Logistics</div>
+                <span class="status packing" style="font-size: 10px; padding: 2px 8px;">Planned</span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--charcoal-soft); margin-bottom: 16px; line-height: 1.5;">
+                Real-time tracking number generation, Paris boutique dispatch dispatch sync, and DHL Express rates.
+            </p>
+            <div style="font-size: 11px; color: var(--muted);">Reserved for Phase 5</div>
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     4. ADMINISTRATION & TEAM MANAGEMENT
+     ========================================================================= -->
+<section id="administration" class="panel" style="margin-bottom: 28px; scroll-margin-top: 100px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <p class="eyebrow" style="color: var(--chateau-green);">Access & Governance</p>
+            <h3 style="margin: 0;">Administration</h3>
+            <p class="subtitle" style="font-size: 13px; margin-top: 6px;">
+                Manage administrator credentials, invite boutique collaborators, and configure team role permissions.
+            </p>
+        </div>
+        <button type="button" class="primary-btn" onclick="alert('Invitation flow ready. Enter colleague email and assign role to send an invitation token.')" style="padding: 10px 22px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+            <span>Invite Administrator</span>
         </button>
+    </div>
+
+    <!-- Active Administrator Users Table -->
+    <div style="overflow-x: auto; margin-bottom: 28px;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr style="border-bottom: 1.5px solid var(--border); text-align: left;">
+                    <th style="padding: 12px 14px; font-weight: 600; color: var(--charcoal-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Administrator</th>
+                    <th style="padding: 12px 14px; font-weight: 600; color: var(--charcoal-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Assigned Role</th>
+                    <th style="padding: 12px 14px; font-weight: 600; color: var(--charcoal-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Status</th>
+                    <th style="padding: 12px 14px; font-weight: 600; color: var(--charcoal-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Joined</th>
+                    <th style="padding: 12px 14px; font-weight: 600; color: var(--charcoal-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in admin_users %}
+                    <tr style="border-bottom: 1px solid var(--border); transition: background var(--transition-fast);">
+                        <td style="padding: 14px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--midnight-teal); color: var(--ivory); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 16px; font-weight: 600;">
+                                    {{ admin.first_name|first|default:admin.username|first|upper }}
+                                </div>
+                                <div>
+                                    <strong style="color: var(--charcoal); display: block;">{{ admin.get_full_name|default:admin.username }}</strong>
+                                    <span style="color: var(--muted); font-size: 11.5px;">{{ admin.email|default:"No email" }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 14px;">
+                            {% if admin.is_superuser %}
+                                <span class="status in-stock" style="font-size: 10.5px; padding: 3px 9px;">Super Administrator</span>
+                            {% else %}
+                                <span class="status packing" style="font-size: 10.5px; padding: 3px 9px;">Staff Member</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 14px;">
+                            <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--chateau-green); font-weight: 500;">
+                                <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--chateau-green);"></span>
+                                Active
+                            </span>
+                        </td>
+                        <td style="padding: 14px; color: var(--charcoal-soft); font-size: 12px;">
+                            {{ admin.date_joined|date:"M j, Y" }}
+                        </td>
+                        <td style="padding: 14px; text-align: right;">
+                            {% if admin == request.user %}
+                                <a href="{% url 'dashboard:profile' %}" style="font-size: 12px; color: var(--chateau-green); font-weight: 500; text-decoration: underline; text-underline-offset: 3px;">
+                                    Edit My Profile
+                                </a>
+                            {% else %}
+                                <span style="font-size: 12px; color: var(--muted);">Protected Account</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="padding: 24px; text-align: center; color: var(--muted);">
+                            No additional staff accounts configured.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Administrative Role Management Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+        <!-- Card 1: Role Permissions -->
+        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; background: var(--ivory);">
+            <h4 style="margin: 0 0 6px; font-size: 13.5px; color: var(--charcoal);">Role Permissions (RBAC)</h4>
+            <p style="font-size: 12px; color: var(--charcoal-soft); margin-bottom: 12px; line-height: 1.5;">
+                Configure access tiers for Atelier Concierge, Inventory Operations, and Financial Reporting teams.
+            </p>
+            <span style="font-size: 11px; color: var(--muted);">Role matrix ready for multi-tiered access</span>
+        </div>
+
+        <!-- Card 2: Security & Audit Trails -->
+        <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; background: var(--ivory);">
+            <h4 style="margin: 0 0 6px; font-size: 13.5px; color: var(--charcoal);">Audit Logs & Session Security</h4>
+            <p style="font-size: 12px; color: var(--charcoal-soft); margin-bottom: 12px; line-height: 1.5;">
+                All administrative modifications and stock adjustments record timestamped audit trails.
+            </p>
+            <span style="font-size: 11px; color: var(--muted);">Active Session: Verified Staff</span>
+        </div>
     </div>
 </section>
 {% endblock %}

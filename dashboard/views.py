@@ -13,8 +13,11 @@ from django.db.models import Sum
 from .decorators import staff_member_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import BusinessSettings
-from .forms import BusinessSettingsForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.models import User
+from .models import BusinessSettings, AdminProfile
+from .forms import BusinessSettingsForm, AdminProfileForm
 
 from apps.catalog.models import Product
 from apps.customers.models import Customer
@@ -271,8 +274,70 @@ def recommendations(request):
 
 
 @staff_member_required
+def profile(request):
+    """
+    Dedicated view for managing Admin personal information, display name,
+    profile picture / avatar, and account password.
+    """
+    admin_profile = AdminProfile.get_for_user(request.user)
+    profile_form = AdminProfileForm(instance=admin_profile, user=request.user)
+    password_form = PasswordChangeForm(user=request.user)
+
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+        if action == "update_profile":
+            profile_form = AdminProfileForm(request.POST, request.FILES, instance=admin_profile, user=request.user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Your profile details have been successfully updated.")
+                return redirect("dashboard:profile")
+            else:
+                messages.error(request, "Please review the errors in the profile form.")
+        elif action == "remove_avatar":
+            if admin_profile.avatar:
+                admin_profile.avatar.delete(save=False)
+                admin_profile.avatar = None
+                admin_profile.save()
+                messages.success(request, "Profile picture removed.")
+            return redirect("dashboard:profile")
+        elif action == "change_password":
+            password_form = PasswordChangeForm(user=request.user, data=request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, "Your password has been changed successfully.")
+                return redirect("dashboard:profile")
+            else:
+                messages.error(request, "Please correct the password errors indicated below.")
+
+    return render(request, "dashboard/profile.html", {
+        "admin_profile": admin_profile,
+        "profile_form": profile_form,
+        "password_form": password_form,
+    })
+
+
+@staff_member_required
 def settings(request):
-    return render(request, "dashboard/settings.html")
+    """
+    Centralized Settings hub grouping Business Settings, Contact Information,
+    System Preferences, Future Integrations, and Team Administration.
+    """
+    contact_info = BusinessSettings.get_settings()
+    admin_users = User.objects.filter(is_staff=True).order_by("-is_superuser", "username")
+
+    if request.method == "POST":
+        store_name = request.POST.get("store_name", "").strip()
+        if store_name:
+            contact_info.business_name = store_name
+            contact_info.save()
+            messages.success(request, "Store preferences updated successfully.")
+            return redirect("dashboard:settings")
+
+    return render(request, "dashboard/settings.html", {
+        "contact_info": contact_info,
+        "admin_users": admin_users,
+    })
 
 
 @staff_member_required

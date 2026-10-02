@@ -6,7 +6,7 @@
 <section class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
     <div>
         <p class="eyebrow">Maison Momènto · Executive Overview</p>
-        <h1>The Maison, at a glance.</h1>
+        <h1>Maison at a glance.</h1>
         <p class="subtitle">
             A considered view of sales performance, client activity, and operational health.
         </p>
@@ -14,7 +14,7 @@
     
     <div style="display: flex; gap: 12px; align-items: center;">
         <form method="GET" action="{% url 'dashboard:dashboard' %}" style="display: flex; gap: 8px;">
-            <select name="date_range" class="form-control" onchange="this.form.submit()" style="min-width: 150px; padding: 6px 12px;">
+            <select name="date_range" class="form-control" onchange="this.form.submit()" style="min-width: 160px;">
                 <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
                 <option value="last_7_days" {% if date_filter == 'last_7_days' %}selected{% endif %}>Last 7 Days</option>
                 <option value="this_month" {% if date_filter == 'this_month' %}selected{% endif %}>This Month</option>

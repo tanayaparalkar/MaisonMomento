@@ -15,12 +15,15 @@
 </section>
 
 <!-- Sub-Navigation Tabs -->
-<div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+<div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 14px; flex-wrap: wrap;">
     <a href="{% url 'dashboard:settings' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
-        &larr; General Settings
+        &larr; Settings Hub
     </a>
     <a href="{% url 'dashboard:contact_settings' %}" class="primary-btn" style="padding: 8px 20px; font-size: 12px; text-decoration: none; border-radius: var(--radius-pill);">
         Contact Information
+    </a>
+    <a href="{% url 'dashboard:profile' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        My Profile &rarr;
     </a>
 </div>
 

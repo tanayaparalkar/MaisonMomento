@@ -291,3 +291,90 @@ class BusinessSettingsForm(forms.ModelForm):
         return phone
 
 
+class AdminProfileForm(forms.ModelForm):
+    """
+    Form for editing Admin personal details, title, phone, timezone, and avatar.
+    Synchronizes display name and email directly with Django's User model.
+    """
+    first_name = forms.CharField(
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "First name (e.g. Tanaya)",
+        })
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Last name (e.g. Paralkar)",
+        })
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "admin@maisonmomento.com",
+        })
+    )
+
+    class Meta:
+        from .models import AdminProfile
+        model = AdminProfile
+        fields = [
+            "avatar",
+            "display_title",
+            "phone",
+            "timezone",
+        ]
+        widgets = {
+            "avatar": forms.FileInput(attrs={
+                "class": "form-control",
+                "accept": "image/*",
+                "id": "admin-avatar-input",
+            }),
+            "display_title": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "e.g. Maison Administrator",
+            }),
+            "phone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "+33 1 40 20 50 50",
+            }),
+            "timezone": forms.Select(
+                choices=[
+                    ("Europe/Paris (CET)", "Paris — Central European Time (CET/CEST)"),
+                    ("Europe/London (GMT)", "London — Greenwich Mean Time (GMT/BST)"),
+                    ("Asia/Kolkata (IST)", "India — Indian Standard Time (IST)"),
+                    ("America/New_York (EST)", "New York — Eastern Standard Time (EST/EDT)"),
+                    ("Asia/Dubai (GST)", "Dubai — Gulf Standard Time (GST)"),
+                    ("Asia/Singapore (SGT)", "Singapore — Singapore Standard Time (SGT)"),
+                ],
+                attrs={"class": "form-control"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+        if self.user:
+            self.fields["first_name"].initial = self.user.first_name
+            self.fields["last_name"].initial = self.user.last_name
+            self.fields["email"].initial = self.user.email
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        if self.user:
+            self.user.first_name = self.cleaned_data.get("first_name", "").strip()
+            self.user.last_name = self.cleaned_data.get("last_name", "").strip()
+            self.user.email = self.cleaned_data.get("email", "").strip()
+            if commit:
+                self.user.save()
+            profile.user = self.user
+        if commit:
+            profile.save()
+        return profile
+
+

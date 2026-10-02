@@ -1,6 +1,7 @@
 import re
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 
 def validate_phone_number(value):
@@ -173,3 +174,57 @@ class BusinessSettings(models.Model):
             return ""
         digits = re.sub(r"\D", "", self.whatsapp_number)
         return f"https://wa.me/{digits}" if digits else ""
+
+
+class AdminProfile(models.Model):
+    """
+    Profile extension for Maison Moménto administrators and staff members.
+    Holds display titles, avatars, contact phone, and workspace preferences.
+    """
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="admin_profile",
+        verbose_name="User Account"
+    )
+    avatar = models.ImageField(
+        upload_to="admin_avatars/",
+        blank=True,
+        null=True,
+        verbose_name="Profile Picture"
+    )
+    display_title = models.CharField(
+        max_length=100,
+        blank=True,
+        default="Maison Administrator",
+        verbose_name="Title / Role"
+    )
+    phone = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        verbose_name="Direct Telephone"
+    )
+    timezone = models.CharField(
+        max_length=50,
+        blank=True,
+        default="Europe/Paris (CET)",
+        verbose_name="Timezone"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Admin Profile"
+        verbose_name_plural = "Admin Profiles"
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
+    @classmethod
+    def get_for_user(cls, user):
+        """
+        Safely fetch or create an AdminProfile for the given User.
+        """
+        profile, _ = cls.objects.get_or_create(user=user)
+        return profile

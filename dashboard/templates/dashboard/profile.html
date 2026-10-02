@@ -1,0 +1,227 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}My Profile | Maison Moménto{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<section class="hero">
+    <div>
+        <p class="eyebrow">Maison Momènto · Account & Credentials</p>
+        <h1>My Profile</h1>
+        <p class="subtitle">
+            Manage your Maison administrative credentials, personalized display name, profile avatar, and account security.
+        </p>
+    </div>
+</section>
+
+<!-- Sub-Navigation / Breadcrumb Bar -->
+<div style="display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+    <a href="{% url 'dashboard:profile' %}" class="primary-btn" style="padding: 8px 20px; font-size: 12px; text-decoration: none; border-radius: var(--radius-pill);">
+        My Profile
+    </a>
+    <a href="{% url 'dashboard:settings' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        Settings Hub &rarr;
+    </a>
+    <a href="{% url 'dashboard:contact_settings' %}" style="padding: 8px 20px; font-size: 12px; font-weight: 500; color: var(--charcoal-soft); text-decoration: none; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--white); transition: all 180ms ease;">
+        Contact Information &rarr;
+    </a>
+</div>
+
+<!-- Alerts / Messages -->
+{% if messages %}
+    <div style="margin-bottom: 24px;">
+        {% for message in messages %}
+            <div style="padding: 14px 20px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; {% if message.tags == 'error' %}background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;{% elif message.tags == 'warning' %}background: #fffbeb; color: #d97706; border: 1px solid #fde68a;{% else %}background: #f0fdf4; color: var(--chateau-green); border: 1px solid #bbf7d0;{% endif %}">
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Top Profile Identity Banner -->
+<section class="panel" style="margin-bottom: 28px; border-left: 3px solid var(--chateau-green); background: linear-gradient(to right, rgba(0, 84, 65, 0.02), var(--white));">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="position: relative;">
+                {% if admin_profile.avatar %}
+                    <img src="{{ admin_profile.avatar.url }}" alt="{{ request.user.get_full_name|default:request.user.username }}" style="width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); box-shadow: var(--shadow-card);">
+                {% else %}
+                    <div style="width: 76px; height: 76px; border-radius: 50%; background: var(--midnight-teal); color: var(--ivory); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 32px; font-weight: 600; border: 2px solid var(--border); box-shadow: var(--shadow-card);">
+                        {{ request.user.first_name|first|default:request.user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                    <h2 style="margin: 0; font-size: 22px; font-family: var(--font-display); font-weight: 600; color: var(--charcoal);">
+                        {{ request.user.get_full_name|default:request.user.username }}
+                    </h2>
+                    <span class="status in-stock" style="font-size: 11px; padding: 4px 10px;">
+                        {% if request.user.is_superuser %}Maison Administrator{% else %}Staff Member{% endif %}
+                    </span>
+                </div>
+                <p style="margin: 0 0 6px; font-size: 13px; color: var(--charcoal-soft);">
+                    {{ request.user.email|default:"No email configured" }}
+                </p>
+                <p style="margin: 0; font-size: 11.5px; color: var(--muted);">
+                    Member since {{ request.user.date_joined|date:"F Y" }} · Last active {{ request.user.last_login|date:"M j, Y, P"|default:"Recently" }}
+                </p>
+            </div>
+        </div>
+
+        {% if admin_profile.avatar %}
+            <form method="POST" action="{% url 'dashboard:profile' %}" style="margin: 0;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove_avatar">
+                <button type="submit" style="padding: 8px 16px; font-size: 12px; color: #dc2626; border: 1px solid #fecaca; background: #fff5f5; border-radius: var(--radius-sm); cursor: pointer; transition: background 180ms ease;">
+                    Remove Picture
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Personal Information & Avatar Form -->
+<form method="POST" action="{% url 'dashboard:profile' %}" enctype="multipart/form-data" novalidate style="margin-bottom: 32px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="update_profile">
+
+    <section class="panel" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+                <p class="eyebrow" style="color: var(--chateau-green);">Identity & Coordinates</p>
+                <h3 style="margin: 0;">Personal Details</h3>
+            </div>
+            <span class="status packing" style="font-size: 10px; padding: 4px 10px;">Account Profile</span>
+        </div>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 24px; font-size: 13px;">
+            Update how your name appears across audit trails, notifications, and internal boutique operations.
+        </p>
+
+        <div class="form-grid">
+            <!-- First Name -->
+            <div class="form-group">
+                <label for="{{ profile_form.first_name.id_for_label }}">First Name</label>
+                {{ profile_form.first_name }}
+                {% if profile_form.first_name.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ profile_form.first_name.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group">
+                <label for="{{ profile_form.last_name.id_for_label }}">Last Name</label>
+                {{ profile_form.last_name }}
+                {% if profile_form.last_name.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ profile_form.last_name.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Email Address -->
+            <div class="form-group">
+                <label for="{{ profile_form.email.id_for_label }}">Email Address *</label>
+                {{ profile_form.email }}
+                {% if profile_form.email.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ profile_form.email.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Used for sign-in and administrative notifications.</small>
+            </div>
+
+            <!-- Display Title -->
+            <div class="form-group">
+                <label for="{{ profile_form.display_title.id_for_label }}">Title / Role</label>
+                {{ profile_form.display_title }}
+                {% if profile_form.display_title.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ profile_form.display_title.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label for="{{ profile_form.phone.id_for_label }}">Direct Telephone (Optional)</label>
+                {{ profile_form.phone }}
+                {% if profile_form.phone.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ profile_form.phone.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Timezone -->
+            <div class="form-group">
+                <label for="{{ profile_form.timezone.id_for_label }}">Operational Timezone</label>
+                {{ profile_form.timezone }}
+                {% if profile_form.timezone.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ profile_form.timezone.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Profile Picture Upload -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="{{ profile_form.avatar.id_for_label }}">Upload New Profile Picture</label>
+                {{ profile_form.avatar }}
+                {% if profile_form.avatar.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ profile_form.avatar.errors.0 }}</span>
+                {% endif %}
+                <small style="color: var(--muted); font-size: 11.5px; margin-top: 4px;">Accepted formats: PNG, JPG, WEBP. Displays in the header and slide-over profile drawer.</small>
+            </div>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end;">
+            <button type="submit" class="primary-btn" style="padding: 12px 28px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                Save Profile Changes
+            </button>
+        </div>
+    </section>
+</form>
+
+<!-- Security & Password Panel -->
+<form method="POST" action="{% url 'dashboard:profile' %}" novalidate style="margin-bottom: 40px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="change_password">
+
+    <section class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+                <p class="eyebrow" style="color: var(--chateau-green);">Account Protection</p>
+                <h3 style="margin: 0;">Change Password</h3>
+            </div>
+            <span class="status out-of-stock" style="font-size: 10px; padding: 4px 10px;">Security</span>
+        </div>
+        <p class="subtitle" style="margin-top: 0; margin-bottom: 24px; font-size: 13px;">
+            Update your administrative password regularly to maintain optimal security for Maison Moménto.
+        </p>
+
+        <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="id_old_password">Current Password *</label>
+                <input type="password" name="old_password" id="id_old_password" class="form-control" autocomplete="current-password" required placeholder="••••••••••••">
+                {% if password_form.old_password.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ password_form.old_password.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_new_password1">New Password *</label>
+                <input type="password" name="new_password1" id="id_new_password1" class="form-control" autocomplete="new-password" required placeholder="••••••••••••">
+                {% if password_form.new_password1.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ password_form.new_password1.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_new_password2">Confirm New Password *</label>
+                <input type="password" name="new_password2" id="id_new_password2" class="form-control" autocomplete="new-password" required placeholder="••••••••••••">
+                {% if password_form.new_password2.errors %}
+                    <span style="color: #dc2626; font-size: 11.5px; margin-top: 4px;">{{ password_form.new_password2.errors.0 }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end;">
+            <button type="submit" class="primary-btn" style="padding: 12px 28px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                Update Password
+            </button>
+        </div>
+    </section>
+</form>
+{% endblock %}

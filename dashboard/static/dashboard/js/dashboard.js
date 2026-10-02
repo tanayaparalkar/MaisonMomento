@@ -726,6 +726,96 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /* =========================================================================
+       SLIDE-OVER PROFILE DRAWER
+       ========================================================================= */
+
+    const profileToggle = document.getElementById("profile-drawer-toggle");
+    const profileDrawer = document.getElementById("profile-drawer");
+    const profileBackdrop = document.getElementById("profile-drawer-backdrop");
+    const profileCloseBtn = document.getElementById("profile-drawer-close");
+
+    const setProfileDrawerState = (isOpen) => {
+        if (!profileDrawer || !profileBackdrop) {
+            return;
+        }
+
+        profileDrawer.classList.toggle("is-open", isOpen);
+        profileBackdrop.classList.toggle("is-open", isOpen);
+
+        profileDrawer.setAttribute("aria-hidden", String(!isOpen));
+        document.body.style.overflow = isOpen ? "hidden" : "";
+
+        if (profileToggle) {
+            profileToggle.setAttribute("aria-expanded", String(isOpen));
+        }
+
+        if (isOpen) {
+            // Focus the close button when opened for accessibility
+            window.setTimeout(() => {
+                if (profileCloseBtn) {
+                    profileCloseBtn.focus();
+                }
+            }, 360);
+        }
+    };
+
+    const openProfileDrawer = () => {
+        setProfileDrawerState(true);
+    };
+
+    const closeProfileDrawer = () => {
+        setProfileDrawerState(false);
+    };
+
+    const toggleProfileDrawer = () => {
+        const isOpen =
+            profileDrawer &&
+            profileDrawer.classList.contains("is-open");
+
+        setProfileDrawerState(!isOpen);
+    };
+
+    if (profileToggle) {
+        profileToggle.addEventListener("click", toggleProfileDrawer);
+    }
+
+    if (profileCloseBtn) {
+        profileCloseBtn.addEventListener("click", closeProfileDrawer);
+    }
+
+    if (profileBackdrop) {
+        profileBackdrop.addEventListener("click", closeProfileDrawer);
+    }
+
+    // Focus trap: keep Tab inside the open drawer
+    if (profileDrawer) {
+        profileDrawer.addEventListener("keydown", (event) => {
+            if (event.key !== "Tab") {
+                return;
+            }
+
+            const focusable = profileDrawer.querySelectorAll(
+                'a[href], button:not([disabled]), input:not([disabled]), textarea, select, [tabindex]:not([tabindex="-1"])'
+            );
+
+            if (!focusable.length) {
+                return;
+            }
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
+    }
+
+    /* =========================================================================
        ESCAPE KEY — CLOSE OPEN INTERFACES
        ========================================================================= */
 
@@ -736,6 +826,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeDrawer();
         closeModal();
+        closeProfileDrawer();
 
         document.querySelectorAll(selectors.dropdownButton).forEach((button) => {
             button.setAttribute("aria-expanded", "false");

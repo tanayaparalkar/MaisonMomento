@@ -3,59 +3,59 @@
 {% block title %}{{ title }} | Maison Moménto Dashboard{% endblock %}
 
 {% block content %}
-<section class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 28px;">
+<section class="page-header">
     <div>
-        <p class="eyebrow" style="color: #D09B34; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px;">Privilege & Promotion Management</p>
-        <h1 style="font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif); font-size: 32px; font-weight: 500; color: #111827; margin: 0 0 8px 0;">{{ title }}</h1>
-        <p class="subtitle" style="color: #64748B; font-size: 13.5px; max-width: 620px; line-height: 1.5; margin: 0;">
+        <p class="eyebrow">Maison Momènto · Privilege & Promotion Management</p>
+        <h1>{{ title }}.</h1>
+        <p class="subtitle">
             Define promotional privilege parameters, schedule redemption windows, configure spend thresholds, or target exclusive VIP clientele.
         </p>
     </div>
     <div>
-        <a href="{% url 'dashboard:vouchers' %}" class="secondary-btn" style="text-decoration: none; padding: 10px 18px; font-size: 13px; border-radius: 6px;">
+        <a href="{% url 'dashboard:vouchers' %}" class="secondary-btn" style="text-decoration: none;">
             ← Return to Vouchers
         </a>
     </div>
 </section>
 
 {% if form.non_field_errors %}
-    <div style="background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; padding: 14px 18px; border-radius: 6px; margin-bottom: 24px; font-size: 13.5px;">
+    <div style="background: #fef2f2; border: 1px solid #fca5a5; color: #ef4444; padding: 14px 18px; border-radius: var(--radius-sm); margin-bottom: 24px; font-size: 13.5px;">
         {% for error in form.non_field_errors %}
             <p style="margin: 0;">{{ error }}</p>
         {% endfor %}
     </div>
 {% endif %}
 
-<section class="panel" style="background: #FFFFFF; border: 1px solid var(--border, #E2E8F0); border-radius: 8px; padding: 32px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); max-width: 960px;">
+<section class="panel voucher-form-panel">
     <form method="POST">
         {% csrf_token %}
 
         <!-- Section 1: Privilege Identity -->
         <div style="margin-bottom: 32px;">
-            <h4 style="font-family: var(--font-display, serif); font-size: 19px; color: #005441; margin: 0 0 16px 0; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+            <h4 class="voucher-section-title">
                 1. Privilege Identity & Code
             </h4>
-            
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+
+            <div class="form-grid">
                 <div class="form-group">
-                    <label for="{{ form.code.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
-                        Privilege Code <span style="color: #DC2626;">*</span>
+                    <label for="{{ form.code.id_for_label }}">
+                        Privilege Code <span style="color: var(--pastel-rose-text);">*</span>
                     </label>
                     {{ form.code }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Automatically converted to uppercase (e.g. MAISON20, VVIP1000)</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Automatically converted to uppercase (e.g. MAISON20, VVIP1000)</small>
                     {% if form.code.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.code.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.code.errors.0 }}</div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.description.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    <label for="{{ form.description.id_for_label }}">
                         Concession Description
                     </label>
                     {{ form.description }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Visible in cart and checkout breakdown (e.g. 20% privilege on orders above ₹10,000)</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Visible in cart and checkout breakdown (e.g. 20% privilege on orders above ₹10,000)</small>
                     {% if form.description.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.description.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.description.errors.0 }}</div>
                     {% endif %}
                 </div>
             </div>
@@ -63,51 +63,51 @@
 
         <!-- Section 2: Concession Structure & Economics -->
         <div style="margin-bottom: 32px;">
-            <h4 style="font-family: var(--font-display, serif); font-size: 19px; color: #005441; margin: 0 0 16px 0; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+            <h4 class="voucher-section-title">
                 2. Discount Structure & Economics
             </h4>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div class="form-grid">
                 <div class="form-group">
-                    <label for="{{ form.discount_type.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
-                        Discount Type <span style="color: #DC2626;">*</span>
+                    <label for="{{ form.discount_type.id_for_label }}">
+                        Discount Type <span style="color: var(--pastel-rose-text);">*</span>
                     </label>
                     {{ form.discount_type }}
                     {% if form.discount_type.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.discount_type.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.discount_type.errors.0 }}</div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.discount_value.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
-                        Discount Value <span style="color: #DC2626;">*</span>
+                    <label for="{{ form.discount_value.id_for_label }}">
+                        Discount Value <span style="color: var(--pastel-rose-text);">*</span>
                     </label>
                     {{ form.discount_value }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">e.g. 15 for 15%, or 500 for flat ₹500</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">e.g. 15 for 15%, or 500 for flat ₹500</small>
                     {% if form.discount_value.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.discount_value.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.discount_value.errors.0 }}</div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.min_cart_value.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    <label for="{{ form.min_cart_value.id_for_label }}">
                         Minimum Cart Value (₹)
                     </label>
                     {{ form.min_cart_value }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Set 0.00 for no minimum</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Set 0.00 for no minimum</small>
                     {% if form.min_cart_value.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.min_cart_value.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.min_cart_value.errors.0 }}</div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.max_discount.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    <label for="{{ form.max_discount.id_for_label }}">
                         Max Discount Cap (₹)
                     </label>
                     {{ form.max_discount }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Optional maximum cap for % discounts</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Optional maximum cap for % discounts</small>
                     {% if form.max_discount.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.max_discount.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.max_discount.errors.0 }}</div>
                     {% endif %}
                 </div>
             </div>
@@ -115,30 +115,30 @@
 
         <!-- Section 3: Scheduling & Lifecycle -->
         <div style="margin-bottom: 32px;">
-            <h4 style="font-family: var(--font-display, serif); font-size: 19px; color: #005441; margin: 0 0 16px 0; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+            <h4 class="voucher-section-title">
                 3. Scheduling & Expiration
             </h4>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-grid">
                 <div class="form-group">
-                    <label for="{{ form.valid_from.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
-                        Valid From (Start Date & Time) <span style="color: #DC2626;">*</span>
+                    <label for="{{ form.valid_from.id_for_label }}">
+                        Valid From (Start Date & Time) <span style="color: var(--pastel-rose-text);">*</span>
                     </label>
                     {{ form.valid_from }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Schedule for future release or start immediately</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Schedule for future release or start immediately</small>
                     {% if form.valid_from.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.valid_from.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.valid_from.errors.0 }}</div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.valid_until.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    <label for="{{ form.valid_until.id_for_label }}">
                         Valid Until (Expiration Date & Time)
                     </label>
                     {{ form.valid_until }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Leave blank for a perpetual / indefinite voucher</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Leave blank for a perpetual / indefinite voucher</small>
                     {% if form.valid_until.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.valid_until.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.valid_until.errors.0 }}</div>
                     {% endif %}
                 </div>
             </div>
@@ -146,64 +146,64 @@
 
         <!-- Section 4: Usage Limits & Customer Personalization -->
         <div style="margin-bottom: 32px;">
-            <h4 style="font-family: var(--font-display, serif); font-size: 19px; color: #005441; margin: 0 0 16px 0; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">
+            <h4 class="voucher-section-title">
                 4. Redemption Limits & Patron Exclusivity
             </h4>
 
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+            <div class="form-grid">
                 <div class="form-group">
-                    <label for="{{ form.max_uses.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    <label for="{{ form.max_uses.id_for_label }}">
                         Maximum Usages
                     </label>
                     {{ form.max_uses }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Leave empty for unlimited redemptions</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Leave empty for unlimited redemptions</small>
                     {% if form.max_uses.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.max_uses.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.max_uses.errors.0 }}</div>
                     {% endif %}
                     {% if voucher %}
-                        <div style="margin-top: 8px; font-size: 12px; color: #005441; font-weight: 600;">
+                        <div style="margin-top: 8px; font-size: 12px; color: var(--chateau-green); font-weight: 600;">
                             Currently redeemed {{ voucher.used_count }} time{{ voucher.used_count|pluralize }}.
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ form.specific_customer.id_for_label }}" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #475569; letter-spacing: 0.05em; margin-bottom: 6px;">
+                    <label for="{{ form.specific_customer.id_for_label }}">
                         Restricted to Specific VIP Patron
                     </label>
                     {{ form.specific_customer }}
-                    <small style="display: block; color: #94A3B8; font-size: 11.5px; margin-top: 4px;">Leave unselected for public / all patrons privilege</small>
+                    <small style="display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px;">Leave unselected for public / all patrons privilege</small>
                     {% if form.specific_customer.errors %}
-                        <div style="color: #DC2626; font-size: 12px; margin-top: 4px;">{{ form.specific_customer.errors.0 }}</div>
+                        <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 4px;">{{ form.specific_customer.errors.0 }}</div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Section 5: Activation Status -->
-        <div style="margin-bottom: 32px; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 18px 24px; border-radius: 6px;">
+        <div style="margin-bottom: 32px; background: var(--ivory); border: 1px solid var(--border); padding: 18px 24px; border-radius: var(--radius-sm);">
             <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; margin: 0;">
                 {{ form.is_active }}
                 <div>
-                    <strong style="display: block; font-size: 13.5px; color: #1E293B;">Enable Privilege Voucher (Active)</strong>
-                    <span style="display: block; font-size: 12px; color: #64748B;">When active, patrons meeting qualifying criteria can redeem this concession at cart or checkout.</span>
+                    <strong style="display: block; font-size: 13.5px; color: var(--charcoal);">Enable Privilege Voucher (Active)</strong>
+                    <span style="display: block; font-size: 12px; color: var(--muted);">When active, patrons meeting qualifying criteria can redeem this concession at cart or checkout.</span>
                 </div>
             </label>
             {% if form.is_active.errors %}
-                <div style="color: #DC2626; font-size: 12px; margin-top: 6px;">{{ form.is_active.errors.0 }}</div>
+                <div style="color: var(--pastel-rose-text); font-size: 12px; margin-top: 6px;">{{ form.is_active.errors.0 }}</div>
             {% endif %}
         </div>
 
         <!-- Submit & Actions -->
-        <div style="display: flex; gap: 14px; align-items: center; padding-top: 20px; border-top: 1px solid #F1F5F9;">
-            <button type="submit" class="primary-btn" style="background: #005441; color: #FFFFFF; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; border-radius: 6px; cursor: pointer;">
+        <div style="display: flex; gap: 14px; align-items: center; padding-top: 20px; border-top: 1px solid var(--border);">
+            <button type="submit" class="primary-btn">
                 Save Privilege Voucher
             </button>
-            <a href="{% url 'dashboard:vouchers' %}" class="secondary-btn" style="text-decoration: none; padding: 12px 22px; font-size: 13px; border-radius: 6px;">
+            <a href="{% url 'dashboard:vouchers' %}" class="secondary-btn" style="text-decoration: none;">
                 Cancel
             </a>
             {% if voucher %}
-                <a href="{% url 'dashboard:voucher_delete' voucher.id %}" style="margin-left: auto; color: #DC2626; font-size: 12.5px; text-decoration: none; padding: 10px 16px;">
+                <a href="{% url 'dashboard:voucher_delete' voucher.id %}" style="margin-left: auto; color: var(--pastel-rose-text); font-size: 12.5px; text-decoration: none; padding: 10px 16px;">
                     Delete Voucher
                 </a>
             {% endif %}

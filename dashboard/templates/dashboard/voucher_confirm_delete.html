@@ -3,20 +3,20 @@
 {% block title %}Delete Privilege Voucher {{ voucher.code }} | Dashboard{% endblock %}
 
 {% block content %}
-<section class="page-header" style="margin-bottom: 28px;">
+<section class="page-header">
     <div>
-        <p class="eyebrow" style="color: #D09B34; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px;">
-            <a href="{% url 'dashboard:vouchers' %}" style="color: #64748B; text-decoration: none;">&larr; Vouchers</a> · Revocation
+        <p class="eyebrow">
+            <a href="{% url 'dashboard:vouchers' %}" style="color: var(--muted); text-decoration: none;">← Vouchers</a> · Revocation
         </p>
-        <h1 style="font-family: var(--font-display, 'Cormorant Garamond', Georgia, serif); font-size: 32px; font-weight: 500; color: #111827; margin: 0 0 8px 0;">Confirm Voucher Deletion.</h1>
-        <p class="subtitle" style="color: #64748B; font-size: 13.5px; max-width: 620px; line-height: 1.5; margin: 0;">
+        <h1>Confirm Voucher Deletion.</h1>
+        <p class="subtitle">
             Are you certain you wish to permanently remove this promotional privilege? This action cannot be reversed.
         </p>
     </div>
 </section>
 
-<section class="panel" style="background: #FFFFFF; border: 1px solid var(--border, #E2E8F0); border-radius: 8px; padding: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); max-width: 600px;">
-    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 20px; margin-bottom: 24px;">
+<section class="panel" style="max-width: 680px;">
+    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-sm); padding: 20px; margin-bottom: 24px;">
         <h4 style="color: #991b1b; margin-top: 0; margin-bottom: 8px; font-size: 15px;">Warning: Permanent Removal</h4>
         <p style="color: #b91c1c; font-size: 13px; margin: 0; line-height: 1.5;">
             Deleting this voucher will immediately invalidate it across all active shopping bags and ongoing checkout sessions.
@@ -26,8 +26,8 @@
         </p>
     </div>
 
-    <div style="padding: 16px 20px; background: #FAF8F5; border: 1px solid var(--border, #E2E8F0); border-radius: 6px; margin-bottom: 28px;">
-        <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Privilege Code:</strong> <span style="font-family: monospace; font-weight: 700; color: #005441;">{{ voucher.code }}</span></p>
+    <div style="padding: 16px 20px; background: var(--ivory); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 28px;">
+        <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Privilege Code:</strong> <span class="voucher-code">{{ voucher.code }}</span></p>
         <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Concession:</strong> {{ voucher.get_discount_display }}</p>
         {% if voucher.description %}<p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Description:</strong> {{ voucher.description }}</p>{% endif %}
         <p style="margin: 0 0 8px 0; font-size: 13px;"><strong>Redemptions:</strong> {{ voucher.used_count }} / {% if voucher.max_uses %}{{ voucher.max_uses }}{% else %}Unlimited{% endif %}</p>
@@ -37,8 +37,8 @@
     <form method="POST">
         {% csrf_token %}
         <div style="display: flex; justify-content: flex-end; gap: 12px;">
-            <a href="{% url 'dashboard:vouchers' %}" class="secondary-btn" style="padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 13px;">Cancel</a>
-            <button type="submit" class="primary-btn" style="background: #dc2626; border-color: #dc2626; color: #FFF; padding: 10px 24px; border-radius: 6px; font-size: 13px; cursor: pointer;">Confirm Delete</button>
+            <a href="{% url 'dashboard:vouchers' %}" class="secondary-btn" style="text-decoration: none;">Cancel</a>
+            <button type="submit" class="primary-btn" style="background: #dc2626; border-color: #dc2626; color: #FFF;">Confirm Delete</button>
         </div>
     </form>
 </section>

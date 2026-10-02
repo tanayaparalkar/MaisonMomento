@@ -19,3 +19,18 @@ def business_contact_info(request):
     except Exception:
         return {"contact_info": None}
 
+
+def admin_profile_context(request):
+    """
+    Exposes AdminProfile instance for authenticated staff members.
+    """
+    if getattr(request, "user", None) and request.user.is_authenticated and request.user.is_staff:
+        try:
+            from dashboard.models import AdminProfile
+            return {
+                "admin_profile": AdminProfile.get_for_user(request.user)
+            }
+        except Exception:
+            return {"admin_profile": None}
+    return {"admin_profile": None}
+

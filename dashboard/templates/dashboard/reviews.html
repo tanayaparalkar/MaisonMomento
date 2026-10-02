@@ -46,7 +46,7 @@
 
     <!-- Product Filter Dropdown -->
     <div>
-        <select name="product" class="form-control" onchange="this.form.submit()" style="padding: 9px 14px; height: auto; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background: #FFF;">
+        <select name="product" class="form-control" onchange="this.form.submit()">
             <option value="">All Fragrances</option>
             {% for prod in products %}
                 <option value="{{ prod.id }}" {% if selected_product == prod.id %}selected{% endif %}>{{ prod.name }}</option>
@@ -56,7 +56,7 @@
 
     <!-- Rating Filter Dropdown -->
     <div>
-        <select name="rating" class="form-control" onchange="this.form.submit()" style="padding: 9px 14px; height: auto; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background: #FFF;">
+        <select name="rating" class="form-control" onchange="this.form.submit()">
             <option value="">All Ratings</option>
             <option value="5" {% if selected_rating == 5 %}selected{% endif %}>★★★★★ (5 Stars)</option>
             <option value="4" {% if selected_rating == 4 %}selected{% endif %}>★★★★☆ (4 Stars)</option>
@@ -80,7 +80,7 @@
     </div>
 
     {% if search_query or selected_product or selected_rating or selected_status %}
-        <a href="{% url 'dashboard:reviews' %}" class="secondary-btn" style="padding: 8px 14px; font-size: 12px; text-decoration: none;">Clear Filters</a>
+        <a href="{% url 'dashboard:reviews' %}" class="secondary-btn" style="text-decoration: none;">Clear Filters</a>
     {% endif %}
 </form>
 
@@ -102,13 +102,13 @@
                 Reviews ({{ page_obj.paginator.count }})
             </h3>
             <div style="display: flex; gap: 8px; align-items: center;">
-                <select name="action" class="form-control" style="padding: 6px 12px; height: auto; min-width: 170px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px;">
+                <select name="action" class="form-control" style="min-width: 170px;">
                     <option value="">Bulk Actions...</option>
                     <option value="approve">Approve Selected</option>
                     <option value="reject">Reject / Hide Selected</option>
                     <option value="delete">Delete Selected</option>
                 </select>
-                <button type="submit" class="secondary-btn" style="padding: 7px 14px; font-size: 12px;">Apply</button>
+                <button type="submit" class="secondary-btn">Apply</button>
             </div>
         </div>
 

@@ -86,21 +86,16 @@
                     <a href="{% url 'dashboard:export_data' %}" class="nav-item">
                         Exports
                     </a>
-
-                    <a href="{% url 'dashboard:settings' %}" class="nav-item">
-                        Settings
-                    </a>
                 </nav>
 
                 <div class="nav-right">
                     <label class="search-field" for="global-search">
                         <span class="search-icon" aria-hidden="true"></span>
-
                         <input
                             id="global-search"
                             class="top-search"
                             type="search"
-                            placeholder="Search"
+                            placeholder="Search..."
                             aria-label="Search dashboard"
                         >
                     </label>
@@ -117,30 +112,142 @@
                         {% endif %}
                     </a>
 
-                    <div class="dropdown" style="margin-left: 12px;">
-                        <button
-                            class="dropbtn profile"
-                            type="button"
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                            aria-label="Profile menu"
-                            style="padding: 0; min-height: auto;"
-                        >
-                            <span class="avatar" aria-hidden="true">T</span>
-                        </button>
-
-                        <div class="dropdown-content" role="menu" style="right: 0; left: auto; min-width: 140px; top: 100%;">
-                            <form action="{% url 'logout' %}" method="post" style="margin: 0;">
-                                {% csrf_token %}
-                                <button type="submit" role="menuitem" style="width: 100%; text-align: left; background: none; border: none; padding: 12px 16px; cursor: pointer; font-size: 12px; color: var(--charcoal-soft); font-weight: 500;">
-                                    Log out
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                    <!-- Profile Drawer Toggle Button -->
+                    <button
+                        id="profile-drawer-toggle"
+                        class="profile-toggle-btn"
+                        type="button"
+                        aria-expanded="false"
+                        aria-haspopup="dialog"
+                        aria-controls="profile-drawer"
+                        aria-label="Open profile and settings"
+                    >
+                        {% if admin_profile.avatar %}
+                            <img src="{{ admin_profile.avatar.url }}" alt="{{ request.user.get_full_name|default:request.user.username }}" class="profile-avatar-img">
+                        {% else %}
+                            <span class="avatar" aria-hidden="true">{{ request.user.first_name|first|default:request.user.username|first|upper }}</span>
+                        {% endif %}
+                        <span class="profile-toggle-meta">
+                            <span class="profile-toggle-name">{{ request.user.first_name|default:request.user.username }}</span>
+                            <svg class="profile-toggle-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M1 1L5 5L9 1"/>
+                            </svg>
+                        </span>
+                    </button>
                 </div>
             </div>
         </header>
+
+        <!-- Slide-Over Profile Drawer Backdrop -->
+        <div id="profile-drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+
+        <!-- Slide-Over Profile Drawer Panel -->
+        <aside id="profile-drawer" class="profile-drawer" role="dialog" aria-modal="true" aria-label="Profile and Settings Menu">
+            <div class="drawer-header">
+                <div class="drawer-user-info">
+                    <div class="drawer-avatar">
+                        {% if admin_profile.avatar %}
+                            <img src="{{ admin_profile.avatar.url }}" alt="{{ request.user.get_full_name|default:request.user.username }}">
+                        {% else %}
+                            <span>{{ request.user.first_name|first|default:request.user.username|first|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="drawer-user-details">
+                        <h4 class="drawer-user-name">{{ request.user.get_full_name|default:request.user.username }}</h4>
+                        <p class="drawer-user-email">{{ request.user.email|default:"admin@maisonmomento.com" }}</p>
+                        <span class="drawer-role-badge">
+                            {% if request.user.is_superuser %}
+                                Maison Administrator
+                            {% elif request.user.is_staff %}
+                                Staff Member
+                            {% else %}
+                                Boutique Concierge
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <button id="profile-drawer-close" class="drawer-close-btn" type="button" aria-label="Close menu">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="drawer-body">
+                <nav class="drawer-nav" aria-label="Profile and Workspace Navigation">
+                    <!-- 1. My Profile -->
+                    <a href="{% url 'dashboard:profile' %}" class="drawer-nav-item">
+                        <span class="drawer-nav-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </span>
+                        <div class="drawer-nav-text">
+                            <span class="drawer-nav-label">My Profile</span>
+                            <span class="drawer-nav-desc">Account details & password</span>
+                        </div>
+                        <span class="drawer-nav-arrow">&rarr;</span>
+                    </a>
+
+                    <!-- 2. Business Settings Group -->
+                    <div class="drawer-nav-group">
+                        <div class="drawer-group-title">
+                            <span>Business Settings</span>
+                        </div>
+                        <div class="drawer-subnav">
+                            <a href="{% url 'dashboard:contact_settings' %}" class="drawer-subnav-item">
+                                <span class="drawer-subnav-dot"></span>
+                                <span class="drawer-subnav-label">Contact Information</span>
+                                <span class="drawer-tag live">Live</span>
+                            </a>
+                            <a href="{% url 'dashboard:settings' %}" class="drawer-subnav-item">
+                                <span class="drawer-subnav-dot"></span>
+                                <span class="drawer-subnav-label">General Settings</span>
+                            </a>
+                            <a href="{% url 'dashboard:settings' %}#integrations" class="drawer-subnav-item">
+                                <span class="drawer-subnav-dot"></span>
+                                <span class="drawer-subnav-label">Future Integrations</span>
+                                <span class="drawer-tag">Planned</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 3. Administration -->
+                    <a href="{% url 'dashboard:settings' %}#administration" class="drawer-nav-item">
+                        <span class="drawer-nav-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </span>
+                        <div class="drawer-nav-text">
+                            <span class="drawer-nav-label">Administration</span>
+                            <span class="drawer-nav-desc">Team roles & permissions</span>
+                        </div>
+                        <span class="drawer-nav-arrow">&rarr;</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Drawer Footer: Logout -->
+            <div class="drawer-footer">
+                <form action="{% url 'logout' %}" method="post" style="margin: 0; width: 100%;">
+                    {% csrf_token %}
+                    <button type="submit" class="drawer-logout-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Log out of Maison Moménto</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
 
         <main class="content">
             {% block content %}
