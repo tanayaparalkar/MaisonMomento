@@ -1,0 +1,309 @@
+{% extends "catalog/base.html" %}
+{% load static %}
+
+{% block title %}Client Profile | Maison Moménto Parfumeur{% endblock %}
+
+{% block content %}
+<div class="sf-container cp-profile-container">
+    <!-- Breadcrumbs / Top Navigation -->
+    <nav class="cp-profile-breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}">Home</a>
+        <span class="cp-bc-sep">/</span>
+        <span class="cp-bc-current">Client Atelier</span>
+    </nav>
+
+    <!-- Profile Header Hero -->
+    <header class="cp-hero">
+        <div class="cp-hero-main">
+            <!-- Circular Avatar with Upload Trigger -->
+            <div class="cp-avatar-wrapper">
+                <div class="cp-avatar-large">
+                    {% if customer.avatar %}
+                        <img src="{{ customer.avatar.url }}" alt="{{ customer.display_name }}" class="cp-avatar-img-large" id="cp-avatar-preview">
+                    {% else %}
+                        <div class="cp-avatar-monogram-large" id="cp-avatar-placeholder">{{ customer.initials }}</div>
+                    {% endif %}
+                </div>
+                <form id="cp-avatar-form" action="{% url 'customers:upload_avatar' %}" method="post" enctype="multipart/form-data" class="cp-avatar-form">
+                    {% csrf_token %}
+                    <label for="cp-avatar-input" class="cp-avatar-upload-badge" title="Change profile picture" aria-label="Upload photo">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                    </label>
+                    <input type="file" id="cp-avatar-input" name="avatar" accept="image/*" style="display: none;">
+                </form>
+            </div>
+
+            <!-- Identity Info -->
+            <div class="cp-hero-info">
+                <span class="cp-hero-eyebrow">✦ Maison Moménto Patron</span>
+                <h1 class="cp-hero-name">{{ customer.display_name }}</h1>
+                <p class="cp-hero-email">{{ customer.email }}</p>
+                <div class="cp-hero-tags">
+                    <span class="cp-hero-tag">Member since {{ customer.created_at|date:"F Y" }}</span>
+                    {% if customer.phone %}
+                        <span class="cp-hero-tag">{{ customer.phone }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Counters -->
+        <div class="cp-stats-grid">
+            <div class="cp-stat-card">
+                <span class="cp-stat-num">{{ orders_count }}</span>
+                <span class="cp-stat-label">Orders Placed</span>
+                <a href="#orders" class="cp-stat-link">View archive &rarr;</a>
+            </div>
+            <div class="cp-stat-card">
+                <span class="cp-stat-num">{{ wishlist_count }}</span>
+                <span class="cp-stat-label">Fragrance Wishlist</span>
+                <a href="{% url 'catalog:wishlist' %}" class="cp-stat-link">View wishlist &rarr;</a>
+            </div>
+            <div class="cp-stat-card">
+                <span class="cp-stat-num">
+                    {% if customer.street_address %}1{% else %}0{% endif %}
+                </span>
+                <span class="cp-stat-label">Saved Address</span>
+                <a href="#addresses" class="cp-stat-link">Manage address &rarr;</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Messages -->
+    {% if messages %}
+        <div class="cp-alerts-wrap">
+            {% for message in messages %}
+                <div class="cp-alert cp-alert-{{ message.tags|default:'info' }}" role="alert">
+                    <span class="cp-alert-sparkle">✦</span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Workspace Grid -->
+    <div class="cp-workspace-grid">
+        
+        <!-- Section 1: Personal Information -->
+        <section class="cp-card" id="personal-info">
+            <div class="cp-card-header">
+                <div>
+                    <h2 class="cp-card-title">Personal Information</h2>
+                    <p class="cp-card-desc">Your contact details and patron profile credentials.</p>
+                </div>
+            </div>
+            <form action="{% url 'customers:update_profile' %}" method="post" class="cp-card-body cp-form-layout">
+                {% csrf_token %}
+                <div class="cp-form-row-2">
+                    <div class="cp-field">
+                        <label for="profile_first_name" class="cp-field-label">First Name</label>
+                        <input type="text" id="profile_first_name" name="first_name" value="{{ customer.first_name }}" class="cp-text-input" required>
+                    </div>
+                    <div class="cp-field">
+                        <label for="profile_last_name" class="cp-field-label">Last Name</label>
+                        <input type="text" id="profile_last_name" name="last_name" value="{{ customer.last_name }}" class="cp-text-input">
+                    </div>
+                </div>
+
+                <div class="cp-form-row-2">
+                    <div class="cp-field">
+                        <label for="profile_email" class="cp-field-label">Email Address <span class="cp-field-note">(Primary identifier)</span></label>
+                        <input type="email" id="profile_email" value="{{ customer.email }}" class="cp-text-input" disabled style="opacity: 0.7; cursor: not-allowed;">
+                    </div>
+                    <div class="cp-field">
+                        <label for="profile_phone" class="cp-field-label">Telephone</label>
+                        <input type="tel" id="profile_phone" name="phone" value="{{ customer.phone }}" class="cp-text-input" placeholder="+33 1 40 20 50 50">
+                    </div>
+                </div>
+
+                <div class="cp-card-footer">
+                    <button type="submit" class="cp-primary-btn">Save Personal Details</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Section 2: Addresses -->
+        <section class="cp-card" id="addresses">
+            <div class="cp-card-header">
+                <div>
+                    <h2 class="cp-card-title">Delivery Address</h2>
+                    <p class="cp-card-desc">Primary shipping destination for signature fragrance deliveries.</p>
+                </div>
+            </div>
+            <form action="{% url 'customers:update_address' %}" method="post" class="cp-card-body cp-form-layout">
+                {% csrf_token %}
+                <div class="cp-field">
+                    <label for="addr_street" class="cp-field-label">Street Address</label>
+                    <input type="text" id="addr_street" name="street_address" value="{{ customer.street_address }}" class="cp-text-input" placeholder="12, Luxury Boulevard, Bandra West">
+                </div>
+
+                <div class="cp-field">
+                    <label for="addr_apt" class="cp-field-label">Apartment, Suite, Unit <span class="cp-field-note">(optional)</span></label>
+                    <input type="text" id="addr_apt" name="apartment" value="{{ customer.apartment }}" class="cp-text-input" placeholder="Suite 402, Royal Residency">
+                </div>
+
+                <div class="cp-form-row-3">
+                    <div class="cp-field">
+                        <label for="addr_city" class="cp-field-label">City</label>
+                        <input type="text" id="addr_city" name="city" value="{{ customer.city }}" class="cp-text-input" placeholder="Mumbai">
+                    </div>
+                    <div class="cp-field">
+                        <label for="addr_state" class="cp-field-label">State / Province</label>
+                        <input type="text" id="addr_state" name="state" value="{{ customer.state }}" class="cp-text-input" placeholder="Maharashtra">
+                    </div>
+                    <div class="cp-field">
+                        <label for="addr_zip" class="cp-field-label">Postal Code</label>
+                        <input type="text" id="addr_zip" name="postal_code" value="{{ customer.postal_code }}" class="cp-text-input" placeholder="400050">
+                    </div>
+                </div>
+
+                <div class="cp-field">
+                    <label for="addr_country" class="cp-field-label">Country</label>
+                    <input type="text" id="addr_country" name="country" value="{{ customer.country|default:'India' }}" class="cp-text-input">
+                </div>
+
+                <div class="cp-card-footer">
+                    <button type="submit" class="cp-primary-btn">Save Shipping Address</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Section 3: Orders History -->
+        <section class="cp-card" id="orders">
+            <div class="cp-card-header">
+                <div>
+                    <h2 class="cp-card-title">Order History &amp; Dispatch Archive</h2>
+                    <p class="cp-card-desc">Your curated purchases, invoices, and shipment tracking.</p>
+                </div>
+                {% if orders_count > 0 %}
+                    <span class="cp-badge-pill">{{ orders_count }} Orders</span>
+                {% endif %}
+            </div>
+
+            <div class="cp-card-body cp-orders-body">
+                {% if orders %}
+                    <div class="cp-orders-table-wrap">
+                        <table class="cp-orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>
+                                            <span class="cp-order-num">#{{ order.order_number|slice:":8" }}…</span>
+                                        </td>
+                                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <span class="cp-status-tag cp-status-{{ order.order_status }}">
+                                                {{ order.get_order_status_display }}
+                                            </span>
+                                        </td>
+                                        <td class="cp-order-total">₹{{ order.total|floatformat:2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="cp-empty-card">
+                        <div class="cp-empty-icon" aria-hidden="true">
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <path d="M16 10a4 4 0 0 1-8 0"></path>
+                            </svg>
+                        </div>
+                        <h3 class="cp-empty-title">No Orders Yet</h3>
+                        <p class="cp-empty-desc">Your bespoke fragrance archive will appear here once you place your first order.</p>
+                        <a href="{% url 'catalog:product_list' %}" class="cp-empty-btn">Explore Haute Fragrances &rarr;</a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Section 4: Wishlist Summary -->
+        <section class="cp-card" id="wishlist">
+            <div class="cp-card-header">
+                <div>
+                    <h2 class="cp-card-title">Curated Wishlist</h2>
+                    <p class="cp-card-desc">Fragrances and accords saved to your private cabinet.</p>
+                </div>
+                <a href="{% url 'catalog:wishlist' %}" class="cp-header-link">View Full Wishlist &rarr;</a>
+            </div>
+
+            <div class="cp-card-body">
+                {% if wishlist_items %}
+                    <div class="cp-wishlist-preview-grid">
+                        {% for item in wishlist_items %}
+                            <div class="cp-wishlist-mini-card">
+                                {% if item.product.primary_image %}
+                                    <img src="{{ item.product.primary_image.image.url }}" alt="{{ item.product.name }}" class="cp-wishlist-mini-img">
+                                {% else %}
+                                    <div class="cp-wishlist-mini-placeholder">MM</div>
+                                {% endif %}
+                                <div class="cp-wishlist-mini-info">
+                                    <h4 class="cp-wishlist-mini-title">{{ item.product.name }}</h4>
+                                    <span class="cp-wishlist-mini-price">₹{{ item.product.effective_price|floatformat:0 }}</span>
+                                    <a href="{% url 'catalog:product_detail' item.product.pk %}" class="cp-wishlist-mini-link">Discover &rarr;</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="cp-empty-card">
+                        <div class="cp-empty-icon" aria-hidden="true">
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="cp-empty-title">Your Wishlist is Empty</h3>
+                        <p class="cp-empty-desc">Save your favorite extraits while browsing to keep track of rare accords.</p>
+                        <a href="{% url 'catalog:product_list' %}" class="cp-empty-btn">Discover Perfumes &rarr;</a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Section 5: Account Settings & Security -->
+        <section class="cp-card" id="settings">
+            <div class="cp-card-header">
+                <div>
+                    <h2 class="cp-card-title">Account Security</h2>
+                    <p class="cp-card-desc">Update your password to keep your patron privileges secure.</p>
+                </div>
+            </div>
+            <form action="{% url 'customers:change_password' %}" method="post" class="cp-card-body cp-form-layout">
+                {% csrf_token %}
+                <div class="cp-field">
+                    <label for="cur_pass" class="cp-field-label">Current Password</label>
+                    <input type="password" id="cur_pass" name="current_password" class="cp-text-input" placeholder="••••••••" required>
+                </div>
+
+                <div class="cp-form-row-2">
+                    <div class="cp-field">
+                        <label for="new_pass" class="cp-field-label">New Password</label>
+                        <input type="password" id="new_pass" name="new_password" class="cp-text-input" placeholder="At least 6 characters" required>
+                    </div>
+                    <div class="cp-field">
+                        <label for="conf_pass" class="cp-field-label">Confirm New Password</label>
+                        <input type="password" id="conf_pass" name="confirm_password" class="cp-text-input" placeholder="Repeat new password" required>
+                    </div>
+                </div>
+
+                <div class="cp-card-footer">
+                    <button type="submit" class="cp-primary-btn">Update Password</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -136,6 +136,7 @@ TEMPLATES = [
                 "dashboard.context_processors.admin_profile_context",
                 "apps.customers.context_processors.wishlist_data",
                 "apps.customers.context_processors.customer_notifications_data",
+                "apps.customers.context_processors.customer_profile_context",
                 "apps.sales.context_processors.cart_data",
             ],
         },

@@ -654,3 +654,153 @@ body.spotlight-open > *:not(#spotlight-search-overlay) {
         padding: 8px 14px;
     }
 }
+
+/* ==========================================================================
+   GROUPED RESULTS & RECENT SEARCHES
+   ========================================================================== */
+.spotlight-section-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.spotlight-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9E7A32;
+    border-bottom: 1px solid rgba(208, 155, 52, 0.16);
+    margin-bottom: 4px;
+}
+
+.spotlight-generic-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(208, 155, 52, 0.2);
+    border-radius: 12px;
+    text-decoration: none;
+    color: #2D3A30;
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.spotlight-generic-card:hover,
+.spotlight-generic-card.is-active {
+    background: rgba(208, 155, 52, 0.14);
+    border-color: #D09B34;
+    transform: translateX(3px);
+}
+
+.spotlight-generic-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.spotlight-generic-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(13, 67, 77, 0.06);
+    color: #0D434D;
+    flex-shrink: 0;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.spotlight-generic-card:hover .spotlight-generic-icon,
+.spotlight-generic-card.is-active .spotlight-generic-icon {
+    background: #0D434D;
+    color: #FAF6F0;
+}
+
+.spotlight-generic-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.spotlight-generic-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0D434D;
+}
+
+.spotlight-generic-desc {
+    margin: 0;
+    font-size: 11px;
+    color: #7A8C80;
+}
+
+.spotlight-recent-searches-box {
+    padding: 12px 14px;
+    background: rgba(208, 155, 52, 0.06);
+    border: 1px solid rgba(208, 155, 52, 0.2);
+    border-radius: 12px;
+    margin-bottom: 14px;
+}
+
+.spotlight-recent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9E7A32;
+}
+
+.spotlight-clear-recent-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 10px;
+    color: #7A8C80;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.spotlight-clear-recent-btn:hover {
+    color: #0D434D;
+}
+
+.spotlight-recent-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.spotlight-recent-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #FFFFFF;
+    border: 1px solid #DFD1B9;
+    border-radius: 999px;
+    font-size: 11.5px;
+    color: #2D3A30;
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease;
+}
+
+.spotlight-recent-pill:hover {
+    background: rgba(208, 155, 52, 0.15);
+    border-color: #D09B34;
+    color: #0D434D;
+}
+

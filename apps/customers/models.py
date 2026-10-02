@@ -1,12 +1,33 @@
+from django.conf import settings
 from django.db import models
 from django.db.models import Sum, Max
 
 
 class Customer(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="customer_profile",
+        verbose_name="User Account"
+    )
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True, db_index=True)
     phone = models.CharField(max_length=32, blank=True)
+    avatar = models.ImageField(
+        upload_to="customer_avatars/",
+        blank=True,
+        null=True,
+        verbose_name="Profile Picture"
+    )
+    street_address = models.CharField(max_length=255, blank=True, verbose_name="Street Address")
+    apartment = models.CharField(max_length=100, blank=True, verbose_name="Apartment, Suite, Unit")
+    city = models.CharField(max_length=100, blank=True, verbose_name="City")
+    state = models.CharField(max_length=100, blank=True, verbose_name="State / Province")
+    postal_code = models.CharField(max_length=20, blank=True, verbose_name="Postal Code")
+    country = models.CharField(max_length=100, blank=True, default="India", verbose_name="Country")
     firebase_uid = models.CharField(
         max_length=128,
         unique=True,
@@ -29,7 +50,47 @@ class Customer(models.Model):
 
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}".strip()
+
+    @property
+    def display_name(self):
+        fn = self.full_name
+        if fn:
+            return fn
+        if self.user and self.user.username:
+            return self.user.username
+        return self.email.split("@")[0]
+
+    @property
+    def initials(self):
+        fn = self.first_name.strip() if self.first_name else ""
+        ln = self.last_name.strip() if self.last_name else ""
+        if fn and ln:
+            return f"{fn[0]}{ln[0]}".upper()
+        if fn:
+            return fn[:2].upper()
+        if self.user and self.user.username:
+            return self.user.username[:2].upper()
+        if self.email:
+            return self.email[:2].upper()
+        return "MM"
+
+    @property
+    def formatted_address(self):
+        lines = []
+        if self.street_address:
+            street = self.street_address
+            if self.apartment:
+                street += f", {self.apartment}"
+            lines.append(street)
+        city_state = ", ".join(filter(None, [self.city, self.state]))
+        if self.postal_code:
+            city_state = f"{city_state} {self.postal_code}".strip()
+        if city_state:
+            lines.append(city_state)
+        if self.country:
+            lines.append(self.country)
+        return "\n".join(lines)
 
     @property
     def number_of_orders(self):

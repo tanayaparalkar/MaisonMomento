@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="{% static 'css/storefront.css' %}?v=2.1">
     <link rel="stylesheet" href="{% static 'css/luxury-animations.css' %}">
     <link rel="stylesheet" href="{% static 'css/spotlight_search.css' %}">
+    <link rel="stylesheet" href="{% static 'css/customer_profile.css' %}">
 </head>
 <body>
     <header class="sf-header">
@@ -38,31 +39,30 @@
             </nav>
             
             <div class="sf-nav-utils">
-                <!-- Search Container -->
-                <div class="sf-search-container" style="display: none;"></div>
+                <!-- 1. Search -->
                 <button class="sf-icon-btn sf-search-trigger" id="spotlight-search-trigger" aria-label="Search" aria-haspopup="dialog" aria-expanded="false" title="Spotlight Search (⌘K)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
-                <!-- Notifications -->
-                {% if user.is_authenticated %}
-                <a href="{% url 'customers:notifications' %}" class="sf-icon-btn" aria-label="Notifications" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                    <span class="sf-badge sf-badge-notification" style="{% if unread_customer_notifications_count == 0 %}display: none;{% endif %} background: #ef4444; color: white;">{{ unread_customer_notifications_count }}</span>
-                </a>
-                {% endif %}
                 
-                <!-- Wishlist Container -->
-                <div class="sf-wishlist-container" style="display: none;"></div>
-                <a href="{% url 'catalog:wishlist' %}" class="sf-icon-btn sf-nav-wishlist-btn" aria-label="Wishlist" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;">
+                <!-- 2. Wishlist -->
+                <a href="{% url 'catalog:wishlist' %}" class="sf-icon-btn sf-nav-wishlist-btn" aria-label="Wishlist" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;" title="Wishlist">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                     <span class="sf-badge sf-badge-wishlist" style="{% if wishlist_count == 0 %}display: none;{% endif %}">{{ wishlist_count }}</span>
                 </a>
-                <!-- Cart -->
-                <div class="sf-cart-container" style="display: none;"></div>
-                <a href="{% url 'sales:cart' %}" class="sf-icon-btn sf-nav-cart-btn" aria-label="Cart" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;">
+
+                <!-- 3. Shopping Bag -->
+                <a href="{% url 'sales:cart' %}" class="sf-icon-btn sf-nav-cart-btn" aria-label="Cart" style="position: relative; text-decoration: none; color: inherit; display: inline-flex; align-items: center; justify-content: center;" title="Shopping Bag">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
                     <span class="sf-badge sf-badge-cart" style="{% if cart_item_count == 0 or not cart_item_count %}display: none;{% endif %}">{{ cart_item_count }}</span>
                 </a>
+
+                <!-- 4. Profile -->
+                <button type="button" class="sf-icon-btn sf-nav-profile-btn" id="customer-profile-trigger" aria-label="Client Profile" aria-haspopup="dialog" aria-expanded="false" title="Client Profile">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
@@ -888,6 +888,10 @@
     <!-- Spotlight Search Overlay & Script -->
     {% include "catalog/includes/spotlight_search.html" %}
     <script src="{% static 'js/spotlight_search.js' %}"></script>
+
+    <!-- Client Privilege Profile Drawer & Script -->
+    {% include "customers/includes/profile_drawer.html" %}
+    <script src="{% static 'js/customer_profile.js' %}"></script>
 
     {% include "includes/privacy_consent_popup.html" %}
 </body>

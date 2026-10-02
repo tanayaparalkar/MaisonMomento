@@ -36,3 +36,19 @@ def customer_notifications_data(request):
         count = Notification.objects.filter(target_type='customer', recipient=request.user, is_read=False).count()
         return {'unread_customer_notifications_count': count}
     return {'unread_customer_notifications_count': 0}
+
+def customer_profile_context(request):
+    """
+    Exposes current_customer instance for authenticated users across storefront templates.
+    """
+    if request.user.is_authenticated:
+        customer = get_customer_from_user(request.user)
+        return {
+            'current_customer': customer,
+            'is_customer_authenticated': True,
+        }
+    return {
+        'current_customer': None,
+        'is_customer_authenticated': False,
+    }
+
