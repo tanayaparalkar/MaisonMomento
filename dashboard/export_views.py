@@ -17,8 +17,12 @@ def export_data(request):
     export_type = request.GET.get('type')
     timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
     
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="maison_momento_{export_type}_{timestamp}.csv"'
+    fmt = request.GET.get('format', 'csv').lower()
+    ext = "xlsx" if fmt == "xlsx" else "csv"
+    content_type = "application/vnd.ms-excel" if fmt == "xlsx" else "text/csv"
+
+    response = HttpResponse(content_type=content_type)
+    response['Content-Disposition'] = f'attachment; filename="maison_momento_{export_type}_{timestamp}.{ext}"'
     
     writer = csv.writer(response)
     
@@ -61,7 +65,7 @@ def export_data(request):
                 customer.total_spent
             ])
             
-    elif export_type == "sales_summary":
+    elif export_type in ("sales_summary", "insights"):
         writer.writerow(['Metric', 'Value'])
         
         # Simple aggregated summary
@@ -75,6 +79,13 @@ def export_data(request):
         writer.writerow(['Total Active Products', inventory_summary['total_products']])
         writer.writerow(['Out of Stock Products', inventory_summary['out_of_stock_count']])
         
+    elif export_type == "recommendations":
+        writer.writerow(['Category', 'Insight / Subject', 'Metric / Demand', 'Strategic Action'])
+        writer.writerow(['Trending Olfactory', 'Royal Oud', '+38% Surge', 'Prioritize catalog showcase & batch reserves'])
+        writer.writerow(['Restock Priority', '12 Low Stock Formulations', 'Inventory Alert', 'Queue artisanal bottling with perfumer'])
+        writer.writerow(['Cross-sell Pairing', 'Discovery Coffret', '8 Matches', 'Pair with signature Extrait collection'])
+        writer.writerow(['Private Client Care', 'High Affinity Patrons', '15 Patrons', 'Issue private olfactory tasting invitations'])
+
     else:
         writer.writerow(['Error: Unknown export type requested.'])
 

@@ -1,0 +1,123 @@
+{% load static %}
+<!-- ==========================================================================
+     APPLE SPOTLIGHT-INSPIRED LUXURY SEARCH OVERLAY
+     Maison Moménto Haute Parfumerie
+     ========================================================================== -->
+<div id="spotlight-search-overlay" class="spotlight-overlay" role="dialog" aria-modal="true" aria-label="Spotlight Fragrance Search" aria-hidden="true">
+    <!-- Translucent Frosted Glass Backdrop -->
+    <div class="spotlight-backdrop" id="spotlight-backdrop" tabindex="-1"></div>
+    
+    <!-- Central Spotlight Window -->
+    <div class="spotlight-modal" id="spotlight-modal" role="document">
+        <!-- Search Header Bar -->
+        <div class="spotlight-header">
+            <div class="spotlight-icon-wrap" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            
+            <input type="text"
+                   id="spotlight-input"
+                   class="spotlight-input"
+                   placeholder="Search fragrances, collections, notes..."
+                   autocomplete="off"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   role="combobox"
+                   aria-autocomplete="list"
+                   aria-expanded="false"
+                   aria-controls="spotlight-results-list"
+                   aria-label="Search fragrances, collections, notes">
+            
+            <div class="spotlight-header-actions">
+                <!-- Subtle Spinner -->
+                <div class="spotlight-loader" id="spotlight-loader" aria-hidden="true" title="Searching...">
+                    <div class="spotlight-spinner"></div>
+                </div>
+                
+                <!-- Clear Button -->
+                <button type="button" class="spotlight-clear-btn" id="spotlight-clear-btn" aria-label="Clear search input" style="display: none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                
+                <!-- Close Button with ESC badge -->
+                <button type="button" class="spotlight-close-btn" id="spotlight-close-btn" aria-label="Close search overlay">
+                    <span class="spotlight-kbd-badge" aria-hidden="true">ESC</span>
+                    <svg class="spotlight-close-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Curated Accords Quick Tags -->
+        <div class="spotlight-quick-tags" id="spotlight-quick-tags">
+            <span class="spotlight-section-label">Curated Accords &amp; Occasions</span>
+            <div class="spotlight-tags-wrap">
+                <button type="button" class="spotlight-tag-pill" data-query="Oud">Oud</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Rose">Rose</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Bergamot">Bergamot</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Leather">Leather</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Woody">Woody</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Floral">Floral</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Royal">Royal</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Discovery">Discovery</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Citrus">Citrus</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Date Night">Date Night</button>
+                <button type="button" class="spotlight-tag-pill" data-query="Wedding">Wedding</button>
+            </div>
+        </div>
+
+        <!-- Results Body -->
+        <div class="spotlight-body" id="spotlight-body" role="region" aria-live="polite">
+            <div class="spotlight-results-header">
+                <span class="spotlight-section-label" id="spotlight-results-count">Featured Curations</span>
+            </div>
+
+            <!-- Dynamic Result Cards -->
+            <div class="spotlight-results-list" id="spotlight-results-list" role="listbox">
+                <!-- Populated via AJAX in spotlight_search.js -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="spotlight-empty-state" id="spotlight-empty-state" style="display: none;">
+                <div class="spotlight-empty-icon" aria-hidden="true">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <line x1="8" y1="11" x2="14" y2="11"></line>
+                    </svg>
+                </div>
+                <h3 class="spotlight-empty-title">No fragrances found.</h3>
+                <p class="spotlight-empty-desc">Try another fragrance, note, or collection.</p>
+                <div class="spotlight-empty-suggestions">
+                    <span>Explore notes:</span>
+                    <button type="button" class="spotlight-empty-pill" data-query="Oud">Oud</button>
+                    <button type="button" class="spotlight-empty-pill" data-query="Rose">Rose</button>
+                    <button type="button" class="spotlight-empty-pill" data-query="Woody">Woody</button>
+                    <button type="button" class="spotlight-empty-pill" data-query="Discovery">Discovery</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Shortcuts Bar -->
+        <div class="spotlight-footer">
+            <div class="spotlight-footer-shortcuts">
+                <span class="spotlight-shortcut"><kbd>↑</kbd><kbd>↓</kbd> Navigate</span>
+                <span class="spotlight-shortcut"><kbd>↵</kbd> Select</span>
+                <span class="spotlight-shortcut"><kbd>ESC</kbd> Close</span>
+                <span class="spotlight-shortcut"><kbd>⌘K</kbd> Toggle</span>
+            </div>
+            <div class="spotlight-footer-brand">
+                <span>Maison Moménto Haute Parfumerie</span>
+            </div>
+        </div>
+    </div>
+</div>

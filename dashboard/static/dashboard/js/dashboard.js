@@ -816,6 +816,267 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* =========================================================================
+       ADMIN SEARCH NAVIGATION SHORTCUT & COMMAND PALETTE (Linear/Notion style)
+       ========================================================================= */
+    const searchInput = document.getElementById("global-search");
+    const searchDropdown = document.getElementById("global-search-dropdown");
+    const routesConfigEl = document.getElementById("dashboard-nav-routes");
+
+    if (searchInput && searchDropdown && routesConfigEl) {
+        let navRoutes = [];
+        try {
+            navRoutes = JSON.parse(routesConfigEl.textContent);
+        } catch (e) {
+            console.error("Failed to parse nav routes config:", e);
+        }
+
+        const routeIcons = {
+            "Dashboard": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+            "Products": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`,
+            "Categories": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`,
+            "Orders": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>`,
+            "Vouchers": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`,
+            "Clients": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
+            "Recommendations": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`,
+            "Insights": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`,
+            "Stock & Inventory": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>`,
+            "Reviews": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
+            "Settings": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+            "Contact Settings": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`,
+            "Admin Profile": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
+            "Notifications": `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`
+        };
+
+        const escapeHtml = (str) => {
+            return (str || "").replace(/[&<>"']/g, (m) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            })[m]);
+        };
+
+        let selectedIndex = -1;
+        let currentMatches = [];
+
+        const closeSearchDropdown = () => {
+            searchDropdown.style.display = "none";
+            searchDropdown.innerHTML = "";
+            selectedIndex = -1;
+            currentMatches = [];
+            searchInput.setAttribute("aria-expanded", "false");
+        };
+
+        const renderSuggestions = (matches, headerTitle = "Quick Jump") => {
+            currentMatches = matches;
+            selectedIndex = -1;
+
+            if (!matches.length) {
+                const queryEscaped = escapeHtml(searchInput.value.trim());
+                searchDropdown.innerHTML = `
+                    <div class="nav-search-header">Search Navigation</div>
+                    <div class="nav-search-empty">
+                        <div>No dashboard section matches "${queryEscaped}"</div>
+                        <div class="nav-search-empty-tip">Products, orders, and clients have dedicated search boxes inside their sections.</div>
+                    </div>
+                    <div class="nav-search-footer">
+                        <span><kbd>esc</kbd> close</span>
+                    </div>
+                `;
+                searchDropdown.style.display = "block";
+                searchInput.setAttribute("aria-expanded", "true");
+                return;
+            }
+
+            let itemsHtml = "";
+            matches.forEach((dest, idx) => {
+                const iconSvg = routeIcons[dest.name] || `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+                itemsHtml += `
+                    <div class="nav-search-item" data-index="${idx}" data-url="${dest.url}" role="option" aria-selected="false">
+                        <div class="nav-search-item-left">
+                            <span class="nav-search-item-icon" aria-hidden="true">${iconSvg}</span>
+                            <div class="nav-search-item-info">
+                                <span class="nav-search-item-title">${dest.name}</span>
+                                <span class="nav-search-item-category">${dest.category}</span>
+                            </div>
+                        </div>
+                        <span class="nav-search-item-arrow">&rarr;</span>
+                    </div>
+                `;
+            });
+
+            searchDropdown.innerHTML = `
+                <div class="nav-search-header">${headerTitle}</div>
+                <div class="nav-search-list">${itemsHtml}</div>
+                <div class="nav-search-footer">
+                    <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate</span>
+                    <span><kbd>&crarr;</kbd> jump</span>
+                    <span><kbd>esc</kbd> close</span>
+                </div>
+            `;
+            searchDropdown.style.display = "block";
+            searchInput.setAttribute("aria-expanded", "true");
+
+            // Attach click handler to each item
+            searchDropdown.querySelectorAll(".nav-search-item").forEach((el) => {
+                el.addEventListener("click", () => {
+                    const url = el.getAttribute("data-url");
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+        };
+
+        const updateSelection = (newIndex) => {
+            const items = searchDropdown.querySelectorAll(".nav-search-item");
+            items.forEach((item, idx) => {
+                if (idx === newIndex) {
+                    item.classList.add("is-selected");
+                    item.setAttribute("aria-selected", "true");
+                    item.scrollIntoView({ block: "nearest" });
+                } else {
+                    item.classList.remove("is-selected");
+                    item.setAttribute("aria-selected", "false");
+                }
+            });
+            selectedIndex = newIndex;
+        };
+
+        const filterRoutes = (query) => {
+            const q = query.trim().toLowerCase();
+            if (!q) {
+                renderSuggestions(navRoutes.slice(0, 7), "Quick Jump");
+                return;
+            }
+
+            const matches = navRoutes.filter((dest) => {
+                const nameMatch = dest.name.toLowerCase().includes(q);
+                const categoryMatch = dest.category.toLowerCase().includes(q);
+                const keywordMatch = dest.keywords && dest.keywords.some((kw) => kw.toLowerCase().includes(q));
+                return nameMatch || categoryMatch || keywordMatch;
+            });
+
+            renderSuggestions(matches, "Matching Sections");
+        };
+
+        searchInput.addEventListener("input", () => {
+            filterRoutes(searchInput.value);
+        });
+
+        searchInput.addEventListener("focus", () => {
+            if (searchInput.value.trim()) {
+                filterRoutes(searchInput.value);
+            } else {
+                renderSuggestions(navRoutes.slice(0, 7), "Quick Jump");
+            }
+        });
+
+        searchInput.addEventListener("keydown", (e) => {
+            if (searchDropdown.style.display === "none") {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    filterRoutes(searchInput.value);
+                    if (currentMatches.length > 0) {
+                        window.location.href = currentMatches[0].url;
+                    }
+                }
+                return;
+            }
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (!currentMatches.length) return;
+                const next = selectedIndex + 1 < currentMatches.length ? selectedIndex + 1 : 0;
+                updateSelection(next);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                if (!currentMatches.length) return;
+                const prev = selectedIndex - 1 >= 0 ? selectedIndex - 1 : currentMatches.length - 1;
+                updateSelection(prev);
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                if (selectedIndex >= 0 && selectedIndex < currentMatches.length) {
+                    window.location.href = currentMatches[selectedIndex].url;
+                } else if (currentMatches.length > 0) {
+                    window.location.href = currentMatches[0].url;
+                }
+            } else if (e.key === "Escape") {
+                closeSearchDropdown();
+                searchInput.blur();
+            }
+        });
+
+        // Global Command Palette Shortcut: ⌘K or Ctrl+K or "/"
+        document.addEventListener("keydown", (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+                if (searchInput.value.trim()) {
+                    filterRoutes(searchInput.value);
+                } else {
+                    renderSuggestions(navRoutes.slice(0, 7), "Quick Jump");
+                }
+                return;
+            }
+
+            if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+                if (searchInput.value.trim()) {
+                    filterRoutes(searchInput.value);
+                } else {
+                    renderSuggestions(navRoutes.slice(0, 7), "Quick Jump");
+                }
+                return;
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                closeSearchDropdown();
+            }
+        });
+    }
+
+    /* =========================================================================
+       EXPORT DROPDOWN CONTROLS
+       ========================================================================= */
+    document.querySelectorAll(".export-dropdown-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const wrapper = btn.closest(".export-dropdown-wrapper");
+            if (!wrapper) return;
+            const isOpen = wrapper.classList.contains("is-open");
+
+            // Close other open export dropdowns
+            document.querySelectorAll(".export-dropdown-wrapper").forEach((w) => {
+                w.classList.remove("is-open");
+                const b = w.querySelector(".export-dropdown-btn");
+                if (b) b.setAttribute("aria-expanded", "false");
+            });
+
+            if (!isOpen) {
+                wrapper.classList.add("is-open");
+                btn.setAttribute("aria-expanded", "true");
+            }
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".export-dropdown-wrapper")) {
+            document.querySelectorAll(".export-dropdown-wrapper").forEach((w) => {
+                w.classList.remove("is-open");
+                const b = w.querySelector(".export-dropdown-btn");
+                if (b) b.setAttribute("aria-expanded", "false");
+            });
+        }
+    });
+
+    /* =========================================================================
        ESCAPE KEY — CLOSE OPEN INTERFACES
        ========================================================================= */
 
@@ -827,6 +1088,17 @@ document.addEventListener("DOMContentLoaded", () => {
         closeDrawer();
         closeModal();
         closeProfileDrawer();
+
+        if (searchDropdown) {
+            searchDropdown.style.display = "none";
+            if (searchInput) searchInput.setAttribute("aria-expanded", "false");
+        }
+
+        document.querySelectorAll(".export-dropdown-wrapper").forEach((w) => {
+            w.classList.remove("is-open");
+            const b = w.querySelector(".export-dropdown-btn");
+            if (b) b.setAttribute("aria-expanded", "false");
+        });
 
         document.querySelectorAll(selectors.dropdownButton).forEach((button) => {
             button.setAttribute("aria-expanded", "false");

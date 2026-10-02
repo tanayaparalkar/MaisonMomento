@@ -3,13 +3,42 @@
 {% block title %}Recommendations{% endblock %}
 
 {% block content %}
-<section class="hero">
+<section class="hero" style="position: relative; z-index: 25; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
     <div>
         <p class="eyebrow">Maison Momènto · Intelligence</p>
         <h1>Considered opportunities.</h1>
         <p class="subtitle">
             Surface timely product, inventory, and client opportunities to guide the Maison’s next considered move.
         </p>
+    </div>
+    <div class="page-action-area">
+        <div class="export-dropdown-wrapper">
+            <button type="button" class="secondary-btn export-dropdown-btn" aria-haspopup="true" aria-expanded="false" id="rec-export-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export</span>
+                <svg class="export-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px;">
+                    <path d="M1 1L5 5L9 1"/>
+                </svg>
+            </button>
+            <div class="export-dropdown-menu" role="menu" aria-labelledby="rec-export-btn">
+                <a href="{% url 'dashboard:export_data' %}?type=recommendations&format=csv" class="export-menu-item" role="menuitem">
+                    <span class="export-item-badge">CSV</span>
+                    <span class="export-item-label">Export CSV</span>
+                </a>
+                <a href="{% url 'dashboard:export_data' %}?type=recommendations&format=xlsx" class="export-menu-item" role="menuitem">
+                    <span class="export-item-badge">XLSX</span>
+                    <span class="export-item-label">Excel (.xlsx)</span>
+                </a>
+                <button type="button" class="export-menu-item export-pdf-btn" role="menuitem" onclick="window.print()">
+                    <span class="export-item-badge">PDF</span>
+                    <span class="export-item-label">Print / PDF</span>
+                </button>
+            </div>
+        </div>
     </div>
 </section>
 

@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'css/storefront.css' %}?v=2.1">
     <link rel="stylesheet" href="{% static 'css/luxury-animations.css' %}">
+    <link rel="stylesheet" href="{% static 'css/spotlight_search.css' %}">
 </head>
 <body>
     <header class="sf-header">
@@ -39,7 +40,7 @@
             <div class="sf-nav-utils">
                 <!-- Search Container -->
                 <div class="sf-search-container" style="display: none;"></div>
-                <button class="sf-icon-btn" aria-label="Search">
+                <button class="sf-icon-btn sf-search-trigger" id="spotlight-search-trigger" aria-label="Search" aria-haspopup="dialog" aria-expanded="false" title="Spotlight Search (⌘K)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
                 <!-- Notifications -->
@@ -883,6 +884,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Spotlight Search Overlay & Script -->
+    {% include "catalog/includes/spotlight_search.html" %}
+    <script src="{% static 'js/spotlight_search.js' %}"></script>
 
     {% include "includes/privacy_consent_popup.html" %}
 </body>

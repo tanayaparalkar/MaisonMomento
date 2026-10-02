@@ -5,6 +5,7 @@ app_name = "catalog"
 
 urlpatterns = [
     path("", views.product_list, name="product_list"),
+    path("search/", views.spotlight_search_api, name="spotlight_search_api"),
     path("discovery/", views.discovery_collection_view, name="discovery_collection"),
     path("<int:pk>/", views.product_detail, name="product_detail"),
     path("<int:pk>/reviews/add/", views.submit_review, name="submit_review"),

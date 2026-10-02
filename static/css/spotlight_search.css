@@ -1,0 +1,656 @@
+/* ==========================================================================
+   MAISON MOMÉNTO — APPLE SPOTLIGHT LUXURY SEARCH OVERLAY
+   Inspired by macOS Spotlight with Haute Parfumerie aesthetic
+   Palette: Château Green × Ivory Silk × French Sand × Antique Gold × Midnight Teal
+   ========================================================================== */
+
+/* Prevent background scroll when overlay is active */
+body.spotlight-open {
+    overflow: hidden !important;
+}
+
+/* Page soft blur effect when spotlight is active */
+body.spotlight-open > *:not(#spotlight-search-overlay) {
+    filter: blur(8px);
+    transition: filter 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Main Overlay Container */
+.spotlight-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 260ms cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Translucent Frosted-Glass Backdrop */
+.spotlight-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at 50% 25%,
+        rgba(13, 67, 77, 0.42) 0%,
+        rgba(10, 42, 49, 0.65) 100%
+    );
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    cursor: pointer;
+}
+
+/* Central Spotlight Modal Window */
+.spotlight-modal {
+    position: relative;
+    z-index: 2;
+    width: min(720px, calc(100vw - 32px));
+    margin: 12vh auto 0;
+    background: rgba(248, 244, 238, 0.94);
+    backdrop-filter: blur(32px) saturate(190%);
+    -webkit-backdrop-filter: blur(32px) saturate(190%);
+    border: 1.5px solid rgba(208, 155, 52, 0.32);
+    border-radius: 22px;
+    box-shadow:
+        0 30px 80px -15px rgba(13, 67, 77, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+        0 12px 32px rgba(0, 0, 0, 0.16);
+    overflow: hidden;
+    transform: translateY(-20px) scale(0.97);
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.spotlight-overlay.is-open .spotlight-modal {
+    transform: translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   SPOTLIGHT HEADER & SEARCH INPUT
+   ========================================================================== */
+.spotlight-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 22px;
+    border-bottom: 1px solid rgba(208, 155, 52, 0.22);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.spotlight-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #D09B34; /* Antique Gold */
+    flex-shrink: 0;
+    transition: transform 200ms ease;
+}
+
+.spotlight-modal:focus-within .spotlight-icon-wrap {
+    transform: scale(1.08);
+    color: #005441; /* Château Green */
+}
+
+.spotlight-input {
+    flex: 1;
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-display, "Cormorant Garamond", Georgia, serif);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: #2D3A30;
+    line-height: 1.3;
+    padding: 2px 0;
+    -webkit-appearance: none;
+}
+
+.spotlight-input::placeholder {
+    color: #7A8C80;
+    font-style: italic;
+    opacity: 0.85;
+}
+
+.spotlight-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Loading Spinner */
+.spotlight-loader {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.spotlight-loader.is-active {
+    display: flex;
+}
+
+.spotlight-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(208, 155, 52, 0.25);
+    border-top-color: #005441;
+    border-radius: 50%;
+    animation: spotlightSpin 0.75s linear infinite;
+}
+
+@keyframes spotlightSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Clear Input Button */
+.spotlight-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(122, 140, 128, 0.2);
+    color: #4A5E52;
+    cursor: pointer;
+    padding: 0;
+    transition: all 180ms ease;
+}
+
+.spotlight-clear-btn:hover {
+    background: rgba(122, 140, 128, 0.35);
+    color: #2D3A30;
+}
+
+/* Close ESC Button */
+.spotlight-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(245, 237, 225, 0.7);
+    border: 1px solid rgba(208, 155, 52, 0.3);
+    border-radius: 8px;
+    padding: 4px 8px;
+    color: #4A5E52;
+    cursor: pointer;
+    transition: all 180ms ease;
+    font-size: 11px;
+}
+
+.spotlight-close-btn:hover {
+    background: #005441;
+    color: #FFFFFF;
+    border-color: #005441;
+}
+
+.spotlight-kbd-badge {
+    font-family: var(--font-body, -apple-system, sans-serif);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+.spotlight-close-icon {
+    display: none;
+}
+
+/* ==========================================================================
+   QUICK TAGS / INITIAL SUGGESTIONS PILLS
+   ========================================================================== */
+.spotlight-quick-tags {
+    padding: 14px 22px;
+    background: rgba(245, 237, 225, 0.45);
+    border-bottom: 1px solid rgba(208, 155, 52, 0.16);
+}
+
+.spotlight-section-label {
+    display: block;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+    color: #D09B34; /* Antique Gold */
+    margin-bottom: 8px;
+}
+
+.spotlight-tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.spotlight-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(208, 155, 52, 0.28);
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-family: var(--font-body, -apple-system, sans-serif);
+    font-weight: 500;
+    color: #2D3A30;
+    cursor: pointer;
+    transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spotlight-tag-pill:hover,
+.spotlight-tag-pill:focus-visible {
+    background: #005441;
+    color: #FFFFFF;
+    border-color: #005441;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 84, 65, 0.18);
+    outline: none;
+}
+
+/* ==========================================================================
+   RESULTS BODY & CARDS
+   ========================================================================== */
+.spotlight-body {
+    max-height: clamp(340px, 54vh, 520px);
+    overflow-y: auto;
+    padding: 10px 14px;
+    scroll-behavior: smooth;
+}
+
+/* Luxury custom scrollbar */
+.spotlight-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.spotlight-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.spotlight-body::-webkit-scrollbar-thumb {
+    background: rgba(208, 155, 52, 0.35);
+    border-radius: 999px;
+}
+
+.spotlight-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(208, 155, 52, 0.6);
+}
+
+.spotlight-results-header {
+    padding: 6px 10px 8px;
+}
+
+.spotlight-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Result Card */
+.spotlight-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: inherit;
+    transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    cursor: pointer;
+    /* Staggered entrance animation */
+    animation: spotlightCardIn 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--item-idx, 0) * 35ms);
+}
+
+@keyframes spotlightCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.spotlight-card:hover,
+.spotlight-card.is-active,
+.spotlight-card:focus-visible {
+    background: rgba(245, 237, 225, 0.95);
+    border-color: rgba(208, 155, 52, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 67, 77, 0.08);
+    outline: none;
+}
+
+/* Perfume Image Thumbnail */
+.spotlight-card-thumb-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #FAF5EE;
+    border: 1px solid rgba(208, 155, 52, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.spotlight-card-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+    transition: transform 250ms ease;
+}
+
+.spotlight-card:hover .spotlight-card-thumb,
+.spotlight-card.is-active .spotlight-card-thumb {
+    transform: scale(1.06);
+}
+
+/* Card Content Details */
+.spotlight-card-info {
+    flex: 1;
+    min-width: 0; /* truncate helper */
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.spotlight-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.spotlight-card-collection {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    color: #D09B34; /* Antique Gold */
+    font-size: 10px;
+}
+
+.spotlight-card-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: #005441;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.spotlight-card-rating-star {
+    color: #D09B34;
+    font-size: 11px;
+}
+
+.spotlight-card-name {
+    font-family: var(--font-display, "Cormorant Garamond", Georgia, serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: #0D434D;
+    line-height: 1.25;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spotlight-card-note {
+    font-size: 12px;
+    color: #4A5E52;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+/* Card Right / Pricing */
+.spotlight-card-aside {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.spotlight-card-pricing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.spotlight-card-price {
+    font-family: var(--font-body, -apple-system, sans-serif);
+    font-size: 15px;
+    font-weight: 600;
+    color: #005441; /* Château Green */
+}
+
+.spotlight-card-orig-price {
+    font-size: 11.5px;
+    color: #7A8C80;
+    text-decoration: line-through;
+}
+
+.spotlight-card-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #D09B34;
+    transition: transform 180ms ease, color 180ms ease;
+}
+
+.spotlight-card:hover .spotlight-card-arrow,
+.spotlight-card.is-active .spotlight-card-arrow {
+    transform: translateX(3px);
+    color: #005441;
+}
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+.spotlight-empty-state {
+    padding: 42px 20px 36px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.spotlight-empty-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: rgba(245, 237, 225, 0.8);
+    border: 1px solid rgba(208, 155, 52, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #D09B34;
+    margin-bottom: 16px;
+}
+
+.spotlight-empty-title {
+    font-family: var(--font-display, "Cormorant Garamond", Georgia, serif);
+    font-size: 24px;
+    font-weight: 600;
+    color: #2D3A30;
+    margin: 0 0 6px;
+}
+
+.spotlight-empty-desc {
+    font-size: 14px;
+    color: #7A8C80;
+    margin: 0 0 20px;
+    max-width: 320px;
+    line-height: 1.5;
+}
+
+.spotlight-empty-suggestions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 12px;
+    color: #4A5E52;
+}
+
+.spotlight-empty-pill {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(208, 155, 52, 0.3);
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-size: 11.5px;
+    color: #005441;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 180ms ease;
+}
+
+.spotlight-empty-pill:hover {
+    background: #005441;
+    color: #FFFFFF;
+    border-color: #005441;
+}
+
+/* ==========================================================================
+   FOOTER & KEYBOARD HINTS
+   ========================================================================== */
+.spotlight-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: rgba(245, 237, 225, 0.5);
+    border-top: 1px solid rgba(208, 155, 52, 0.18);
+    font-size: 11px;
+    color: #7A8C80;
+}
+
+.spotlight-footer-shortcuts {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.spotlight-shortcut {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.spotlight-shortcut kbd {
+    display: inline-block;
+    padding: 1px 5px;
+    font-size: 9.5px;
+    font-family: inherit;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(208, 155, 52, 0.3);
+    border-radius: 4px;
+    color: #2D3A30;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.spotlight-footer-brand {
+    font-family: var(--font-display, "Cormorant Garamond", Georgia, serif);
+    font-style: italic;
+    font-size: 12.5px;
+    color: #D09B34;
+}
+
+/* ==========================================================================
+   MOBILE & RESPONSIVE REFINEMENTS
+   ========================================================================== */
+@media (max-width: 640px) {
+    .spotlight-modal {
+        margin: 16px auto 0;
+        width: calc(100vw - 20px);
+        border-radius: 18px;
+    }
+
+    .spotlight-header {
+        padding: 14px 16px;
+        gap: 10px;
+    }
+
+    .spotlight-input {
+        font-size: 18px;
+    }
+
+    .spotlight-kbd-badge {
+        display: none;
+    }
+
+    .spotlight-close-icon {
+        display: inline-block;
+    }
+
+    .spotlight-close-btn {
+        padding: 6px;
+        border-radius: 50%;
+    }
+
+    .spotlight-quick-tags {
+        padding: 10px 14px;
+    }
+
+    .spotlight-body {
+        max-height: 58vh;
+        padding: 8px 10px;
+    }
+
+    .spotlight-card {
+        padding: 10px 12px;
+        gap: 12px;
+    }
+
+    .spotlight-card-thumb-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+    }
+
+    .spotlight-card-name {
+        font-size: 16px;
+    }
+
+    .spotlight-card-price {
+        font-size: 14px;
+    }
+
+    .spotlight-footer-shortcuts {
+        display: none;
+    }
+
+    .spotlight-footer {
+        justify-content: center;
+        padding: 8px 14px;
+    }
+}

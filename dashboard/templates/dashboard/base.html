@@ -82,23 +82,28 @@
                     <a href="{% url 'dashboard:insights' %}" class="nav-item">
                         Insights
                     </a>
-
-                    <a href="{% url 'dashboard:export_data' %}" class="nav-item">
-                        Exports
-                    </a>
                 </nav>
 
                 <div class="nav-right">
-                    <label class="search-field" for="global-search">
-                        <span class="search-icon" aria-hidden="true"></span>
-                        <input
-                            id="global-search"
-                            class="top-search"
-                            type="search"
-                            placeholder="Search..."
-                            aria-label="Search dashboard"
-                        >
-                    </label>
+                    <div class="search-field-wrapper">
+                        <label class="search-field" for="global-search">
+                            <span class="search-icon" aria-hidden="true"></span>
+                            <input
+                                id="global-search"
+                                class="top-search"
+                                type="search"
+                                placeholder="Jump to... (⌘K)"
+                                aria-label="Navigate dashboard sections"
+                                autocomplete="off"
+                                spellcheck="false"
+                                role="combobox"
+                                aria-autocomplete="list"
+                                aria-expanded="false"
+                                aria-controls="global-search-dropdown"
+                            >
+                        </label>
+                        <div id="global-search-dropdown" class="nav-search-dropdown" role="listbox" style="display: none;"></div>
+                    </div>
 
                     <a
                         href="{% url 'dashboard:notifications' %}"
@@ -258,6 +263,24 @@
         </footer>
     </div>
 
+    <script id="dashboard-nav-routes" type="application/json">
+    [
+        {"name": "Dashboard", "url": "{% url 'dashboard:dashboard' %}", "category": "Overview", "keywords": ["dashboard", "home", "analytics", "main", "dash"]},
+        {"name": "Products", "url": "{% url 'dashboard:products' %}", "category": "Catalogue", "keywords": ["products", "fragrances", "catalogue", "catalog", "perfumes", "stock", "items", "prod"]},
+        {"name": "Categories", "url": "{% url 'dashboard:categories' %}", "category": "Catalogue", "keywords": ["categories", "category", "families", "collections"]},
+        {"name": "Orders", "url": "{% url 'dashboard:orders' %}", "category": "Sales", "keywords": ["orders", "order", "sales", "transactions", "invoices", "purchases"]},
+        {"name": "Vouchers", "url": "{% url 'dashboard:vouchers' %}", "category": "Marketing", "keywords": ["vouchers", "voucher", "discounts", "coupons", "privilege"]},
+        {"name": "Clients", "url": "{% url 'dashboard:clients' %}", "category": "CRM", "keywords": ["clients", "client", "customers", "users", "patrons", "crm"]},
+        {"name": "Recommendations", "url": "{% url 'dashboard:recommendations' %}", "category": "Intelligence", "keywords": ["recommendations", "recommend", "intelligence", "opportunities", "insights", "ins"]},
+        {"name": "Insights", "url": "{% url 'dashboard:insights' %}", "category": "Analytics", "keywords": ["insights", "insight", "analytics", "revenue", "performance", "charts", "ins"]},
+        {"name": "Stock & Inventory", "url": "{% url 'dashboard:inventory' %}", "category": "Operations", "keywords": ["stock", "inventory", "supplies", "low stock", "restock"]},
+        {"name": "Reviews", "url": "{% url 'dashboard:reviews' %}", "category": "Catalogue", "keywords": ["reviews", "review", "ratings", "feedback"]},
+        {"name": "Settings", "url": "{% url 'dashboard:settings' %}", "category": "Configuration", "keywords": ["settings", "setting", "admin", "config", "preferences"]},
+        {"name": "Contact Settings", "url": "{% url 'dashboard:contact_settings' %}", "category": "Configuration", "keywords": ["contact", "contact settings", "phone", "email", "address", "social"]},
+        {"name": "Admin Profile", "url": "{% url 'dashboard:profile' %}", "category": "Account", "keywords": ["profile", "account", "password", "avatar"]},
+        {"name": "Notifications", "url": "{% url 'dashboard:notifications' %}", "category": "System", "keywords": ["notifications", "alerts", "inbox"]}
+    ]
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'dashboard/js/dashboard.js' %}"></script>
 </body>

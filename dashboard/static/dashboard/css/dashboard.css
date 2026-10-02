@@ -2574,3 +2574,292 @@ select.form-control {
         transition-duration: 1ms !important;
     }
 }
+
+/* ==========================================================================
+   NAVIGATION SEARCH SHORTCUT & AUTOCOMPLETE
+   ========================================================================== */
+.search-field-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-search-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: #FAF6F0; /* Warm ivory */
+    border: 1px solid var(--border-strong, #D6C9B2);
+    border-radius: 14px;
+    box-shadow: 0 16px 36px rgba(13, 67, 77, 0.18), 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 6px;
+    z-index: 1000;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.nav-search-dropdown::-webkit-scrollbar {
+    width: 4px;
+}
+
+.nav-search-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(208, 155, 52, 0.4);
+    border-radius: 999px;
+}
+
+.nav-search-header {
+    padding: 6px 10px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted, #7A8C80);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 9px;
+    text-decoration: none;
+    color: var(--charcoal, #2D3A30);
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+    font-family: var(--font-body);
+}
+
+.nav-search-item:hover,
+.nav-search-item.is-selected {
+    background: rgba(208, 155, 52, 0.14);
+    color: var(--deep-navy, #0D434D);
+}
+
+.nav-search-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-search-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: rgba(208, 155, 52, 0.12);
+    color: #B58428;
+    flex-shrink: 0;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.nav-search-item:hover .nav-search-item-icon,
+.nav-search-item.is-selected .nav-search-item-icon {
+    background: #D09B34;
+    color: #FAF6F0;
+}
+
+.nav-search-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.nav-search-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: inherit;
+    line-height: 1.25;
+}
+
+.nav-search-item-category {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted, #7A8C80);
+}
+
+.nav-search-item-arrow {
+    color: #D09B34;
+    font-size: 13px;
+    opacity: 0.6;
+    transition: transform 150ms ease, opacity 150ms ease;
+}
+
+.nav-search-item:hover .nav-search-item-arrow,
+.nav-search-item.is-selected .nav-search-item-arrow {
+    transform: translateX(3px);
+    opacity: 1;
+}
+
+.nav-search-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px 4px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border, #E4DCD0);
+    font-size: 10px;
+    color: var(--muted, #7A8C80);
+}
+
+.nav-search-footer kbd {
+    display: inline-block;
+    padding: 1px 4px;
+    font-size: 9px;
+    font-family: inherit;
+    background: rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    margin: 0 1px;
+    color: var(--charcoal, #2D3A30);
+}
+
+.nav-search-empty {
+    padding: 18px 14px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--charcoal, #2D3A30);
+    font-weight: 500;
+}
+
+.nav-search-empty-tip {
+    font-size: 11px;
+    color: var(--muted, #7A8C80);
+    margin-top: 6px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   EXPORT DROPDOWN CONTROLS
+   ========================================================================== */
+.export-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 100;
+}
+
+.export-dropdown-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.export-chevron {
+    transition: transform 200ms ease;
+}
+
+.export-dropdown-wrapper.is-open .export-chevron {
+    transform: rotate(180deg);
+}
+
+.export-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 175px;
+    background: #FAF6F0; /* Warm ivory */
+    border: 1px solid var(--border-strong, #D6C9B2);
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(13, 67, 77, 0.14), 0 2px 6px rgba(0, 0, 0, 0.04);
+    padding: 6px;
+    z-index: 500;
+    display: none;
+}
+
+.export-dropdown-wrapper.is-open .export-dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: exportMenuFadeIn 180ms ease both;
+}
+
+@keyframes exportMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.export-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--charcoal, #2D3A30);
+    text-decoration: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 150ms ease, color 150ms ease;
+}
+
+.export-menu-item:hover,
+.export-menu-item:focus-visible {
+    background: rgba(208, 155, 52, 0.15);
+    color: var(--deep-navy, #0D434D);
+    outline: none;
+}
+
+.export-item-badge {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(13, 67, 77, 0.08);
+    color: var(--deep-navy, #0D434D);
+    text-transform: uppercase;
+}
+
+.export-item-label {
+    flex: 1;
+}
+
+/* Print Styles for High-Quality PDF Export */
+@media print {
+    .sidebar,
+    .nav-right,
+    .profile-drawer,
+    .drawer-overlay,
+    .export-dropdown-wrapper,
+    footer,
+    .icon-btn {
+        display: none !important;
+    }
+
+    body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+    }
+
+    .app-shell,
+    .content,
+    .dashboard-grid,
+    .panel {
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: 1px solid #E5E5E5 !important;
+        page-break-inside: avoid;
+    }
+}
